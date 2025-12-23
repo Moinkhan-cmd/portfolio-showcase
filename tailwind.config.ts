@@ -16,6 +16,7 @@ export default {
       fontFamily: {
         display: ['Outfit', 'sans-serif'],
         body: ['Inter', 'sans-serif'],
+        signature: ['Dancing Script', 'cursive'],
       },
       colors: {
         border: "hsl(var(--border))",

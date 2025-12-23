@@ -3,37 +3,16 @@ import { Briefcase, Calendar } from "lucide-react";
 
 const experiences = [
   {
-    title: "Frontend Developer Intern",
-    company: "Company Name Here",
+    title: "Web Development Intern",
+    company: "Remote Position",
     duration: "Month Year – Month Year",
     responsibilities: [
-      "Responsibility or learning outcome here",
-      "Another responsibility here",
-      "One more point here",
+      "Built and maintained responsive web interfaces using modern frontend technologies",
+      "Collaborated with development team using Git for version control and code reviews",
+      "Optimized UI components for better performance and user experience",
+      "Debugged and resolved frontend issues to improve application stability",
     ],
     current: true,
-  },
-  {
-    title: "Web Development Trainee",
-    company: "Organization Name Here",
-    duration: "Month Year – Month Year",
-    responsibilities: [
-      "Developed responsive web pages using HTML, CSS, and JavaScript",
-      "Collaborated with team members on project requirements",
-      "Learned version control using Git and GitHub",
-    ],
-    current: false,
-  },
-  {
-    title: "Freelance Projects",
-    company: "Self-Employed",
-    duration: "Month Year – Present",
-    responsibilities: [
-      "Built custom websites for small businesses",
-      "Implemented modern UI/UX designs",
-      "Managed client communications and project timelines",
-    ],
-    current: false,
   },
 ];
 
