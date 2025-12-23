@@ -42,13 +42,15 @@ export const Navigation = () => {
         <div className="flex items-center justify-between">
           <a
             href="#"
-            className="font-display text-xl font-bold gradient-text"
+            className="font-signature text-2xl md:text-3xl text-foreground hover:text-primary transition-all duration-300 relative group"
             onClick={(e) => {
               e.preventDefault();
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
           >
-            Portfolio
+            <span className="relative z-10">Your Name</span>
+            <span className="absolute inset-0 bg-primary/10 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 -z-0" />
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-primary/50 group-hover:w-full transition-all duration-300" />
           </a>
 
           {/* Desktop Navigation */}

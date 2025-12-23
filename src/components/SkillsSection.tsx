@@ -1,45 +1,55 @@
 import { useEffect, useRef, useState } from "react";
-import { Code2, Palette, Terminal, Boxes } from "lucide-react";
+import { Code2, Database, Users, Wrench, Code } from "lucide-react";
 
 const skillCategories = [
   {
-    title: "Frontend Skills",
+    title: "Frontend Development",
     icon: Code2,
     skills: [
-      { name: "HTML", level: 90 },
-      { name: "CSS", level: 85 },
-      { name: "JavaScript", level: 80 },
-      { name: "React", level: 75 },
+      { name: "HTML5 & CSS3" },
+      { name: "JavaScript" },
+      { name: "React.js" },
+      { name: "Tailwind CSS" },
+      { name: "Responsive UI Design" },
     ],
   },
   {
-    title: "Styling & Design",
-    icon: Palette,
+    title: "Backend & Database",
+    icon: Database,
     skills: [
-      { name: "Tailwind CSS", level: 85 },
-      { name: "SASS/SCSS", level: 70 },
-      { name: "Figma", level: 65 },
-      { name: "Responsive Design", level: 90 },
+      { name: "Node.js" },
+      { name: "Express.js" },
+      { name: "PHP" },
+      { name: "MySQL" },
     ],
   },
   {
-    title: "Tools & Workflow",
-    icon: Terminal,
+    title: "Programming Languages",
+    icon: Code,
     skills: [
-      { name: "Git & GitHub", level: 80 },
-      { name: "VS Code", level: 90 },
-      { name: "npm/yarn", level: 75 },
-      { name: "Chrome DevTools", level: 85 },
+      { name: "JavaScript" },
+      { name: "Java" },
+      { name: "Python" },
+      { name: "C / C++" },
     ],
   },
   {
-    title: "Other Skills",
-    icon: Boxes,
+    title: "Tools & Platforms",
+    icon: Wrench,
     skills: [
-      { name: "API Integration", level: 70 },
-      { name: "TypeScript", level: 65 },
-      { name: "Problem Solving", level: 85 },
-      { name: "Team Collaboration", level: 90 },
+      { name: "Git & GitHub" },
+      { name: "VS Code" },
+      { name: "XAMPP" },
+    ],
+  },
+  {
+    title: "Soft Skills",
+    icon: Users,
+    skills: [
+      { name: "Team Collaboration" },
+      { name: "Communication" },
+      { name: "Problem Solving" },
+      { name: "Time Management" },
     ],
   },
 ];
@@ -87,7 +97,7 @@ export const SkillsSection = () => {
         </div>
 
         {/* Skills Grid */}
-        <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {skillCategories.map((category, categoryIndex) => (
             <div
               key={category.title}
@@ -102,24 +112,18 @@ export const SkillsSection = () => {
                 <h3 className="font-display text-xl font-semibold">{category.title}</h3>
               </div>
 
-              {/* Skills */}
-              <div className="space-y-4">
+              {/* Skills as Badges */}
+              <div className="flex flex-wrap gap-2">
                 {category.skills.map((skill, skillIndex) => (
-                  <div key={skill.name}>
-                    <div className="flex justify-between mb-2">
-                      <span className="text-sm font-medium">{skill.name}</span>
-                      <span className="text-sm text-muted-foreground">{skill.level}%</span>
-                    </div>
-                    <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-primary to-[hsl(200,90%,60%)] rounded-full transition-all duration-1000 ease-out"
-                        style={{
-                          width: isVisible ? `${skill.level}%` : '0%',
-                          transitionDelay: `${0.2 + categoryIndex * 0.1 + skillIndex * 0.05}s`,
-                        }}
-                      />
-                    </div>
-                  </div>
+                  <span
+                    key={skill.name}
+                    className="px-3 py-2 text-sm font-medium bg-primary/10 text-primary rounded-lg border border-primary/20 hover:bg-primary/20 hover:border-primary/40 hover:scale-105 transition-all duration-300 cursor-default"
+                    style={{
+                      animationDelay: `${0.2 + categoryIndex * 0.1 + skillIndex * 0.05}s`,
+                    }}
+                  >
+                    {skill.name}
+                  </span>
                 ))}
               </div>
             </div>
