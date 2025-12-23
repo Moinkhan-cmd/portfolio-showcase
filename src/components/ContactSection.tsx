@@ -1,0 +1,196 @@
+import { useEffect, useRef, useState } from "react";
+import { Mail, Github, Linkedin, Send, MapPin } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+
+const socialLinks = [
+  { name: "GitHub", icon: Github, url: "#", label: "github.com/yourusername" },
+  { name: "LinkedIn", icon: Linkedin, url: "#", label: "linkedin.com/in/yourusername" },
+  { name: "Email", icon: Mail, url: "mailto:your@email.com", label: "your@email.com" },
+];
+
+export const ContactSection = () => {
+  const [isVisible, setIsVisible] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    // Simulate form submission
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    toast({
+      title: "Message sent!",
+      description: "Thank you for reaching out. I'll get back to you soon!",
+    });
+    
+    setIsSubmitting(false);
+    (e.target as HTMLFormElement).reset();
+  };
+
+  return (
+    <section
+      id="contact"
+      ref={sectionRef}
+      className="section-padding relative"
+    >
+      {/* Background decoration */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 left-0 w-80 h-80 bg-primary/5 rounded-full blur-3xl" />
+      </div>
+
+      <div className="container mx-auto container-padding relative z-10">
+        {/* Section Header */}
+        <div className={`text-center mb-16 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}>
+          <span className="text-primary text-sm font-medium uppercase tracking-wider">Contact</span>
+          <h2 className="font-display text-4xl md:text-5xl font-bold mt-4">
+            Let's <span className="gradient-text">Connect</span>
+          </h2>
+          <p className="text-muted-foreground mt-4 max-w-2xl mx-auto">
+            Have a project in mind or want to discuss opportunities? I'd love to hear from you!
+          </p>
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-12 max-w-5xl mx-auto">
+          {/* Contact Info */}
+          <div 
+            className={`${isVisible ? 'animate-slide-up' : 'opacity-0'}`}
+            style={{ animationDelay: '0.1s' }}
+          >
+            <h3 className="font-display text-2xl font-semibold mb-6">Get in Touch</h3>
+            <p className="text-muted-foreground mb-8">
+              Feel free to reach out through any of these platforms. I'm always open to 
+              discussing new projects, creative ideas, or opportunities to be part of your vision.
+            </p>
+
+            {/* Location */}
+            <div className="flex items-center gap-4 mb-8">
+              <div className="p-3 glass-card rounded-xl">
+                <MapPin className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <p className="font-medium">Location</p>
+                <p className="text-muted-foreground text-sm">Your City, Country</p>
+              </div>
+            </div>
+
+            {/* Social Links */}
+            <div className="space-y-4">
+              {socialLinks.map((link) => (
+                <a
+                  key={link.name}
+                  href={link.url}
+                  className="flex items-center gap-4 p-4 glass-card rounded-xl hover:bg-primary/10 transition-all duration-300 group"
+                >
+                  <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                    <link.icon className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-medium group-hover:text-primary transition-colors">{link.name}</p>
+                    <p className="text-muted-foreground text-sm">{link.label}</p>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Contact Form */}
+          <div 
+            className={`${isVisible ? 'animate-slide-up' : 'opacity-0'}`}
+            style={{ animationDelay: '0.2s' }}
+          >
+            <form onSubmit={handleSubmit} className="glass-card rounded-2xl p-8">
+              <h3 className="font-display text-2xl font-semibold mb-6">Send a Message</h3>
+              
+              <div className="space-y-6">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium mb-2">
+                    Name
+                  </label>
+                  <Input
+                    id="name"
+                    name="name"
+                    placeholder="Your name"
+                    required
+                    className="bg-secondary/50 border-border focus:border-primary"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium mb-2">
+                    Email
+                  </label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="your@email.com"
+                    required
+                    className="bg-secondary/50 border-border focus:border-primary"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="message" className="block text-sm font-medium mb-2">
+                    Message
+                  </label>
+                  <Textarea
+                    id="message"
+                    name="message"
+                    placeholder="Tell me about your project or opportunity..."
+                    rows={5}
+                    required
+                    className="bg-secondary/50 border-border focus:border-primary resize-none"
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  variant="hero"
+                  size="lg"
+                  className="w-full"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <span className="flex items-center gap-2">
+                      <span className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                      Sending...
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <Send className="w-4 h-4" />
+                      Send Message
+                    </span>
+                  )}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
