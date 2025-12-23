@@ -23,8 +23,8 @@ const projects = [
     title: "Weather Application",
     description: "A beautiful weather app that displays current conditions and forecasts using a weather API.",
     techStack: ["HTML", "CSS", "JavaScript", "API"],
-    liveUrl: "#",
-    githubUrl: "#",
+    liveUrl: "https://inspiring-speculoos-f9e5d7.netlify.app/",
+    githubUrl: "https://github.com/Moinkhan-cmd/Weather-App",
     image: null,
   },
 ];
