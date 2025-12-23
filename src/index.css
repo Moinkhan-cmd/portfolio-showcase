@@ -232,3 +232,420 @@
     }
   }
 }
+
+/* Preserve default cursor for inputs and text areas */
+input, textarea, select {
+  cursor: text !important;
+}
+
+/* Support for reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  /* Re-enable default cursor for reduced motion */
+  * {
+    cursor: auto !important;
+  }
+}
+
+/* 3D perspective for cards */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+/* Enhanced gradient utilities */
+.bg-gradient-radial {
+  background: radial-gradient(circle, var(--tw-gradient-stops));
+}
+
+/* Smooth scrolling with offset for fixed nav */
+html {
+  scroll-padding-top: 100px;
+}
+
+/* Enhanced animations */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes float-smooth {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px);
+  }
+  25% {
+    transform: translateY(-10px) translateX(5px);
+  }
+  50% {
+    transform: translateY(-20px) translateX(0px);
+  }
+  75% {
+    transform: translateY(-10px) translateX(-5px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px hsl(175 80% 50% / 0.3), 0 0 40px hsl(175 80% 50% / 0.1);
+  }
+  50% {
+    box-shadow: 0 0 30px hsl(175 80% 50% / 0.5), 0 0 60px hsl(175 80% 50% / 0.2);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 3s linear infinite;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    hsl(175 80% 50% / 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 1000px 100%;
+}
+
+.animate-float-smooth {
+  animation: float-smooth 8s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+/* Smooth page transitions */
+.page-transition {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Enhanced glass morphism with backdrop */
+.glass-card-premium {
+  background: linear-gradient(
+    135deg,
+    hsl(222 47% 10% / 0.7) 0%,
+    hsl(222 47% 8% / 0.5) 100%
+  );
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid hsl(175 80% 50% / 0.15);
+  box-shadow: 
+    0 8px 32px hsl(0 0% 0% / 0.3),
+    inset 0 1px 0 hsl(255 255% 255% / 0.05);
+}
+
+/* Magnetic hover effect utility */
+.magnetic-hover {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.magnetic-hover:hover {
+  transform: scale(1.05);
+}
+
+/* Text reveal animation */
+@keyframes textReveal {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.text-reveal {
+  animation: textReveal 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Stagger children animations */
+.stagger-children > * {
+  opacity: 0;
+  animation: textReveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.stagger-children > *:nth-child(1) { animation-delay: 0.1s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.2s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.3s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.4s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.5s; }
+.stagger-children > *:nth-child(6) { animation-delay: 0.6s; }
+
+/* Enhanced smooth scrolling */
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Smooth scroll with momentum on webkit browsers */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(222 47% 8%);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    hsl(175 80% 50%) 0%,
+    hsl(200 90% 60%) 100%
+  );
+  border-radius: 10px;
+  border: 2px solid hsl(222 47% 8%);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    180deg,
+    hsl(175 80% 60%) 0%,
+    hsl(200 90% 70%) 100%
+  );
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(175 80% 50%) hsl(222 47% 8%);
+}
+
+/* Smooth transitions for all scroll-triggered animations */
+.scroll-smooth-transition {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+              opacity 0.3s ease-out;
+}
+
+/* Parallax effect helper */
+.parallax-slow {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Optimize scroll performance */
+.scroll-optimized {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Smooth reveal on scroll */
+@keyframes revealOnScroll {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.reveal-on-scroll {
+  animation: revealOnScroll 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Smooth fade in */
+@keyframes smoothFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+    filter: blur(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.smooth-fade-in {
+  animation: smoothFadeIn 0.6s ease-out forwards;
+}
+
+/* Subtle scale on scroll */
+@keyframes scaleOnScroll {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.scale-on-scroll {
+  animation: scaleOnScroll 0.5s ease-out forwards;
+}
+
+/* 3D Transform perspective for scroll effects */
+body {
+  perspective: 1000px;
+  perspective-origin: center center;
+}
+
+/* Enhanced 3D transformations */
+.transform-3d {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+/* Dramatic reveal animations */
+@keyframes dramaticReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(100px) scale(0.8) rotateX(-15deg);
+    filter: blur(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotateX(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes rotate3D {
+  0% {
+    transform: perspective(1000px) rotateY(-45deg) rotateX(15deg);
+    opacity: 0;
+  }
+  100% {
+    transform: perspective(1000px) rotateY(0) rotateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes zoomRotate {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) rotate(-10deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
+@keyframes floatUpRotate {
+  0% {
+    opacity: 0;
+    transform: translateY(150px) scale(0.7) rotateX(45deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotateX(0);
+  }
+}
+
+.dramatic-reveal {
+  animation: dramaticReveal 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.rotate-3d {
+  animation: rotate3D 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.zoom-rotate {
+  animation: zoomRotate 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.float-up-rotate {
+  animation: floatUpRotate 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Glowing pulse on scroll */
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 20px hsl(175 80% 50% / 0.2),
+                0 0 40px hsl(175 80% 50% / 0.1);
+  }
+  50% {
+    box-shadow: 0 0 40px hsl(175 80% 50% / 0.4),
+                0 0 80px hsl(175 80% 50% / 0.2);
+  }
+}
+
+.glow-pulse {
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+/* Shimmer wave effect */
+@keyframes shimmerWave {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.shimmer-wave {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    hsl(175 80% 50% / 0.1),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: shimmerWave 3s linear infinite;
+}
+
+/* Particle trail effect */
+@keyframes particleTrail {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-40px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-80px) scale(0);
+  }
+}
+
+.particle-trail {
+  animation: particleTrail 2s ease-out infinite;
+}
+
+/* Smooth section transitions */
+section {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
