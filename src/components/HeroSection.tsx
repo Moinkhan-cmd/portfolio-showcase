@@ -34,7 +34,7 @@ export const HeroSection = () => {
             className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6 animate-slide-up"
             style={{ animationDelay: "0.1s" }}
           >
-            <span className="text-foreground">YOUR NAME</span>
+            <span className="text-foreground">Moinkhan Bhatti</span>
             <br />
             <span className="gradient-text">HERE</span>
           </h1>
