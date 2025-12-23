@@ -20,7 +20,7 @@ export const Footer = () => {
             onClick={scrollToTop}
             className="font-display text-xl font-bold gradient-text hover:opacity-80 transition-opacity"
           >
-            Your Name
+            Moinkhan Bhatti
           </button>
 
           {/* Social Links */}
@@ -39,7 +39,7 @@ export const Footer = () => {
 
           {/* Copyright */}
           <p className="text-sm text-muted-foreground flex items-center gap-1">
-            © 2025 Your Name. Made with
+            © 2025 Moinkhan Bhatti. Made with
             <Heart className="w-4 h-4 text-destructive inline" />
             All rights reserved.
           </p>
