@@ -86,38 +86,38 @@ export const SkillsSection = () => {
 
       <div className="container mx-auto container-padding relative z-10">
         {/* Section Header */}
-        <div className={`text-center mb-16 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}>
+        <div className={`text-center mb-10 sm:mb-16 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}>
           <span className="text-primary text-sm font-medium uppercase tracking-wider">Skills</span>
-          <h2 className="font-display text-4xl md:text-5xl font-bold mt-4">
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold mt-3 sm:mt-4">
             My <span className="gradient-text">Expertise</span>
           </h2>
-          <p className="text-muted-foreground mt-4 max-w-2xl mx-auto">
+          <p className="text-muted-foreground mt-3 sm:mt-4 max-w-2xl mx-auto text-sm sm:text-base px-4">
             A comprehensive overview of my technical skills and proficiencies
           </p>
         </div>
 
         {/* Skills Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto">
           {skillCategories.map((category, categoryIndex) => (
             <div
               key={category.title}
-              className={`glass-card rounded-2xl p-6 hover-lift ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}
+              className={`glass-card rounded-xl sm:rounded-2xl p-4 sm:p-6 hover-lift ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}
               style={{ animationDelay: `${0.1 + categoryIndex * 0.1}s` }}
             >
               {/* Category Header */}
-              <div className="flex items-center gap-3 mb-6">
-                <div className="p-3 rounded-xl bg-primary/10">
-                  <category.icon className="w-6 h-6 text-primary" />
+              <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-primary/10">
+                  <category.icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                 </div>
-                <h3 className="font-display text-xl font-semibold">{category.title}</h3>
+                <h3 className="font-display text-lg sm:text-xl font-semibold">{category.title}</h3>
               </div>
 
               {/* Skills as Badges */}
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5 sm:gap-2">
                 {category.skills.map((skill, skillIndex) => (
                   <span
                     key={skill.name}
-                    className="px-3 py-2 text-sm font-medium bg-primary/10 text-primary rounded-lg border border-primary/20 hover:bg-primary/20 hover:border-primary/40 hover:scale-105 transition-all duration-300 cursor-default"
+                    className="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium bg-primary/10 text-primary rounded-md sm:rounded-lg border border-primary/20 hover:bg-primary/20 hover:border-primary/40 transition-all duration-300 cursor-default"
                     style={{
                       animationDelay: `${0.2 + categoryIndex * 0.1 + skillIndex * 0.05}s`,
                     }}

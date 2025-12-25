@@ -272,7 +272,7 @@ export const Navigation = () => {
           {/* Enhanced Logo */}
           <motion.a
             href="#"
-            className="font-signature text-2xl md:text-3xl text-foreground relative group overflow-hidden"
+            className="font-signature text-xl sm:text-2xl md:text-3xl text-foreground relative group overflow-hidden"
             onClick={(e) => {
               e.preventDefault();
               window.scrollTo({ top: 0, behavior: "smooth" });

@@ -41,15 +41,15 @@ export const AboutSection = () => {
       <div className="container mx-auto container-padding">
         <div className="max-w-4xl mx-auto">
           {/* Section Header */}
-          <div className={`text-center mb-16 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}>
+          <div className={`text-center mb-10 sm:mb-16 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}>
             <span className="text-primary text-sm font-medium uppercase tracking-wider">About Me</span>
-            <h2 className="font-display text-4xl md:text-5xl font-bold mt-4">
+            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold mt-3 sm:mt-4">
               Get to Know <span className="gradient-text">Me</span>
             </h2>
           </div>
 
           {/* Content */}
-          <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 items-center">
             {/* Image/Avatar Placeholder */}
             <div 
               className={`${isVisible ? 'animate-slide-up' : 'opacity-0'}`}
@@ -72,11 +72,11 @@ export const AboutSection = () => {
               className={`${isVisible ? 'animate-slide-up' : 'opacity-0'}`}
               style={{ animationDelay: '0.3s' }}
             >
-              <p className="text-lg text-muted-foreground leading-relaxed mb-6">
+              <p className="text-base sm:text-lg text-muted-foreground leading-relaxed mb-4 sm:mb-6">
                 Write a short introduction about yourself here. Mention your background, 
                 interests, and what kind of roles you are looking for.
               </p>
-              <p className="text-lg text-muted-foreground leading-relaxed mb-8">
+              <p className="text-base sm:text-lg text-muted-foreground leading-relaxed mb-6 sm:mb-8">
                 I'm passionate about creating seamless digital experiences that combine 
                 beautiful design with clean, efficient code. Currently exploring 
                 opportunities where I can grow and contribute to meaningful projects.
@@ -84,12 +84,12 @@ export const AboutSection = () => {
 
               {/* Tech Stack */}
               <div>
-                <h3 className="font-display text-lg font-semibold mb-4">Tech Stack</h3>
-                <div className="flex flex-wrap gap-3">
+                <h3 className="font-display text-base sm:text-lg font-semibold mb-3 sm:mb-4">Tech Stack</h3>
+                <div className="flex flex-wrap gap-2 sm:gap-3">
                   {techStack.map((tech, index) => (
                     <span
                       key={tech}
-                      className="px-4 py-2 glass-card rounded-full text-sm font-medium hover:bg-primary/20 transition-all duration-300 cursor-default"
+                      className="px-3 py-1.5 sm:px-4 sm:py-2 glass-card rounded-full text-xs sm:text-sm font-medium hover:bg-primary/20 transition-all duration-300 cursor-default"
                       style={{ animationDelay: `${0.4 + index * 0.05}s` }}
                     >
                       {tech}
