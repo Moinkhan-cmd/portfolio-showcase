@@ -1,4 +1,5 @@
 import { Github, Linkedin, Mail, Heart } from "lucide-react";
+import { ScrollToTop } from "@/components/ScrollToTop";
 
 const socialLinks = [
   { icon: Github, url: "#", label: "GitHub" },
@@ -12,37 +13,45 @@ export const Footer = () => {
   };
 
   return (
-    <footer className="py-8 sm:py-12 border-t border-border">
-      <div className="container mx-auto container-padding">
-        <div className="flex flex-col items-center gap-4 sm:gap-6 text-center md:flex-row md:justify-between md:text-left">
-          {/* Logo / Name */}
-          <button
-            onClick={scrollToTop}
-            className="font-display text-lg sm:text-xl font-bold gradient-text hover:opacity-80 transition-opacity"
-          >
-            Moinkhan Bhatti
-          </button>
+    <footer className="relative mt-20 border-t border-white/10 bg-background/50 backdrop-blur-xl">
+      {/* Decorative gradient line */}
+      <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
 
-          {/* Social Links */}
-          <div className="flex items-center gap-3 sm:gap-4">
+      <div className="container mx-auto container-padding py-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+
+          {/* Brand & Copyright - Left */}
+          <div className="flex flex-col items-center md:items-start gap-4">
+            <button
+              onClick={scrollToTop}
+              className="text-2xl font-display font-bold gradient-text hover:opacity-80 transition-opacity"
+            >
+              Moinkhan Bhatti
+            </button>
+            <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+              © 2025 Made with
+              <Heart className="w-4 h-4 text-rose-500 fill-rose-500 animate-pulse" />
+            </p>
+          </div>
+
+          {/* Social Links - Center */}
+          <div className="flex justify-center gap-4">
             {socialLinks.map((link) => (
               <a
                 key={link.label}
                 href={link.url}
-                className="p-2 text-muted-foreground hover:text-primary transition-colors"
+                className="p-3 rounded-full hover:bg-white/5 border border-transparent hover:border-white/10 transition-all duration-300 hover:scale-110 group"
                 aria-label={link.label}
               >
-                <link.icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                <link.icon className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
               </a>
             ))}
           </div>
 
-          {/* Copyright */}
-          <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1 flex-wrap justify-center">
-            © 2025 Moinkhan Bhatti. Made with
-            <Heart className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-destructive inline" />
-            All rights reserved.
-          </p>
+          {/* Scroll To Top - Right */}
+          <div className="flex justify-center md:justify-end">
+            <ScrollToTop />
+          </div>
         </div>
       </div>
     </footer>
