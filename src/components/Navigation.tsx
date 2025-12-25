@@ -1,7 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
+import {
+  motion,
+  AnimatePresence,
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from "framer-motion";
+import { useMotionPreferences } from "@/hooks/use-motion-preferences";
 
 const navLinks = [
   { name: "About", href: "#about" },
@@ -11,24 +18,42 @@ const navLinks = [
   { name: "Contact", href: "#contact" },
 ];
 
-const NavLink = ({ link, isActive, onClick, index }: { link: { name: string; href: string }; isActive: boolean; onClick: () => void; index: number }) => {
+const NavLink = ({
+  link,
+  isActive,
+  onClick,
+  index,
+}: {
+  link: { name: string; href: string };
+  isActive: boolean;
+  onClick: () => void;
+  index: number;
+}) => {
+  const { liteMotion } = useMotionPreferences();
   const [isHovered, setIsHovered] = useState(false);
   const linkRef = useRef<HTMLButtonElement>(null);
-  
+
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
-  
+
   const magnetStrength = 20;
-  const magneticX = useSpring(useTransform(mouseX, [-100, 100], [-magnetStrength, magnetStrength]), {
-    stiffness: 150,
-    damping: 15,
-  });
-  const magneticY = useSpring(useTransform(mouseY, [-100, 100], [-magnetStrength, magnetStrength]), {
-    stiffness: 150,
-    damping: 15,
-  });
+  const magneticX = useSpring(
+    useTransform(mouseX, [-100, 100], [-magnetStrength, magnetStrength]),
+    {
+      stiffness: 150,
+      damping: 15,
+    }
+  );
+  const magneticY = useSpring(
+    useTransform(mouseY, [-100, 100], [-magnetStrength, magnetStrength]),
+    {
+      stiffness: 150,
+      damping: 15,
+    }
+  );
 
   const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (liteMotion) return;
     if (!linkRef.current) return;
     const rect = linkRef.current.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
@@ -56,7 +81,7 @@ const NavLink = ({ link, isActive, onClick, index }: { link: { name: string; hre
         onMouseMove={handleMouseMove}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={handleMouseLeave}
-        style={{ x: magneticX, y: magneticY }}
+        style={{ x: liteMotion ? 0 : magneticX, y: liteMotion ? 0 : magneticY }}
         className={`text-sm font-medium transition-colors duration-200 relative px-4 py-2 rounded-lg overflow-hidden ${
           isActive ? "text-primary" : "text-muted-foreground"
         }`}
@@ -73,7 +98,7 @@ const NavLink = ({ link, isActive, onClick, index }: { link: { name: string; hre
           }}
           transition={{ duration: 0.4, ease: "easeOut" }}
         />
-        
+
         {/* Shimmer effect on hover */}
         {isHovered && (
           <motion.span
@@ -100,9 +125,10 @@ const NavLink = ({ link, isActive, onClick, index }: { link: { name: string; hre
         <motion.span
           className="absolute inset-0 rounded-lg blur-md"
           animate={{
-            boxShadow: isHovered || isActive
-              ? "0 0 20px hsl(175 80% 50% / 0.4), 0 0 40px hsl(175 80% 50% / 0.2)"
-              : "0 0 0px hsl(175 80% 50% / 0)",
+            boxShadow:
+              isHovered || isActive
+                ? "0 0 20px hsl(175 80% 50% / 0.4), 0 0 40px hsl(175 80% 50% / 0.2)"
+                : "0 0 0px hsl(175 80% 50% / 0)",
           }}
           transition={{ duration: 0.3 }}
         />
@@ -144,11 +170,12 @@ const NavLink = ({ link, isActive, onClick, index }: { link: { name: string; hre
 };
 
 export const Navigation = () => {
+  const { liteMotion } = useMotionPreferences();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
   const navRef = useRef<HTMLDivElement>(null);
-  
+
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
@@ -179,14 +206,14 @@ export const Navigation = () => {
   useEffect(() => {
     const observerOptions = {
       root: null,
-      rootMargin: '-20% 0px -70% 0px', // Trigger when section is 20% from top
+      rootMargin: "-20% 0px -70% 0px", // Trigger when section is 20% from top
       threshold: 0,
     };
 
     const observerCallback = (entries: IntersectionObserverEntry[]) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          const sectionId = entry.target.getAttribute('id');
+          const sectionId = entry.target.getAttribute("id");
           if (sectionId) {
             setActiveSection(sectionId);
           }
@@ -211,6 +238,8 @@ export const Navigation = () => {
   }, []);
 
   useEffect(() => {
+    if (liteMotion) return;
+
     const handleMouseMove = (e: MouseEvent) => {
       if (!navRef.current) return;
       const rect = navRef.current.getBoundingClientRect();
@@ -219,11 +248,11 @@ export const Navigation = () => {
     };
 
     window.addEventListener("mousemove", handleMouseMove);
-    
+
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
     };
-  }, [mouseX, mouseY]);
+  }, [mouseX, mouseY, liteMotion]);
 
   const scrollToSection = (href: string) => {
     const element = document.querySelector(href);
@@ -247,8 +276,8 @@ export const Navigation = () => {
       <motion.div
         className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-500 pointer-events-none overflow-hidden rounded-2xl"
         style={{
-          x: navBgX,
-          y: navBgY,
+          x: liteMotion ? 0 : navBgX,
+          y: liteMotion ? 0 : navBgY,
         }}
       >
         <div className="absolute inset-0 bg-gradient-radial from-primary/5 via-transparent to-transparent" />

@@ -10,18 +10,20 @@ import { ScrollReveal, ScrollScale, Scroll3D } from "@/components/ScrollReveal";
 import { SectionDivider } from "@/components/SectionDivider";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Index = () => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"],
   });
 
-  // Create floating background elements that move on scroll
-  const bg1Y = useTransform(scrollYProgress, [0, 1], [0, -300]);
-  const bg2Y = useTransform(scrollYProgress, [0, 1], [0, 300]);
-  const bg3Y = useTransform(scrollYProgress, [0, 1], [0, -500]);
+  // Floating background elements (disable movement on mobile)
+  const bg1Y = useTransform(scrollYProgress, [0, 1], isMobile ? [0, 0] : [0, -300]);
+  const bg2Y = useTransform(scrollYProgress, [0, 1], isMobile ? [0, 0] : [0, 300]);
+  const bg3Y = useTransform(scrollYProgress, [0, 1], isMobile ? [0, 0] : [0, -500]);
 
   return (
     <main ref={containerRef} className="min-h-screen bg-background overflow-x-hidden relative">
@@ -75,16 +77,16 @@ const Index = () => {
         <SectionDivider />
         
         {/* Experience with dramatic reveal */}
-        <ScrollScale>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.5, rotateY: -45 }}
-            whileInView={{ opacity: 1, scale: 1, rotateY: 0 }}
-            viewport={{ once: false, margin: "-150px" }}
-            transition={{
-              duration: 1.2,
-              ease: [0.25, 0.46, 0.45, 0.94],
-            }}
-          >
+          <ScrollScale>
+            <motion.div
+              initial={isMobile ? { opacity: 0, y: 24 } : { opacity: 0, scale: 0.5, rotateY: -45 }}
+              whileInView={isMobile ? { opacity: 1, y: 0 } : { opacity: 1, scale: 1, rotateY: 0 }}
+              viewport={{ once: isMobile ? true : false, margin: isMobile ? "-60px" : "-150px" }}
+              transition={{
+                duration: isMobile ? 0.6 : 1.2,
+                ease: [0.25, 0.46, 0.45, 0.94],
+              }}
+            >
             <ExperienceSection />
           </motion.div>
         </ScrollScale>
@@ -94,11 +96,11 @@ const Index = () => {
         {/* Contact with impressive entrance */}
         <Scroll3D>
           <motion.div
-            initial={{ opacity: 0, y: 150, scale: 0.7, rotateX: 45 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
-            viewport={{ once: false, margin: "-100px" }}
+            initial={isMobile ? { opacity: 0, y: 24 } : { opacity: 0, y: 150, scale: 0.7, rotateX: 45 }}
+            whileInView={isMobile ? { opacity: 1, y: 0 } : { opacity: 1, y: 0, scale: 1, rotateX: 0 }}
+            viewport={{ once: isMobile ? true : false, margin: isMobile ? "-60px" : "-100px" }}
             transition={{
-              duration: 1,
+              duration: isMobile ? 0.6 : 1,
               ease: [0.34, 1.56, 0.64, 1],
             }}
           >

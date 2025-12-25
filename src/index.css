@@ -512,16 +512,26 @@ html {
   animation: scaleOnScroll 0.5s ease-out forwards;
 }
 
-/* 3D Transform perspective for scroll effects */
-body {
-  perspective: 1000px;
-  perspective-origin: center center;
+/* 3D Transform perspective for scroll effects (desktop only) */
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  body {
+    perspective: 1000px;
+    perspective-origin: center center;
+  }
+
+  /* Enhanced 3D transformations */
+  .transform-3d {
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+  }
 }
 
-/* Enhanced 3D transformations */
-.transform-3d {
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
+/* Disable forced 3D context on mobile and for reduced-motion users */
+@media (max-width: 767px), (prefers-reduced-motion: reduce) {
+  body {
+    perspective: none;
+    perspective-origin: initial;
+  }
 }
 
 /* Dramatic reveal animations */
@@ -645,7 +655,18 @@ body {
 }
 
 /* Smooth section transitions */
-section {
+.scroll-optimized {
   will-change: transform, opacity;
-  transform: translateZ(0);
+}
+
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .scroll-optimized {
+    transform: translateZ(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-optimized {
+    will-change: auto;
+  }
 }

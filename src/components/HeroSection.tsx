@@ -2,11 +2,13 @@ import { ArrowDown, Github, Linkedin, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, useMotionValue, useTransform, useSpring } from "framer-motion";
 import { useEffect, useRef } from "react";
+import { useMotionPreferences } from "@/hooks/use-motion-preferences";
 
 export const HeroSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+  const { liteMotion } = useMotionPreferences();
 
   // Spring animation for smooth mouse movement
   const springConfig = { damping: 30, stiffness: 200 };
@@ -22,28 +24,31 @@ export const HeroSection = () => {
   const orb3Y = useTransform(mouseYSpring, [-500, 500], [20, -20]);
 
   // Gradient rotation based on mouse position
-  const gradientRotate = useTransform(
-    [mouseXSpring, mouseYSpring],
-    ([x, y]) => {
-      return Math.atan2(Number(y), Number(x)) * (180 / Math.PI);
-    }
-  );
+  const gradientRotate = useTransform([mouseXSpring, mouseYSpring], ([x, y]) => {
+    return Math.atan2(Number(y), Number(x)) * (180 / Math.PI);
+  });
+
+  // Card tilt (desktop only)
+  const tiltX = useTransform(mouseYSpring, [-500, 500], [2, -2]);
+  const tiltY = useTransform(mouseXSpring, [-500, 500], [-2, 2]);
 
   useEffect(() => {
+    if (liteMotion) return;
+
     const handleMouseMove = (e: MouseEvent) => {
       if (!sectionRef.current) return;
-      
+
       const rect = sectionRef.current.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
-      
+
       mouseX.set(e.clientX - centerX);
       mouseY.set(e.clientY - centerY);
     };
 
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [mouseX, mouseY]);
+  }, [mouseX, mouseY, liteMotion]);
 
   const scrollToSection = (href: string) => {
     const element = document.querySelector(href);
@@ -53,7 +58,7 @@ export const HeroSection = () => {
   };
 
   return (
-    <section 
+    <section
       ref={sectionRef}
       className="min-h-screen flex items-center justify-center relative overflow-hidden px-4"
     >
@@ -61,7 +66,7 @@ export const HeroSection = () => {
       <div className="absolute inset-0 overflow-hidden">
         {/* Animated Gradient Orbs - Smaller on mobile */}
         <motion.div
-          style={{ x: orb1X, y: orb1Y }}
+          style={liteMotion ? undefined : { x: orb1X, y: orb1Y }}
           className="absolute top-1/4 left-1/4 w-48 sm:w-64 md:w-96 h-48 sm:h-64 md:h-96 bg-primary/10 rounded-full blur-3xl"
           animate={{
             scale: [1, 1.2, 1],
@@ -73,9 +78,9 @@ export const HeroSection = () => {
             ease: "easeInOut",
           }}
         />
-        
+
         <motion.div
-          style={{ x: orb2X, y: orb2Y }}
+          style={liteMotion ? undefined : { x: orb2X, y: orb2Y }}
           className="absolute bottom-1/4 right-1/4 w-40 sm:w-56 md:w-80 h-40 sm:h-56 md:h-80 bg-primary/5 rounded-full blur-3xl"
           animate={{
             scale: [1, 1.3, 1],
@@ -90,7 +95,7 @@ export const HeroSection = () => {
         />
 
         <motion.div
-          style={{ x: orb3X, y: orb3Y }}
+          style={liteMotion ? undefined : { x: orb3X, y: orb3Y }}
           className="absolute top-1/2 right-1/3 w-36 sm:w-48 md:w-72 h-36 sm:h-48 md:h-72 bg-accent/8 rounded-full blur-3xl"
           animate={{
             scale: [1, 1.15, 1],
@@ -138,10 +143,7 @@ export const HeroSection = () => {
         {/* Content Card with Tilt Effect */}
         <motion.div
           className="text-center max-w-4xl mx-auto"
-          style={{
-            rotateX: useTransform(mouseYSpring, [-500, 500], [2, -2]),
-            rotateY: useTransform(mouseXSpring, [-500, 500], [-2, 2]),
-          }}
+          style={liteMotion ? undefined : { rotateX: tiltX, rotateY: tiltY }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
         >
           {/* Status Badge */}
