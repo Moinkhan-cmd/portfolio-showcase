@@ -3,6 +3,7 @@ import { ExternalLink, Github, Folder } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import weatherAppImage from "@/images/weather-app.png";
+import { useMotionPreferences } from "@/hooks/use-motion-preferences";
 
 const projects = [
   {
@@ -35,6 +36,7 @@ const projects = [
 ];
 
 const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: number }) => {
+  const { liteMotion } = useMotionPreferences();
   const cardRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -51,12 +53,13 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: n
   });
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (liteMotion) return;
     if (!cardRef.current) return;
-    
+
     const rect = cardRef.current.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
-    
+
     mouseX.set(e.clientX - centerX);
     mouseY.set(e.clientY - centerY);
   };
@@ -74,14 +77,18 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: n
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.6, delay: index * 0.1 }}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={handleMouseLeave}
-      style={{
-        rotateX: isHovered ? rotateX : 0,
-        rotateY: isHovered ? rotateY : 0,
-        transformStyle: "preserve-3d",
-      }}
+      onMouseMove={liteMotion ? undefined : handleMouseMove}
+      onMouseEnter={liteMotion ? undefined : () => setIsHovered(true)}
+      onMouseLeave={liteMotion ? undefined : handleMouseLeave}
+      style={
+        liteMotion
+          ? undefined
+          : {
+              rotateX: isHovered ? rotateX : 0,
+              rotateY: isHovered ? rotateY : 0,
+              transformStyle: "preserve-3d",
+            }
+      }
       className="group glass-card rounded-2xl overflow-hidden"
     >
       <motion.div
@@ -132,9 +139,7 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: n
               aria-label="Live Demo"
               initial={{ scale: 0, rotate: -180 }}
               animate={
-                isHovered
-                  ? { scale: 1, rotate: 0 }
-                  : { scale: 0, rotate: -180 }
+                isHovered ? { scale: 1, rotate: 0 } : { scale: 0, rotate: -180 }
               }
               transition={{ duration: 0.4, delay: 0.1 }}
               whileHover={{ scale: 1.2, rotate: 5 }}
@@ -156,11 +161,7 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: n
               className="p-4 glass-card rounded-full group/btn relative overflow-hidden"
               aria-label="GitHub"
               initial={{ scale: 0, rotate: 180 }}
-              animate={
-                isHovered
-                  ? { scale: 1, rotate: 0 }
-                  : { scale: 0, rotate: 180 }
-              }
+              animate={isHovered ? { scale: 1, rotate: 0 } : { scale: 0, rotate: 180 }}
               transition={{ duration: 0.4, delay: 0.2 }}
               whileHover={{ scale: 1.2, rotate: -5 }}
               whileTap={{ scale: 0.9 }}
@@ -179,23 +180,21 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: n
           <motion.div
             className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-primary/30 to-transparent"
             initial={{ scale: 0, opacity: 0 }}
-            animate={
-              isHovered ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }
-            }
+            animate={isHovered ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }}
             transition={{ duration: 0.3 }}
             style={{ borderTopRightRadius: "1rem" }}
           />
         </div>
 
         {/* Project Content */}
-        <div className="p-6" style={{ transform: "translateZ(20px)" }}>
+        <div className="p-6" style={liteMotion ? undefined : { transform: "translateZ(20px)" }}>
           <motion.h3
             className="font-display text-xl font-semibold mb-2 transition-colors"
             animate={{ color: isHovered ? "hsl(175 80% 50%)" : "hsl(210 40% 98%)" }}
           >
             {project.title}
           </motion.h3>
-          
+
           <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
             {project.description}
           </p>
@@ -222,11 +221,7 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: n
 
           {/* Action Buttons */}
           <div className="flex gap-3">
-            <motion.div
-              className="flex-1"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
+            <motion.div className="flex-1" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 variant="hero"
                 size="sm"
@@ -250,14 +245,10 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: n
                 </a>
               </Button>
             </motion.div>
-            
+
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button variant="outline" size="sm" asChild>
-                <a
-                  href={project.githubUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+                <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
                   <Github className="w-4 h-4" />
                 </a>
               </Button>
