@@ -25,7 +25,7 @@ export const HeroSection = () => {
   const gradientRotate = useTransform(
     [mouseXSpring, mouseYSpring],
     ([x, y]) => {
-      return Math.atan2(y, x) * (180 / Math.PI);
+      return Math.atan2(Number(y), Number(x)) * (180 / Math.PI);
     }
   );
 
@@ -55,14 +55,14 @@ export const HeroSection = () => {
   return (
     <section 
       ref={sectionRef}
-      className="min-h-screen flex items-center justify-center relative overflow-hidden"
+      className="min-h-screen flex items-center justify-center relative overflow-hidden px-4"
     >
-      {/* Enhanced Interactive Background */}
+      {/* Enhanced Interactive Background - Simplified for mobile */}
       <div className="absolute inset-0 overflow-hidden">
-        {/* Animated Gradient Orbs with Parallax */}
+        {/* Animated Gradient Orbs - Smaller on mobile */}
         <motion.div
           style={{ x: orb1X, y: orb1Y }}
-          className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl"
+          className="absolute top-1/4 left-1/4 w-48 sm:w-64 md:w-96 h-48 sm:h-64 md:h-96 bg-primary/10 rounded-full blur-3xl"
           animate={{
             scale: [1, 1.2, 1],
             opacity: [0.3, 0.5, 0.3],
@@ -76,7 +76,7 @@ export const HeroSection = () => {
         
         <motion.div
           style={{ x: orb2X, y: orb2Y }}
-          className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-primary/5 rounded-full blur-3xl"
+          className="absolute bottom-1/4 right-1/4 w-40 sm:w-56 md:w-80 h-40 sm:h-56 md:h-80 bg-primary/5 rounded-full blur-3xl"
           animate={{
             scale: [1, 1.3, 1],
             opacity: [0.2, 0.4, 0.2],
@@ -91,7 +91,7 @@ export const HeroSection = () => {
 
         <motion.div
           style={{ x: orb3X, y: orb3Y }}
-          className="absolute top-1/2 right-1/3 w-72 h-72 bg-accent/8 rounded-full blur-3xl"
+          className="absolute top-1/2 right-1/3 w-36 sm:w-48 md:w-72 h-36 sm:h-48 md:h-72 bg-accent/8 rounded-full blur-3xl"
           animate={{
             scale: [1, 1.15, 1],
             opacity: [0.25, 0.45, 0.25],
@@ -104,10 +104,10 @@ export const HeroSection = () => {
           }}
         />
 
-        {/* Interactive Radial Gradient */}
+        {/* Interactive Radial Gradient - Hidden on mobile for performance */}
         <motion.div
           style={{ rotate: gradientRotate }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] opacity-40"
+          className="hidden sm:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] md:w-[600px] lg:w-[800px] h-[400px] md:h-[600px] lg:h-[800px] opacity-40"
         >
           <div className="w-full h-full bg-gradient-radial from-primary/15 via-primary/5 to-transparent rounded-full" />
         </motion.div>
@@ -131,10 +131,10 @@ export const HeroSection = () => {
         />
       </div>
 
-      {/* Enhanced Grid Pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border)/0.3)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.3)_1px,transparent_1px)] bg-[size:60px_60px] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_70%)]" />
+      {/* Enhanced Grid Pattern - Simplified on mobile */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border)/0.2)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.2)_1px,transparent_1px)] bg-[size:40px_40px] sm:bg-[size:60px_60px] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_70%)]" />
 
-      <div className="container mx-auto container-padding relative z-10">
+      <div className="container mx-auto container-padding relative z-10 w-full">
         {/* Content Card with Tilt Effect */}
         <motion.div
           className="text-center max-w-4xl mx-auto"
@@ -164,7 +164,7 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6"
+            className="font-display text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-4 sm:mb-6 leading-tight"
           >
             <span className="text-foreground">Moinkhan Bhatti</span>
             <br />
@@ -191,7 +191,7 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="text-xl sm:text-2xl md:text-3xl text-primary font-display font-medium mb-4"
+            className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-primary font-display font-medium mb-3 sm:mb-4"
           >
             Frontend Web Developer
           </motion.p>
@@ -201,7 +201,7 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10"
+            className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-xl md:max-w-2xl mx-auto mb-6 sm:mb-8 md:mb-10 px-2"
           >
             Short one-line description about you goes here. Crafting beautiful,
             responsive, and user-friendly web experiences.
@@ -212,7 +212,7 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.5 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12"
+            className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-8 sm:mb-12 w-full sm:w-auto px-4 sm:px-0"
           >
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button

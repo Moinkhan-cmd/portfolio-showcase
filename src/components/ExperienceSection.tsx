@@ -51,64 +51,64 @@ export const ExperienceSection = () => {
 
       <div className="container mx-auto container-padding relative z-10">
         {/* Section Header */}
-        <div className={`text-center mb-16 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}>
+        <div className={`text-center mb-10 sm:mb-16 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}>
           <span className="text-primary text-sm font-medium uppercase tracking-wider">Experience</span>
-          <h2 className="font-display text-4xl md:text-5xl font-bold mt-4">
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold mt-3 sm:mt-4">
             Work <span className="gradient-text">Journey</span>
           </h2>
-          <p className="text-muted-foreground mt-4 max-w-2xl mx-auto">
+          <p className="text-muted-foreground mt-3 sm:mt-4 max-w-2xl mx-auto text-sm sm:text-base px-4">
             My professional experience and learning journey in web development
           </p>
         </div>
 
-        {/* Timeline */}
+        {/* Timeline - Simplified for mobile */}
         <div className="max-w-3xl mx-auto">
           <div className="relative">
-            {/* Timeline Line */}
-            <div className="absolute left-0 md:left-1/2 top-0 bottom-0 w-px bg-border md:-translate-x-1/2" />
+            {/* Timeline Line - Left aligned on mobile */}
+            <div className="absolute left-2 sm:left-0 md:left-1/2 top-0 bottom-0 w-px bg-border md:-translate-x-1/2" />
 
             {experiences.map((exp, index) => (
               <div
                 key={exp.title}
-                className={`relative mb-12 last:mb-0 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}
+                className={`relative mb-8 sm:mb-12 last:mb-0 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}
                 style={{ animationDelay: `${0.1 + index * 0.1}s` }}
               >
-                <div className={`flex flex-col md:flex-row items-start gap-6 ${index % 2 === 1 ? 'md:flex-row-reverse' : ''}`}>
+                <div className={`flex flex-col md:flex-row items-start gap-4 sm:gap-6 ${index % 2 === 1 ? 'md:flex-row-reverse' : ''}`}>
                   {/* Timeline Node */}
-                  <div className="absolute left-0 md:left-1/2 w-4 h-4 -translate-x-1/2 md:-translate-x-1/2 top-8">
-                    <div className={`w-4 h-4 rounded-full border-2 border-primary ${exp.current ? 'bg-primary animate-glow-pulse' : 'bg-background'}`} />
+                  <div className="absolute left-2 sm:left-0 md:left-1/2 w-3 h-3 sm:w-4 sm:h-4 -translate-x-1/2 md:-translate-x-1/2 top-6 sm:top-8">
+                    <div className={`w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 border-primary ${exp.current ? 'bg-primary animate-glow-pulse' : 'bg-background'}`} />
                   </div>
 
                   {/* Content Card */}
-                  <div className={`md:w-[calc(50%-2rem)] ml-8 md:ml-0 ${index % 2 === 0 ? 'md:mr-auto md:pr-8' : 'md:ml-auto md:pl-8'}`}>
-                    <div className="glass-card rounded-2xl p-6 hover-lift">
+                  <div className={`md:w-[calc(50%-2rem)] ml-8 sm:ml-8 md:ml-0 ${index % 2 === 0 ? 'md:mr-auto md:pr-8' : 'md:ml-auto md:pl-8'}`}>
+                    <div className="glass-card rounded-xl sm:rounded-2xl p-4 sm:p-6 hover-lift">
                       {/* Header */}
-                      <div className="flex items-start gap-4 mb-4">
-                        <div className="p-3 rounded-xl bg-primary/10 shrink-0">
-                          <Briefcase className="w-5 h-5 text-primary" />
+                      <div className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
+                        <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-primary/10 shrink-0">
+                          <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                         </div>
                         <div>
-                          <h3 className="font-display text-lg font-semibold">{exp.title}</h3>
-                          <p className="text-primary font-medium">{exp.company}</p>
+                          <h3 className="font-display text-base sm:text-lg font-semibold">{exp.title}</h3>
+                          <p className="text-primary font-medium text-sm sm:text-base">{exp.company}</p>
                         </div>
                       </div>
 
                       {/* Duration */}
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-                        <Calendar className="w-4 h-4" />
+                      <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
+                        <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         <span>{exp.duration}</span>
                         {exp.current && (
-                          <span className="px-2 py-0.5 bg-primary/20 text-primary text-xs rounded-full ml-2">
+                          <span className="px-2 py-0.5 bg-primary/20 text-primary text-xs rounded-full">
                             Current
                           </span>
                         )}
                       </div>
 
                       {/* Responsibilities */}
-                      <ul className="space-y-2">
+                      <ul className="space-y-1.5 sm:space-y-2">
                         {exp.responsibilities.map((resp, i) => (
-                          <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                            <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
+                          <li key={i} className="flex items-start gap-2 text-xs sm:text-sm text-muted-foreground">
+                            <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-primary mt-1.5 sm:mt-2 shrink-0" />
                             <span>{resp}</span>
                           </li>
                         ))}

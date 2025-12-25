@@ -64,53 +64,53 @@ export const ContactSection = () => {
 
       <div className="container mx-auto container-padding relative z-10">
         {/* Section Header */}
-        <div className={`text-center mb-16 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}>
+        <div className={`text-center mb-10 sm:mb-16 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}>
           <span className="text-primary text-sm font-medium uppercase tracking-wider">Contact</span>
-          <h2 className="font-display text-4xl md:text-5xl font-bold mt-4">
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold mt-3 sm:mt-4">
             Let's <span className="gradient-text">Connect</span>
           </h2>
-          <p className="text-muted-foreground mt-4 max-w-2xl mx-auto">
+          <p className="text-muted-foreground mt-3 sm:mt-4 max-w-2xl mx-auto text-sm sm:text-base px-4">
             Have a project in mind or want to discuss opportunities? I'd love to hear from you!
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 max-w-5xl mx-auto">
           {/* Contact Info */}
           <div 
             className={`${isVisible ? 'animate-slide-up' : 'opacity-0'}`}
             style={{ animationDelay: '0.1s' }}
           >
-            <h3 className="font-display text-2xl font-semibold mb-6">Get in Touch</h3>
-            <p className="text-muted-foreground mb-8">
+            <h3 className="font-display text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">Get in Touch</h3>
+            <p className="text-muted-foreground mb-6 sm:mb-8 text-sm sm:text-base">
               Feel free to reach out through any of these platforms. I'm always open to 
               discussing new projects, creative ideas, or opportunities to be part of your vision.
             </p>
 
             {/* Location */}
-            <div className="flex items-center gap-4 mb-8">
-              <div className="p-3 glass-card rounded-xl">
-                <MapPin className="w-5 h-5 text-primary" />
+            <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
+              <div className="p-2.5 sm:p-3 glass-card rounded-lg sm:rounded-xl">
+                <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
               </div>
               <div>
-                <p className="font-medium">Location</p>
-                <p className="text-muted-foreground text-sm">Your City, Country</p>
+                <p className="font-medium text-sm sm:text-base">Location</p>
+                <p className="text-muted-foreground text-xs sm:text-sm">Your City, Country</p>
               </div>
             </div>
 
             {/* Social Links */}
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {socialLinks.map((link) => (
                 <a
                   key={link.name}
                   href={link.url}
-                  className="flex items-center gap-4 p-4 glass-card rounded-xl hover:bg-primary/10 transition-all duration-300 group"
+                  className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 glass-card rounded-lg sm:rounded-xl hover:bg-primary/10 transition-all duration-300 group"
                 >
-                  <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                    <link.icon className="w-5 h-5 text-primary" />
+                  <div className="p-1.5 sm:p-2 rounded-md sm:rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                    <link.icon className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                   </div>
                   <div>
-                    <p className="font-medium group-hover:text-primary transition-colors">{link.name}</p>
-                    <p className="text-muted-foreground text-sm">{link.label}</p>
+                    <p className="font-medium text-sm sm:text-base group-hover:text-primary transition-colors">{link.name}</p>
+                    <p className="text-muted-foreground text-xs sm:text-sm">{link.label}</p>
                   </div>
                 </a>
               ))}
@@ -122,8 +122,8 @@ export const ContactSection = () => {
             className={`${isVisible ? 'animate-slide-up' : 'opacity-0'}`}
             style={{ animationDelay: '0.2s' }}
           >
-            <form onSubmit={handleSubmit} className="glass-card rounded-2xl p-8">
-              <h3 className="font-display text-2xl font-semibold mb-6">Send a Message</h3>
+            <form onSubmit={handleSubmit} className="glass-card rounded-xl sm:rounded-2xl p-5 sm:p-8">
+              <h3 className="font-display text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">Send a Message</h3>
               
               <div className="space-y-6">
                 <div>

@@ -285,7 +285,7 @@ export const ProjectsSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-10 sm:mb-16"
         >
           <motion.span
             initial={{ opacity: 0, scale: 0.8 }}
@@ -302,7 +302,7 @@ export const ProjectsSection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-display text-4xl md:text-5xl font-bold mt-4"
+            className="font-display text-3xl sm:text-4xl md:text-5xl font-bold mt-3 sm:mt-4"
           >
             Featured <span className="gradient-text">Work</span>
           </motion.h2>
@@ -312,7 +312,7 @@ export const ProjectsSection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-muted-foreground mt-4 max-w-2xl mx-auto"
+            className="text-muted-foreground mt-3 sm:mt-4 max-w-2xl mx-auto text-sm sm:text-base px-4"
           >
             A selection of projects that showcase my skills and passion for web
             development
@@ -320,7 +320,7 @@ export const ProjectsSection = () => {
         </motion.div>
 
         {/* Projects Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto perspective-1000">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 max-w-6xl mx-auto perspective-1000">
           {projects.map((project, index) => (
             <ProjectCard key={project.title} project={project} index={index} />
           ))}
