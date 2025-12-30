@@ -78,24 +78,24 @@ export default {
           to: { height: "0" },
         },
         "float": {
-          "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-20px)" },
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.8" },
         },
         "glow-pulse": {
           "0%, 100%": { boxShadow: "0 0 20px hsl(175 80% 50% / 0.3)" },
           "50%": { boxShadow: "0 0 40px hsl(175 80% 50% / 0.5)" },
         },
         "slide-up": {
-          from: { opacity: "0", transform: "translateY(30px)" },
-          to: { opacity: "1", transform: "translateY(0)" },
+          from: { opacity: "0" },
+          to: { opacity: "1" },
         },
         "fade-in": {
           from: { opacity: "0" },
           to: { opacity: "1" },
         },
         "scale-in": {
-          from: { opacity: "0", transform: "scale(0.95)" },
-          to: { opacity: "1", transform: "scale(1)" },
+          from: { opacity: "0" },
+          to: { opacity: "1" },
         },
       },
       animation: {

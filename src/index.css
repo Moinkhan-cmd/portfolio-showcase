@@ -161,7 +161,6 @@
   }
 
   .hover-lift:hover {
-    transform: translateY(-4px);
     box-shadow: var(--shadow-hover);
   }
 
@@ -196,8 +195,8 @@
   }
 
   @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); }
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
   }
 
   @keyframes glow-pulse {
@@ -208,11 +207,9 @@
   @keyframes slide-up {
     from {
       opacity: 0;
-      transform: translateY(30px);
     }
     to {
       opacity: 1;
-      transform: translateY(0);
     }
   }
 
@@ -224,11 +221,9 @@
   @keyframes scale-in {
     from {
       opacity: 0;
-      transform: scale(0.95);
     }
     to {
       opacity: 1;
-      transform: scale(1);
     }
   }
 }
@@ -254,11 +249,6 @@ input, textarea, select {
   }
 }
 
-/* 3D perspective for cards */
-.perspective-1000 {
-  perspective: 1000px;
-}
-
 /* Enhanced gradient utilities */
 .bg-gradient-radial {
   background: radial-gradient(circle, var(--tw-gradient-stops));
@@ -281,16 +271,10 @@ html {
 
 @keyframes float-smooth {
   0%, 100% {
-    transform: translateY(0px) translateX(0px);
-  }
-  25% {
-    transform: translateY(-10px) translateX(5px);
+    opacity: 1;
   }
   50% {
-    transform: translateY(-20px) translateX(0px);
-  }
-  75% {
-    transform: translateY(-10px) translateX(-5px);
+    opacity: 0.7;
   }
 }
 
@@ -330,11 +314,9 @@ html {
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -355,23 +337,21 @@ html {
 
 /* Magnetic hover effect utility */
 .magnetic-hover {
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: box-shadow 0.3s ease, opacity 0.3s ease;
 }
 
 .magnetic-hover:hover {
-  transform: scale(1.05);
+  box-shadow: var(--shadow-hover);
 }
 
 /* Text reveal animation */
 @keyframes textReveal {
   from {
     opacity: 0;
-    transform: translateY(20px);
     filter: blur(10px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
     filter: blur(0);
   }
 }
@@ -445,32 +425,16 @@ html {
 
 /* Smooth transitions for all scroll-triggered animations */
 .scroll-smooth-transition {
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-              opacity 0.3s ease-out;
-}
-
-/* Parallax effect helper */
-.parallax-slow {
-  will-change: transform;
-  transform: translateZ(0);
-}
-
-/* Optimize scroll performance */
-.scroll-optimized {
-  will-change: transform, opacity;
-  transform: translateZ(0);
-  backface-visibility: hidden;
+  transition: opacity 0.3s ease-out;
 }
 
 /* Smooth reveal on scroll */
 @keyframes revealOnScroll {
   from {
     opacity: 0;
-    transform: translateY(40px) scale(0.95);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
   }
 }
 
@@ -482,119 +446,16 @@ html {
 @keyframes smoothFadeIn {
   from {
     opacity: 0;
-    transform: translateY(30px);
     filter: blur(5px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
     filter: blur(0);
   }
 }
 
 .smooth-fade-in {
   animation: smoothFadeIn 0.6s ease-out forwards;
-}
-
-/* Subtle scale on scroll */
-@keyframes scaleOnScroll {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.scale-on-scroll {
-  animation: scaleOnScroll 0.5s ease-out forwards;
-}
-
-/* 3D Transform perspective for scroll effects (desktop only) */
-@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
-  body {
-    perspective: 1000px;
-    perspective-origin: center center;
-  }
-
-  /* Enhanced 3D transformations */
-  .transform-3d {
-    transform-style: preserve-3d;
-    backface-visibility: hidden;
-  }
-}
-
-/* Disable forced 3D context on mobile and for reduced-motion users */
-@media (max-width: 767px), (prefers-reduced-motion: reduce) {
-  body {
-    perspective: none;
-    perspective-origin: initial;
-  }
-}
-
-/* Dramatic reveal animations */
-@keyframes dramaticReveal {
-  0% {
-    opacity: 0;
-    transform: translateY(100px) scale(0.8) rotateX(-15deg);
-    filter: blur(10px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1) rotateX(0);
-    filter: blur(0);
-  }
-}
-
-@keyframes rotate3D {
-  0% {
-    transform: perspective(1000px) rotateY(-45deg) rotateX(15deg);
-    opacity: 0;
-  }
-  100% {
-    transform: perspective(1000px) rotateY(0) rotateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes zoomRotate {
-  0% {
-    opacity: 0;
-    transform: scale(0.5) rotate(-10deg);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) rotate(0);
-  }
-}
-
-@keyframes floatUpRotate {
-  0% {
-    opacity: 0;
-    transform: translateY(150px) scale(0.7) rotateX(45deg);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1) rotateX(0);
-  }
-}
-
-.dramatic-reveal {
-  animation: dramaticReveal 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-
-.rotate-3d {
-  animation: rotate3D 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-}
-
-.zoom-rotate {
-  animation: zoomRotate 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-
-.float-up-rotate {
-  animation: floatUpRotate 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 /* Glowing pulse on scroll */
@@ -632,41 +493,4 @@ html {
   );
   background-size: 200% 100%;
   animation: shimmerWave 3s linear infinite;
-}
-
-/* Particle trail effect */
-@keyframes particleTrail {
-  0% {
-    opacity: 0;
-    transform: translateY(0) scale(0);
-  }
-  50% {
-    opacity: 1;
-    transform: translateY(-40px) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-80px) scale(0);
-  }
-}
-
-.particle-trail {
-  animation: particleTrail 2s ease-out infinite;
-}
-
-/* Smooth section transitions */
-.scroll-optimized {
-  will-change: transform, opacity;
-}
-
-@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
-  .scroll-optimized {
-    transform: translateZ(0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .scroll-optimized {
-    will-change: auto;
-  }
 }

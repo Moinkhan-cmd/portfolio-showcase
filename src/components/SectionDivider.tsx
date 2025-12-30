@@ -35,9 +35,7 @@ export const SectionDivider = () => {
             top: "50%",
           }}
           animate={{
-            y: [0, -40, 0],
             opacity: [0, 1, 0],
-            scale: [0, 1.5, 0],
           }}
           transition={{
             duration: 2,
@@ -50,10 +48,9 @@ export const SectionDivider = () => {
       
       {/* Orbit circles */}
       <motion.div
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border border-primary/20 rounded-full"
+        className="absolute left-1/2 top-1/2 w-32 h-32 border border-primary/20 rounded-full"
+        style={{ marginLeft: '-4rem', marginTop: '-4rem' }}
         animate={{
-          scale: [1, 1.5, 1],
-          rotate: 360,
           opacity: [0.2, 0.5, 0.2],
         }}
         transition={{
@@ -64,10 +61,9 @@ export const SectionDivider = () => {
       />
       
       <motion.div
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 border border-primary/30 rounded-full"
+        className="absolute left-1/2 top-1/2 w-24 h-24 border border-primary/30 rounded-full"
+        style={{ marginLeft: '-3rem', marginTop: '-3rem' }}
         animate={{
-          scale: [1, 1.3, 1],
-          rotate: -360,
           opacity: [0.3, 0.6, 0.3],
         }}
         transition={{
