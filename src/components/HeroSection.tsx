@@ -1,4 +1,4 @@
-import { ArrowDown, Github, Linkedin, Mail } from "lucide-react";
+import { ArrowDown, Github, Linkedin, Mail, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
@@ -166,6 +166,17 @@ export const HeroSection = () => {
               onClick={() => scrollToSection("#contact")}
             >
               Contact Me
+            </Button>
+            <Button
+              variant="outline"
+              size="xl"
+              asChild
+              className="gap-2 border-primary/30 hover:border-primary hover:bg-primary/10 hover:shadow-[0_0_20px_hsl(175_80%_50%/0.2)]"
+            >
+              <a href="/resume.pdf" download="Moinkhan_Bhatti_Resume.pdf">
+                <Download className="w-4 h-4" />
+                Download CV
+              </a>
             </Button>
           </motion.div>
 
