@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const navLinks = [
   { name: "About", href: "#about" },
@@ -204,11 +205,21 @@ export const Navigation = () => {
               />
             ))}
             
-            {/* Hire Me Button */}
+            {/* Theme Toggle */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5, duration: 0.5 }}
+              className="ml-2"
+            >
+              <ThemeToggle />
+            </motion.div>
+
+            {/* Hire Me Button */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
               className="relative ml-2"
             >
               <Button
@@ -317,12 +328,14 @@ export const Navigation = () => {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ delay: navLinks.length * 0.05, duration: 0.3 }}
+                  className="flex items-center gap-3 mt-2"
                 >
+                  <ThemeToggle />
                   <Button
                     variant="hero"
                     size="sm"
                     onClick={() => scrollToSection("#contact")}
-                    className="w-full mt-2"
+                    className="flex-1"
                   >
                     Hire Me
                   </Button>
