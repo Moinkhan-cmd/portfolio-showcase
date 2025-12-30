@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 
 const techStack = [
   "HTML",
@@ -51,21 +52,56 @@ export const AboutSection = () => {
           {/* Content */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 items-center">
             {/* Image/Avatar Placeholder */}
-            <div 
-              className={`${isVisible ? 'animate-slide-up' : 'opacity-0'}`}
-              style={{ animationDelay: '0.2s' }}
+            <motion.div 
+              initial={{ opacity: 0, x: -50 }}
+              animate={isVisible ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <div className="relative">
-                <div className="aspect-square rounded-2xl glass-card overflow-hidden">
-                  <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-                    <span className="text-6xl">👨‍💻</span>
-                  </div>
+              <motion.div 
+                className="relative"
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="aspect-square rounded-2xl glass-enhanced overflow-hidden card-hover">
+                  <motion.div 
+                    className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center"
+                    animate={{ 
+                      background: [
+                        "linear-gradient(135deg, hsl(175 80% 50% / 0.2) 0%, hsl(175 80% 50% / 0.05) 100%)",
+                        "linear-gradient(135deg, hsl(200 90% 60% / 0.2) 0%, hsl(175 80% 50% / 0.05) 100%)",
+                        "linear-gradient(135deg, hsl(175 80% 50% / 0.2) 0%, hsl(175 80% 50% / 0.05) 100%)"
+                      ]
+                    }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <motion.span 
+                      className="text-6xl"
+                      animate={{ rotate: [0, 10, -10, 0] }}
+                      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      👨‍💻
+                    </motion.span>
+                  </motion.div>
                 </div>
                 {/* Decorative elements */}
-                <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl" />
-                <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-primary/10 rounded-full blur-2xl" />
-              </div>
-            </div>
+                <motion.div 
+                  className="absolute -top-4 -right-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl"
+                  animate={{ 
+                    scale: [1, 1.2, 1],
+                    opacity: [0.3, 0.5, 0.3]
+                  }}
+                  transition={{ duration: 3, repeat: Infinity }}
+                />
+                <motion.div 
+                  className="absolute -bottom-4 -left-4 w-32 h-32 bg-primary/10 rounded-full blur-2xl"
+                  animate={{ 
+                    scale: [1, 1.3, 1],
+                    opacity: [0.2, 0.4, 0.2]
+                  }}
+                  transition={{ duration: 4, repeat: Infinity }}
+                />
+              </motion.div>
+            </motion.div>
 
             {/* Text Content */}
             <div 
@@ -87,13 +123,16 @@ export const AboutSection = () => {
                 <h3 className="font-display text-base sm:text-lg font-semibold mb-3 sm:mb-4">Tech Stack</h3>
                 <div className="flex flex-wrap gap-2 sm:gap-3">
                   {techStack.map((tech, index) => (
-                    <span
+                    <motion.span
                       key={tech}
-                      className="px-3 py-1.5 sm:px-4 sm:py-2 glass-card rounded-full text-xs sm:text-sm font-medium hover:bg-primary/20 transition-all duration-300 cursor-default"
-                      style={{ animationDelay: `${0.4 + index * 0.05}s` }}
+                      initial={{ opacity: 0, scale: 0 }}
+                      animate={isVisible ? { opacity: 1, scale: 1 } : {}}
+                      transition={{ duration: 0.4, delay: 0.4 + index * 0.05, type: "spring" }}
+                      whileHover={{ scale: 1.1, y: -3 }}
+                      className="px-3 py-1.5 sm:px-4 sm:py-2 glass-card rounded-full text-xs sm:text-sm font-medium hover:bg-primary/20 transition-all duration-300 cursor-default magnetic-hover"
                     >
                       {tech}
-                    </span>
+                    </motion.span>
                   ))}
                 </div>
               </div>

@@ -45,7 +45,8 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: n
       transition={{ duration: 0.6, delay: index * 0.1 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="group glass-card rounded-2xl overflow-hidden"
+      whileHover={{ y: -8, scale: 1.02 }}
+      className="group glass-enhanced rounded-2xl overflow-hidden card-hover"
     >
       <motion.div
         animate={{
@@ -165,12 +166,12 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: n
 
           {/* Action Buttons */}
           <div className="flex gap-3">
-            <div className="flex-1">
+            <motion.div className="flex-1" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button
                 variant="hero"
                 size="sm"
                 asChild
-                className="w-full relative overflow-hidden group/btn"
+                className="w-full relative overflow-hidden group/btn glow-on-hover btn-lift"
               >
                 <a
                   href={project.liveUrl}
@@ -178,17 +179,24 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: n
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2"
                 >
-                  <ExternalLink className="w-4 h-4 relative z-10" />
+                  <motion.span
+                    animate={isHovered ? { x: 2 } : {}}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <ExternalLink className="w-4 h-4 relative z-10" />
+                  </motion.span>
                   <span className="relative z-10">Live Demo</span>
                 </a>
               </Button>
-            </div>
+            </motion.div>
 
-            <Button variant="outline" size="sm" asChild>
-              <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
-                <Github className="w-4 h-4" />
-              </a>
-            </Button>
+            <motion.div whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.9 }}>
+              <Button variant="outline" size="sm" asChild className="border-glow">
+                <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
+                  <Github className="w-4 h-4" />
+                </a>
+              </Button>
+            </motion.div>
           </div>
         </div>
       </motion.div>

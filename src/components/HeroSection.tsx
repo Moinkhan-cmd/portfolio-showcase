@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { motion } from "framer-motion";
 
 const socialLinks = [
   { icon: Github, href: "https://github.com/Moinkhan-cmd", label: "GitHub" },
@@ -59,30 +60,82 @@ export const HeroSection = () => {
               <span className="glass-card rounded-full px-3 py-1 text-xs font-medium text-foreground/90">UI Systems</span>
             </div>
 
-            <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 max-w-xl">
-              <Button variant="hero" size="xl" onClick={() => scrollToSection("#projects")}>
-                View Projects
-              </Button>
-              <Button variant="hero-outline" size="xl" onClick={() => scrollToSection("#contact")}>
-                Contact Me
-              </Button>
-            </div>
-
-            <div className="mt-8 flex items-center gap-3">
-              {socialLinks.map(({ icon: Icon, href, label }) => (
-                <Button key={label} variant="glass" size="icon" asChild className="rounded-full">
-                  <a href={href} aria-label={label} target={href === "#" ? undefined : "_blank"} rel={href === "#" ? undefined : "noopener noreferrer"}>
-                    <Icon className="h-5 w-5" />
-                  </a>
+            <motion.div 
+              className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 max-w-xl"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button 
+                  variant="hero" 
+                  size="xl" 
+                  onClick={() => scrollToSection("#projects")}
+                  className="glow-on-hover btn-lift w-full sm:w-auto"
+                >
+                  View Projects
                 </Button>
+              </motion.div>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button 
+                  variant="hero-outline" 
+                  size="xl" 
+                  onClick={() => scrollToSection("#contact")}
+                  className="btn-lift border-glow w-full sm:w-auto"
+                >
+                  Contact Me
+                </Button>
+              </motion.div>
+            </motion.div>
+
+            <motion.div 
+              className="mt-8 flex items-center gap-3"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
+              {socialLinks.map(({ icon: Icon, href, label }, index) => (
+                <motion.div
+                  key={label}
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.4, delay: 0.6 + index * 0.1, type: "spring" }}
+                  whileHover={{ scale: 1.15, rotate: 5 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <Button 
+                    variant="glass" 
+                    size="icon" 
+                    asChild 
+                    className="rounded-full glow-on-hover magnetic-hover"
+                  >
+                    <a 
+                      href={href} 
+                      aria-label={label} 
+                      target={href === "#" ? undefined : "_blank"} 
+                      rel={href === "#" ? undefined : "noopener noreferrer"}
+                    >
+                      <Icon className="h-5 w-5" />
+                    </a>
+                  </Button>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
 
           {/* Right: Profile Card */}
-          <div className="lg:col-span-5">
-            <div className="gradient-border">
-              <Card className="glass-card border-0">
+          <motion.div 
+            className="lg:col-span-5"
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+          >
+            <motion.div 
+              className="gradient-border"
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Card className="glass-card border-0 card-hover">
                 <CardHeader className="pb-4">
                   <div className="flex items-center gap-4">
                     <Avatar className="h-14 w-14 border border-border">
@@ -125,36 +178,53 @@ export const HeroSection = () => {
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-3">
-                    <Button variant="glass" className="w-full" onClick={() => scrollToSection("#contact")}>
-                      Let’s Talk
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="w-full border-primary/30 hover:border-primary hover:bg-primary/10"
-                      asChild
-                    >
-                      <a href="https://drive.google.com/uc?export=download&id=1p42p9NpczSWy_-iLeVaO38ciHAMHXp9r" download="Moin_Bhatti_Resume.pdf">
-                        <Download className="w-4 h-4" />
-                        CV
-                      </a>
-                    </Button>
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="flex-1">
+                      <Button 
+                        variant="glass" 
+                        className="w-full btn-lift" 
+                        onClick={() => scrollToSection("#contact")}
+                      >
+                        Let's Talk
+                      </Button>
+                    </motion.div>
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="flex-1">
+                      <Button
+                        variant="outline"
+                        className="w-full border-primary/30 hover:border-primary hover:bg-primary/10 btn-lift border-glow"
+                        asChild
+                      >
+                        <a href="https://drive.google.com/uc?export=download&id=1p42p9NpczSWy_-iLeVaO38ciHAMHXp9r" download="Moin_Bhatti_Resume.pdf">
+                          <Download className="w-4 h-4" />
+                          CV
+                        </a>
+                      </Button>
+                    </motion.div>
                   </div>
                 </CardContent>
               </Card>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
 
         {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
-          <button
+        <motion.div 
+          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+        >
+          <motion.button
             onClick={() => scrollToSection("#about")}
-            className="p-2 text-muted-foreground hover:text-primary transition-colors"
+            className="p-2 text-muted-foreground hover:text-primary transition-colors rounded-full hover:bg-primary/10"
             aria-label="Scroll to about"
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            whileHover={{ scale: 1.2 }}
+            whileTap={{ scale: 0.9 }}
           >
             <ArrowDown className="w-6 h-6" />
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
       </div>
     </section>
   );

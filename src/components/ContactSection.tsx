@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { motion } from "framer-motion";
 
 const socialLinks = [
   { name: "GitHub", icon: Github, url: "https://github.com/Moinkhan-cmd", label: "github.com/Moinkhan-cmd" },
@@ -99,22 +100,30 @@ export const ContactSection = () => {
 
             {/* Social Links */}
             <div className="space-y-3 sm:space-y-4">
-              {socialLinks.map((link) => (
-                <a
+              {socialLinks.map((link, index) => (
+                <motion.a
                   key={link.name}
                   href={link.url}
                   target={link.url === "#" ? undefined : "_blank"}
                   rel={link.url === "#" ? undefined : "noopener noreferrer"}
-                  className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 glass-card rounded-lg sm:rounded-xl hover:bg-primary/10 transition-all duration-300 group"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={isVisible ? { opacity: 1, x: 0 } : {}}
+                  transition={{ duration: 0.4, delay: 0.2 + index * 0.1 }}
+                  whileHover={{ x: 10, scale: 1.02 }}
+                  className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 glass-enhanced rounded-lg sm:rounded-xl hover:bg-primary/10 transition-all duration-300 group card-hover"
                 >
-                  <div className="p-1.5 sm:p-2 rounded-md sm:rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                  <motion.div 
+                    className="p-1.5 sm:p-2 rounded-md sm:rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors"
+                    whileHover={{ rotate: 360, scale: 1.1 }}
+                    transition={{ duration: 0.5 }}
+                  >
                     <link.icon className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-                  </div>
+                  </motion.div>
                   <div>
                     <p className="font-medium text-sm sm:text-base group-hover:text-primary transition-colors">{link.name}</p>
                     <p className="text-muted-foreground text-xs sm:text-sm">{link.label}</p>
                   </div>
-                </a>
+                </motion.a>
               ))}
             </div>
           </div>
@@ -169,25 +178,30 @@ export const ContactSection = () => {
                   />
                 </div>
 
-                <Button
-                  type="submit"
-                  variant="hero"
-                  size="lg"
-                  className="w-full"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <span className="flex items-center gap-2">
-                      <span className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                      Sending...
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-2">
-                      <Send className="w-4 h-4" />
-                      Send Message
-                    </span>
-                  )}
-                </Button>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    type="submit"
+                    variant="hero"
+                    size="lg"
+                    className="w-full glow-on-hover btn-lift"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <span className="flex items-center gap-2">
+                        <span className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                        Sending...
+                      </span>
+                    ) : (
+                      <motion.span 
+                        className="flex items-center gap-2"
+                        whileHover={{ x: 2 }}
+                      >
+                        <Send className="w-4 h-4" />
+                        Send Message
+                      </motion.span>
+                    )}
+                  </Button>
+                </motion.div>
               </div>
             </form>
           </div>

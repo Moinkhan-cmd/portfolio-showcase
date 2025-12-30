@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Code2, Database, Users, Wrench, Code } from "lucide-react";
+import { motion } from "framer-motion";
 
 const skillCategories = [
   {
@@ -99,34 +100,49 @@ export const SkillsSection = () => {
         {/* Skills Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto">
           {skillCategories.map((category, categoryIndex) => (
-            <div
+            <motion.div
               key={category.title}
-              className={`glass-card rounded-xl sm:rounded-2xl p-4 sm:p-6 hover-lift ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}
-              style={{ animationDelay: `${0.1 + categoryIndex * 0.1}s` }}
+              initial={{ opacity: 0, y: 30 }}
+              animate={isVisible ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.5, delay: 0.1 + categoryIndex * 0.1 }}
+              whileHover={{ y: -8, scale: 1.02 }}
+              className="glass-enhanced rounded-xl sm:rounded-2xl p-4 sm:p-6 card-hover"
             >
               {/* Category Header */}
-              <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-                <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-primary/10">
+              <motion.div 
+                className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6"
+                whileHover={{ x: 5 }}
+              >
+                <motion.div 
+                  className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-primary/10"
+                  whileHover={{ rotate: 360, scale: 1.1 }}
+                  transition={{ duration: 0.5 }}
+                >
                   <category.icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
-                </div>
+                </motion.div>
                 <h3 className="font-display text-lg sm:text-xl font-semibold">{category.title}</h3>
-              </div>
+              </motion.div>
 
               {/* Skills as Badges */}
               <div className="flex flex-wrap gap-1.5 sm:gap-2">
                 {category.skills.map((skill, skillIndex) => (
-                  <span
+                  <motion.span
                     key={skill.name}
-                    className="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium bg-primary/10 text-primary rounded-md sm:rounded-lg border border-primary/20 hover:bg-primary/20 hover:border-primary/40 transition-all duration-300 cursor-default"
-                    style={{
-                      animationDelay: `${0.2 + categoryIndex * 0.1 + skillIndex * 0.05}s`,
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={isVisible ? { opacity: 1, scale: 1 } : {}}
+                    transition={{ 
+                      duration: 0.3, 
+                      delay: 0.2 + categoryIndex * 0.1 + skillIndex * 0.05,
+                      type: "spring"
                     }}
+                    whileHover={{ scale: 1.15, y: -3, rotate: 2 }}
+                    className="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium bg-primary/10 text-primary rounded-md sm:rounded-lg border border-primary/20 hover:bg-primary/20 hover:border-primary/40 transition-all duration-300 cursor-default magnetic-hover"
                   >
                     {skill.name}
-                  </span>
+                  </motion.span>
                 ))}
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

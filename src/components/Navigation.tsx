@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { motion } from "framer-motion";
 
 const navLinks = [
   { name: "About", href: "#about" },
@@ -115,13 +116,17 @@ export const Navigation = () => {
           {/* Logo */}
           <a
             href="#"
-            className="font-signature text-xl sm:text-2xl md:text-3xl text-foreground relative group overflow-hidden transition-colors hover:text-primary"
+            className="font-signature text-xl sm:text-2xl md:text-3xl text-foreground relative group overflow-hidden transition-all duration-300 hover:text-primary hover:scale-105"
             onClick={(e) => {
               e.preventDefault();
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
           >
-            <span className="relative z-10">Moinkhan Bhatti</span>
+            <span className="relative z-10 gradient-text-animated">Moinkhan Bhatti</span>
+            <motion.span
+              className="absolute inset-0 bg-primary/10 rounded-lg blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              whileHover={{ scale: 1.2 }}
+            />
           </a>
 
           {/* Desktop Navigation */}
@@ -139,12 +144,16 @@ export const Navigation = () => {
               <ThemeToggle />
             </div>
 
-            <div className="relative ml-2">
+            <motion.div 
+              className="relative ml-2"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
               <Button
                 variant="hero"
                 size="sm"
                 onClick={() => scrollToSection("#contact")}
-                className="relative overflow-hidden"
+                className="relative overflow-hidden glow-on-hover btn-lift"
               >
                 <span
                   className="absolute inset-0 bg-gradient-to-r from-primary/25 via-primary/15 to-primary/25"
@@ -152,18 +161,20 @@ export const Navigation = () => {
                 />
                 <span className="relative z-10 font-medium">Hire Me</span>
               </Button>
-            </div>
+            </motion.div>
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            className="md:hidden text-foreground p-2 relative rounded-lg hover:bg-primary/10 transition-colors"
+          <motion.button
+            className="md:hidden text-foreground p-2 relative rounded-lg hover:bg-primary/10 transition-all duration-300"
             onClick={() => setIsMobileMenuOpen((v) => !v)}
             aria-label="Toggle menu"
             type="button"
+            whileHover={{ scale: 1.1, rotate: 90 }}
+            whileTap={{ scale: 0.9 }}
           >
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          </motion.button>
         </div>
 
         {/* Mobile Navigation */}
