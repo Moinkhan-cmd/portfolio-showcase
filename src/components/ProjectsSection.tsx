@@ -11,7 +11,7 @@ const projects = [
       "Brief description of what this project does. Explain the problem it solves and key features.",
     techStack: ["React", "TypeScript", "Tailwind CSS"],
     liveUrl: "#",
-    githubUrl: "#",
+    githubUrl: "https://github.com/Moinkhan-cmd",
     image: null,
   },
   {
@@ -20,7 +20,7 @@ const projects = [
       "A comprehensive admin dashboard for managing products, orders, and analytics with real-time updates.",
     techStack: ["JavaScript", "React", "Chart.js"],
     liveUrl: "#",
-    githubUrl: "#",
+    githubUrl: "https://github.com/Moinkhan-cmd",
     image: null,
   },
   {

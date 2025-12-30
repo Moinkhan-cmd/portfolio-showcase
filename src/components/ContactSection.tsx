@@ -6,8 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 
 const socialLinks = [
-  { name: "GitHub", icon: Github, url: "#", label: "github.com/yourusername" },
-  { name: "LinkedIn", icon: Linkedin, url: "#", label: "linkedin.com/in/yourusername" },
+  { name: "GitHub", icon: Github, url: "https://github.com/Moinkhan-cmd", label: "github.com/Moinkhan-cmd" },
+  { name: "LinkedIn", icon: Linkedin, url: "https://www.linkedin.com/in/moin-bhatti-65363a255", label: "linkedin.com/in/moin-bhatti-65363a255" },
   { name: "Email", icon: Mail, url: "mailto:your@email.com", label: "your@email.com" },
 ];
 
@@ -103,6 +103,8 @@ export const ContactSection = () => {
                 <a
                   key={link.name}
                   href={link.url}
+                  target={link.url === "#" ? undefined : "_blank"}
+                  rel={link.url === "#" ? undefined : "noopener noreferrer"}
                   className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 glass-card rounded-lg sm:rounded-xl hover:bg-primary/10 transition-all duration-300 group"
                 >
                   <div className="p-1.5 sm:p-2 rounded-md sm:rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">

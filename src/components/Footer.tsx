@@ -2,8 +2,8 @@ import { Github, Linkedin, Mail, Heart } from "lucide-react";
 import { ScrollToTop } from "@/components/ScrollToTop";
 
 const socialLinks = [
-  { icon: Github, url: "#", label: "GitHub" },
-  { icon: Linkedin, url: "#", label: "LinkedIn" },
+  { icon: Github, url: "https://github.com/Moinkhan-cmd", label: "GitHub" },
+  { icon: Linkedin, url: "https://www.linkedin.com/in/moin-bhatti-65363a255", label: "LinkedIn" },
   { icon: Mail, url: "mailto:your@email.com", label: "Email" },
 ];
 
@@ -40,7 +40,9 @@ export const Footer = () => {
               <a
                 key={link.label}
                 href={link.url}
-                className="p-3 rounded-full hover:bg-white/5 border border-transparent hover:border-white/10 transition-all duration-300 hover:scale-110 group"
+                target={link.url === "#" ? undefined : "_blank"}
+                rel={link.url === "#" ? undefined : "noopener noreferrer"}
+                className="p-3 rounded-full hover:bg-white/5 border border-transparent hover:border-white/10 transition-all duration-300 group"
                 aria-label={link.label}
               >
                 <link.icon className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />

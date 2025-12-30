@@ -1,6 +1,14 @@
-import { ArrowDown, Github, Linkedin, Mail, Download } from "lucide-react";
+import { ArrowDown, Download, Github, Linkedin, Mail } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+
+const socialLinks = [
+  { icon: Github, href: "https://github.com/Moinkhan-cmd", label: "GitHub" },
+  { icon: Linkedin, href: "https://www.linkedin.com/in/moin-bhatti-65363a255", label: "LinkedIn" },
+  { icon: Mail, href: "#", label: "Email" },
+] as const;
 
 export const HeroSection = () => {
   const scrollToSection = (href: string) => {
@@ -11,216 +19,142 @@ export const HeroSection = () => {
   };
 
   return (
-    <section className="min-h-screen flex items-center justify-center relative overflow-hidden px-4">
-      {/* Background */}
+    <section className="relative min-h-screen overflow-hidden px-4">
+      {/* Background (static, theme-token based) */}
       <div className="absolute inset-0 overflow-hidden">
-        {/* Animated Gradient Orbs */}
-        <motion.div
-          className="absolute top-1/4 left-1/4 w-48 sm:w-64 md:w-96 h-48 sm:h-64 md:h-96 bg-primary/10 rounded-full blur-3xl"
-          animate={{
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-
-        <motion.div
-          className="absolute bottom-1/4 right-1/4 w-40 sm:w-56 md:w-80 h-40 sm:h-56 md:h-80 bg-primary/5 rounded-full blur-3xl"
-          animate={{
-            opacity: [0.2, 0.4, 0.2],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 1,
-          }}
-        />
-
-        <motion.div
-          className="absolute top-1/2 right-1/3 w-36 sm:w-48 md:w-72 h-36 sm:h-48 md:h-72 bg-accent/8 rounded-full blur-3xl"
-          animate={{
-            opacity: [0.25, 0.45, 0.25],
-          }}
-          transition={{
-            duration: 7,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 2,
-          }}
-        />
-
-        {/* Flowing Gradient Overlay */}
-        <motion.div
-          className="absolute inset-0"
-          animate={{
-            background: [
-              "radial-gradient(circle at 20% 50%, hsl(175 80% 50% / 0.08) 0%, transparent 50%)",
-              "radial-gradient(circle at 80% 50%, hsl(200 90% 60% / 0.08) 0%, transparent 50%)",
-              "radial-gradient(circle at 50% 80%, hsl(175 80% 50% / 0.08) 0%, transparent 50%)",
-              "radial-gradient(circle at 20% 50%, hsl(175 80% 50% / 0.08) 0%, transparent 50%)",
-            ],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-        />
+        <div className="absolute -top-28 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
+        <div className="absolute top-1/4 -left-24 h-72 w-72 rounded-full bg-primary/5 blur-3xl" />
+        <div className="absolute bottom-20 -right-28 h-80 w-80 rounded-full bg-accent/5 blur-3xl" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,hsl(var(--primary)/0.10)_0%,transparent_45%),radial-gradient(circle_at_80%_60%,hsl(var(--accent)/0.08)_0%,transparent_50%)]" />
       </div>
 
       {/* Grid Pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border)/0.2)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.2)_1px,transparent_1px)] bg-[size:40px_40px] sm:bg-[size:60px_60px] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_70%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border)/0.22)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.22)_1px,transparent_1px)] bg-[size:44px_44px] sm:bg-[size:60px_60px] [mask-image:radial-gradient(ellipse_at_center,black_18%,transparent_72%)]" />
 
-      <div className="container mx-auto container-padding relative z-10 w-full">
-        {/* Content Card */}
-        <motion.div
-          className="text-center max-w-4xl mx-auto"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6 }}
-        >
-          {/* Status Badge */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="inline-flex items-center gap-2 glass-card px-4 py-2 rounded-full mb-8"
-          >
-            <motion.span
-              className="w-2 h-2 bg-green-500 rounded-full"
-              animate={{ opacity: [1, 0.7, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-            <span className="text-sm text-muted-foreground">Available for opportunities</span>
-          </motion.div>
+      <div className="container mx-auto container-padding relative z-10 flex min-h-screen flex-col justify-center pt-28 pb-20 sm:pt-32 sm:pb-28">
+        <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-12">
+          {/* Left: Copy */}
+          <div className="lg:col-span-7 text-left">
+            <div className="inline-flex items-center gap-2 glass-card px-4 py-2 rounded-full">
+              <span className="h-2 w-2 rounded-full bg-primary" />
+              <span className="text-sm text-muted-foreground">Available for opportunities</span>
+            </div>
 
-          {/* Main Heading */}
-          <motion.h1
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="font-display text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-4 sm:mb-6 leading-tight"
-          >
-            <span className="text-foreground">Moinkhan Bhatti</span>
-            <br />
-            <motion.span
-              className="gradient-text inline-block"
-              animate={{
-                backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-              }}
-              transition={{
-                duration: 5,
-                repeat: Infinity,
-                ease: "linear",
-              }}
-              style={{
-                backgroundSize: "200% 200%",
-              }}
-            >
-              HERE
-            </motion.span>
-          </motion.h1>
+            <h1 className="mt-6 font-display text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight leading-[1.05] text-balance">
+              Hi, I’m <span className="gradient-text">Moinkhan Bhatti</span>
+            </h1>
 
-          {/* Role */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-primary font-display font-medium mb-3 sm:mb-4"
-          >
-            Frontend Web Developer
-          </motion.p>
+            <p className="mt-4 text-lg sm:text-xl lg:text-2xl text-primary font-display font-semibold">
+              Frontend Web Developer
+            </p>
 
-          {/* Tagline */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-xl md:max-w-2xl mx-auto mb-6 sm:mb-8 md:mb-10 px-2"
-          >
-            Short one-line description about you goes here. Crafting beautiful,
-            responsive, and user-friendly web experiences.
-          </motion.p>
+            <p className="mt-4 text-base sm:text-lg text-muted-foreground max-w-2xl text-pretty">
+              I build modern, responsive, and accessible interfaces with React and TypeScript — focused on clean UI, strong UX, and fast performance.
+            </p>
 
-          {/* CTA Buttons */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-8 sm:mb-12 w-full sm:w-auto px-4 sm:px-0"
-          >
-            <Button
-              variant="hero"
-              size="xl"
-              onClick={() => scrollToSection("#projects")}
-            >
-              View Projects
-            </Button>
-            <Button
-              variant="hero-outline"
-              size="xl"
-              onClick={() => scrollToSection("#contact")}
-            >
-              Contact Me
-            </Button>
-            <Button
-              variant="outline"
-              size="xl"
-              asChild
-              className="gap-2 border-primary/30 hover:border-primary hover:bg-primary/10 hover:shadow-[0_0_20px_hsl(175_80%_50%/0.2)]"
-            >
-              <a href="/resume.pdf" download="Moinkhan_Bhatti_Resume.pdf">
-                <Download className="w-4 h-4" />
-                Download CV
-              </a>
-            </Button>
-          </motion.div>
+            <div className="mt-6 flex flex-wrap gap-2">
+              <span className="glass-card rounded-full px-3 py-1 text-xs font-medium text-foreground/90">React</span>
+              <span className="glass-card rounded-full px-3 py-1 text-xs font-medium text-foreground/90">TypeScript</span>
+              <span className="glass-card rounded-full px-3 py-1 text-xs font-medium text-foreground/90">Tailwind</span>
+              <span className="glass-card rounded-full px-3 py-1 text-xs font-medium text-foreground/90">UI Systems</span>
+            </div>
 
-          {/* Social Links */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            className="flex items-center justify-center gap-4"
-          >
-            {[
-              { icon: Github, href: "#", label: "GitHub" },
-              { icon: Linkedin, href: "#", label: "LinkedIn" },
-              { icon: Mail, href: "#", label: "Email" },
-            ].map(({ icon: Icon, href, label }) => (
-              <a
-                key={label}
-                href={href}
-                className="p-3 glass-card rounded-full group relative overflow-hidden transition-all duration-300 hover:shadow-[0_0_20px_hsl(175_80%_50%/0.3)]"
-                aria-label={label}
-              >
-                <Icon className="w-5 h-5 relative z-10 transition-colors group-hover:text-primary" />
-              </a>
-            ))}
-          </motion.div>
-        </motion.div>
+            <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 max-w-xl">
+              <Button variant="hero" size="xl" onClick={() => scrollToSection("#projects")}>
+                View Projects
+              </Button>
+              <Button variant="hero-outline" size="xl" onClick={() => scrollToSection("#contact")}>
+                Contact Me
+              </Button>
+            </div>
+
+            <div className="mt-8 flex items-center gap-3">
+              {socialLinks.map(({ icon: Icon, href, label }) => (
+                <Button key={label} variant="glass" size="icon" asChild className="rounded-full">
+                  <a href={href} aria-label={label} target={href === "#" ? undefined : "_blank"} rel={href === "#" ? undefined : "noopener noreferrer"}>
+                    <Icon className="h-5 w-5" />
+                  </a>
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          {/* Right: Profile Card */}
+          <div className="lg:col-span-5">
+            <div className="gradient-border">
+              <Card className="glass-card border-0">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center gap-4">
+                    <Avatar className="h-14 w-14 border border-border">
+                      <AvatarFallback className="font-display text-base font-semibold">MB</AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0">
+                      <div className="font-display text-lg font-semibold leading-tight truncate">
+                        Moinkhan Bhatti
+                      </div>
+                      <div className="text-sm text-muted-foreground truncate">Frontend Web Developer</div>
+                    </div>
+                  </div>
+                </CardHeader>
+
+                <CardContent className="space-y-4">
+                  <div className="rounded-lg border bg-secondary/20 p-4">
+                    <p className="text-sm text-muted-foreground">
+                      Clean components, consistent spacing, and polished interactions — built with maintainable code.
+                    </p>
+                  </div>
+
+                  <Separator className="opacity-60" />
+
+                  <div className="space-y-2">
+                    <div className="text-xs uppercase tracking-wider text-muted-foreground">What you’ll get</div>
+                    <div className="grid gap-2">
+                      <div className="flex items-start gap-2">
+                        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-primary" />
+                        <p className="text-sm text-foreground/90">Responsive, pixel-tight layouts</p>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-primary" />
+                        <p className="text-sm text-foreground/90">Accessible UI and scalable components</p>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-primary" />
+                        <p className="text-sm text-foreground/90">Fast-loading pages and clean UX</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Button variant="glass" className="w-full" onClick={() => scrollToSection("#contact")}>
+                      Let’s Talk
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full border-primary/30 hover:border-primary hover:bg-primary/10"
+                      asChild
+                    >
+                      <a href="https://drive.google.com/uc?export=download&id=1p42p9NpczSWy_-iLeVaO38ciHAMHXp9r" download="Moin_Bhatti_Resume.pdf">
+                        <Download className="w-4 h-4" />
+                        CV
+                      </a>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
 
         {/* Scroll Indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ opacity: { delay: 0.8, duration: 0.6 } }}
-          className="absolute bottom-8 left-1/2 ml-[-12px]"
-        >
-          <motion.button
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
+          <button
             onClick={() => scrollToSection("#about")}
             className="p-2 text-muted-foreground hover:text-primary transition-colors"
             aria-label="Scroll to about"
-            animate={{ opacity: [1, 0.5, 1] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           >
             <ArrowDown className="w-6 h-6" />
-          </motion.button>
-        </motion.div>
+          </button>
+        </div>
       </div>
     </section>
   );
