@@ -109,13 +109,12 @@ export const AboutSection = () => {
               style={{ animationDelay: '0.3s' }}
             >
               <p className="text-base sm:text-lg text-muted-foreground leading-relaxed mb-4 sm:mb-6">
-                Write a short introduction about yourself here. Mention your background, 
-                interests, and what kind of roles you are looking for.
+               I’m a passionate front-end web developer with a strong interest in building seamless digital experiences that blend modern design with clean, efficient 
+               code. I enjoy turning ideas into responsive, user-friendly interfaces using HTML, CSS, JavaScript, React and modern tools.
               </p>
               <p className="text-base sm:text-lg text-muted-foreground leading-relaxed mb-6 sm:mb-8">
-                I'm passionate about creating seamless digital experiences that combine 
-                beautiful design with clean, efficient code. Currently exploring 
-                opportunities where I can grow and contribute to meaningful projects.
+                I’m continuously learning and improving my skills while working on real-world projects that focus on performance, accessibility, and visual appeal. Currently, I’m looking for opportunities
+                 where I can grow as a developer, collaborate with creative teams, and contribute to meaningful, impactful products.
               </p>
 
               {/* Tech Stack */}
