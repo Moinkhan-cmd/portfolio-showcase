@@ -5,11 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
+import emailjs from "@emailjs/browser";
 
 const socialLinks = [
   { name: "GitHub", icon: Github, url: "https://github.com/Moinkhan-cmd", label: "github.com/Moinkhan-cmd" },
   { name: "LinkedIn", icon: Linkedin, url: "https://www.linkedin.com/in/moin-bhatti-65363a255", label: "linkedin.com/in/moin-bhatti-65363a255" },
-  { name: "Email", icon: Mail, url: "mailto:your@email.com", label: "your@email.com" },
+  { name: "Email", icon: Mail, url: "mailto:moinbhatti59@gmail.com", label: "moinbhatti59@gmail.com" },
 ];
 
 export const ContactSection = () => {
@@ -39,16 +40,55 @@ export const ContactSection = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    toast({
-      title: "Message sent!",
-      description: "Thank you for reaching out. I'll get back to you soon!",
-    });
-    
-    setIsSubmitting(false);
-    (e.target as HTMLFormElement).reset();
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const message = formData.get("message") as string;
+
+    // EmailJS configuration
+    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+    // Check if EmailJS is configured
+    if (!serviceId || !templateId || !publicKey) {
+      toast({
+        title: "Email service not configured",
+        description: "Please configure EmailJS environment variables. Check the README for setup instructions.",
+        variant: "destructive",
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
+    try {
+      // Send email using EmailJS
+      await emailjs.send(serviceId, templateId, {
+        from_name: name,
+        from_email: email,
+        message: message,
+        to_email: "moinbhatti59@gmail.com",
+        reply_to: email,
+        to_name: "Moinkhan Bhatti",
+      }, publicKey);
+
+      toast({
+        title: "Message sent successfully!",
+        description: "Thank you for reaching out. I'll get back to you soon!",
+      });
+      
+      form.reset();
+    } catch (error) {
+      console.error("EmailJS Error:", error);
+      toast({
+        title: "Failed to send message",
+        description: "Please try again later or contact me directly via email.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

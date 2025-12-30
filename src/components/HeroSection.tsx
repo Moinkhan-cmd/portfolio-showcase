@@ -1,9 +1,11 @@
 import { ArrowDown, Download, Github, Linkedin, Mail } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { motion } from "framer-motion";
+
+import myPhoto from "@/images/my photo.jpg";
 
 const socialLinks = [
   { icon: Github, href: "https://github.com/Moinkhan-cmd", label: "GitHub" },
@@ -36,7 +38,7 @@ export const HeroSection = () => {
         <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-12">
           {/* Left: Copy */}
           <div className="lg:col-span-7 text-left">
-            <div className="inline-flex items-center gap-2 glass-card px-4 py-2 rounded-full">
+            <div className="inline-flex items-center gap-2 glass-card px-4 py-2 rounded-full shine-sweep">
               <span className="h-2 w-2 rounded-full bg-primary" />
               <span className="text-sm text-muted-foreground">Available for opportunities</span>
             </div>
@@ -71,7 +73,7 @@ export const HeroSection = () => {
                   variant="hero" 
                   size="xl" 
                   onClick={() => scrollToSection("#projects")}
-                  className="glow-on-hover btn-lift w-full sm:w-auto"
+                  className="glow-on-hover btn-lift shine-sweep w-full sm:w-auto"
                 >
                   View Projects
                 </Button>
@@ -81,7 +83,7 @@ export const HeroSection = () => {
                   variant="hero-outline" 
                   size="xl" 
                   onClick={() => scrollToSection("#contact")}
-                  className="btn-lift border-glow w-full sm:w-auto"
+                  className="btn-lift border-glow shine-sweep w-full sm:w-auto"
                 >
                   Contact Me
                 </Button>
@@ -107,7 +109,7 @@ export const HeroSection = () => {
                     variant="glass" 
                     size="icon" 
                     asChild 
-                    className="rounded-full glow-on-hover magnetic-hover"
+                    className="rounded-full glow-on-hover magnetic-hover shine-sweep"
                   >
                     <a 
                       href={href} 
@@ -135,10 +137,11 @@ export const HeroSection = () => {
               whileHover={{ scale: 1.02 }}
               transition={{ duration: 0.3 }}
             >
-              <Card className="glass-card border-0 card-hover">
+              <Card className="glass-card border-0 holo-hover">
                 <CardHeader className="pb-4">
                   <div className="flex items-center gap-4">
-                    <Avatar className="h-14 w-14 border border-border">
+                    <Avatar className="h-16 w-16 sm:h-20 sm:w-20 border border-border">
+                      <AvatarImage src={myPhoto} alt="Moinkhan Bhatti" className="object-cover" />
                       <AvatarFallback className="font-display text-base font-semibold">MB</AvatarFallback>
                     </Avatar>
                     <div className="min-w-0">
