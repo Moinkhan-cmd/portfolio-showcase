@@ -1077,3 +1077,202 @@ a, button, [role="button"] {
 }
 
 
+
+
+/* ===========================
+   3D Effects & Transforms
+   =========================== */
+
+.transform-3d {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.card-3d {
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.card-3d:hover {
+  transform: rotateY(10deg) rotateX(10deg) scale(1.05);
+}
+
+.perspective-card {
+  perspective: 1500px;
+  transform-style: preserve-3d;
+}
+
+.perspective-card > * {
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.perspective-card:hover > * {
+  transform: translateZ(30px);
+}
+
+.floating-3d {
+  animation: floating3d 6s ease-in-out infinite;
+}
+
+@keyframes floating3d {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotateY(0deg);
+  }
+  25% {
+    transform: translate3d(0, -15px, 20px) rotateY(5deg);
+  }
+  50% {
+    transform: translate3d(0, -10px, 10px) rotateY(-5deg);
+  }
+  75% {
+    transform: translate3d(0, -15px, 20px) rotateY(5deg);
+  }
+}
+
+.tilt-3d {
+  transform-style: preserve-3d;
+  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.tilt-3d:hover {
+  transform: perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) scale(1.02);
+}
+
+.layer-3d {
+  transform: translateZ(var(--layer-depth, 0px));
+  transition: transform 0.3s ease;
+}
+
+.glass-3d {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.05),
+    rgba(255, 255, 255, 0.01)
+  );
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.37),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.holographic {
+  position: relative;
+  overflow: hidden;
+}
+
+.holographic::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(6, 182, 212, 0.1) 50%,
+    transparent 70%
+  );
+  background-size: 200% 200%;
+  animation: holographic-shine 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes holographic-shine {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.neon-glow {
+  box-shadow: 
+    0 0 10px rgba(6, 182, 212, 0.5),
+    0 0 20px rgba(6, 182, 212, 0.3),
+    0 0 30px rgba(6, 182, 212, 0.2),
+    inset 0 0 10px rgba(6, 182, 212, 0.1);
+}
+
+.neon-text {
+  text-shadow:
+    0 0 10px rgba(6, 182, 212, 0.8),
+    0 0 20px rgba(6, 182, 212, 0.6),
+    0 0 30px rgba(6, 182, 212, 0.4),
+    0 0 40px rgba(6, 182, 212, 0.2);
+}
+
+.depth-shadow {
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.1),
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 4px 8px rgba(0, 0, 0, 0.1),
+    0 8px 16px rgba(0, 0, 0, 0.1),
+    0 16px 32px rgba(0, 0, 0, 0.1);
+}
+
+.parallax-layer {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Isometric effect */
+.isometric {
+  transform: rotateX(45deg) rotateZ(45deg);
+  transform-style: preserve-3d;
+}
+
+/* 3D Button effect */
+.btn-3d {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.15s ease;
+}
+
+.btn-3d::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(6, 182, 212, 0.05));
+  transform: translateZ(-1px);
+  border-radius: inherit;
+}
+
+.btn-3d:hover {
+  transform: translateY(-2px) translateZ(10px);
+}
+
+.btn-3d:active {
+  transform: translateY(0) translateZ(5px);
+}
+
+/* Stacked cards effect */
+.stack-3d {
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+.stack-3d::before,
+.stack-3d::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  border-radius: inherit;
+  opacity: 0.5;
+}
+
+.stack-3d::before {
+  transform: translateZ(-10px) scale(0.95);
+}
+
+.stack-3d::after {
+  transform: translateZ(-20px) scale(0.9);
+}

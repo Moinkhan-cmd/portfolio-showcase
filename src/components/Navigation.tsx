@@ -2,7 +2,9 @@ import { useEffect, useState, useRef } from "react";
 import { Menu, X, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { motion, AnimatePresence, useScroll } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import { AnimatedLogo } from "./AnimatedLogo";
+import { EnhancedNavLink } from "./EnhancedNavLink";
 
 const navLinks = [
   { name: "About", href: "#about" },
@@ -12,112 +14,17 @@ const navLinks = [
   { name: "Contact", href: "#contact" },
 ] as const;
 
-const NavLink = ({
-  link,
-  isActive,
-  onClick,
-  index,
-}: {
-  link: (typeof navLinks)[number];
-  isActive: boolean;
-  onClick: () => void;
-  index: number;
-}) => {
-  return (
-    <motion.li
-      className="relative"
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: index * 0.03 }}
-    >
-      <motion.button
-        type="button"
-        onClick={onClick}
-        className={`group relative text-sm font-medium tracking-wide transition-all duration-300 px-3 py-2 rounded-md overflow-hidden ${
-          isActive 
-            ? "text-primary" 
-            : "text-muted-foreground hover:text-foreground"
-        }`}
-        whileHover={{ y: -2, scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        whileFocus={{ outline: "2px solid hsl(var(--primary))", outlineOffset: "2px" }}
-      >
-        {/* Shimmer effect on hover */}
-        <motion.span
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -z-10"
-          initial={{ x: "-100%" }}
-          whileHover={{ x: "200%" }}
-          transition={{ duration: 0.6, ease: "easeInOut" }}
-        />
-
-        {/* Glowing background on hover */}
-        <motion.span
-          className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent rounded-md -z-10"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: isActive ? 1 : 0, scale: isActive ? 1 : 0.8 }}
-          whileHover={{ opacity: 1, scale: 1.1 }}
-          transition={{ duration: 0.3 }}
-        />
-
-        {/* Glow effect */}
-        <motion.span
-          className="absolute inset-0 bg-primary/20 rounded-md blur-md -z-20 opacity-0"
-          whileHover={{ opacity: 1, scale: 1.2 }}
-          transition={{ duration: 0.3 }}
-        />
-
-        {/* Animated underline with gradient */}
-        <motion.span
-          className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent origin-left"
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: isActive ? 1 : 0 }}
-          whileHover={{ scaleX: 1 }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
-        />
-
-        {/* Floating particles on hover */}
-        <motion.span
-          className="absolute inset-0 pointer-events-none"
-          initial={{ opacity: 0 }}
-          whileHover={{ opacity: 1 }}
-        >
-          {[...Array(2)].map((_, i) => (
-            <motion.span
-              key={i}
-              className="absolute w-1 h-1 bg-primary rounded-full"
-              initial={{
-                x: "50%",
-                y: "50%",
-                scale: 0,
-              }}
-              whileHover={{
-                x: `${50 + (i === 0 ? -20 : 20)}%`,
-                y: `${50 + (i === 0 ? -15 : 15)}%`,
-                scale: [0, 1, 0],
-                opacity: [0, 1, 0],
-              }}
-              transition={{
-                duration: 1.5,
-                repeat: Infinity,
-                delay: i * 0.3,
-                ease: "easeOut",
-              }}
-            />
-          ))}
-        </motion.span>
-
-        <span className="relative z-10">{link.name}</span>
-      </motion.button>
-    </motion.li>
-  );
-};
+// NavLink replaced with EnhancedNavLink component
 
 export const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
   const navRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll();
+  const { scrollYProgress, scrollY } = useScroll();
+  const navScale = useTransform(scrollY, [0, 100], [1, 0.95]);
+  const navOpacity = useTransform(scrollY, [0, 50], [1, 0.98]);
+  const navBlur = useTransform(scrollY, [0, 100], [0, 20]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -266,7 +173,7 @@ export const Navigation = () => {
           <nav className="hidden lg:flex items-center flex-1 justify-end min-w-0">
             <ul className="flex items-center gap-0.5 xl:gap-1 flex-wrap justify-end">
               {navLinks.map((link, index) => (
-                <NavLink
+                <EnhancedNavLink 
                   key={link.name}
                   link={link}
                   isActive={activeSection === link.href.substring(1)}

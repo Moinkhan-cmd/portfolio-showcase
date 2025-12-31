@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { motion } from "framer-motion";
 
 import myPhoto from "@/images/my photo.jpg";
+import { HeroBackground3D } from "./HeroBackground3D";
 
 const socialLinks = [
   { icon: Github, href: "https://github.com/Moinkhan-cmd", label: "GitHub" },
@@ -23,16 +24,8 @@ export const HeroSection = () => {
 
   return (
     <section className="relative min-h-screen overflow-hidden px-4">
-      {/* Background (static, theme-token based) */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-28 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
-        <div className="absolute top-1/4 -left-24 h-72 w-72 rounded-full bg-primary/5 blur-3xl" />
-        <div className="absolute bottom-20 -right-28 h-80 w-80 rounded-full bg-accent/5 blur-3xl" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,hsl(var(--primary)/0.10)_0%,transparent_45%),radial-gradient(circle_at_80%_60%,hsl(var(--accent)/0.08)_0%,transparent_50%)]" />
-      </div>
-
-      {/* Grid Pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border)/0.22)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.22)_1px,transparent_1px)] bg-[size:44px_44px] sm:bg-[size:60px_60px] [mask-image:radial-gradient(ellipse_at_center,black_18%,transparent_72%)]" />
+      {/* 3D Background */}
+      <HeroBackground3D />
 
       <div className="container mx-auto container-padding relative z-10 flex min-h-screen flex-col justify-center pt-28 pb-20 sm:pt-32 sm:pb-28">
         <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-12">

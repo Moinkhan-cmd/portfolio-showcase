@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { AboutBackground3D } from "./AboutBackground3D";
 
 const techStack = [
   "HTML",
@@ -39,6 +40,7 @@ export const AboutSection = () => {
       ref={sectionRef}
       className="section-padding relative"
     >
+      <AboutBackground3D />
       <div className="container mx-auto container-padding">
         <div className="max-w-4xl mx-auto">
           {/* Section Header */}
