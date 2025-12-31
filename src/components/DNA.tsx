@@ -7,7 +7,8 @@ export const DNA = () => {
   
   useFrame((state) => {
     if (groupRef.current) {
-      groupRef.current.rotation.y = state.clock.getElapsedTime() * 0.5;
+      groupRef.current.rotation.y = state.clock.getElapsedTime() * 0.4;
+      groupRef.current.position.y = Math.sin(state.clock.getElapsedTime() * 0.3) * 0.5;
     }
   });
 
@@ -31,9 +32,11 @@ export const DNA = () => {
         <meshStandardMaterial
           color="#06b6d4"
           emissive="#06b6d4"
-          emissiveIntensity={0.5}
-          metalness={0.8}
-          roughness={0.2}
+          emissiveIntensity={0.3}
+          metalness={0.9}
+          roughness={0.1}
+          transparent
+          opacity={0.5}
         />
       </mesh>
     );
@@ -44,9 +47,11 @@ export const DNA = () => {
         <meshStandardMaterial
           color="#8b5cf6"
           emissive="#8b5cf6"
-          emissiveIntensity={0.5}
-          metalness={0.8}
-          roughness={0.2}
+          emissiveIntensity={0.3}
+          metalness={0.9}
+          roughness={0.1}
+          transparent
+          opacity={0.5}
         />
       </mesh>
     );
@@ -57,10 +62,12 @@ export const DNA = () => {
           <cylinderGeometry args={[0.05, 0.05, helixRadius * 2, 8]} />
           <meshStandardMaterial
             color="#fff"
-            opacity={0.3}
+            emissive="#06b6d4"
+            emissiveIntensity={0.1}
+            opacity={0.2}
             transparent
-            metalness={0.5}
-            roughness={0.5}
+            metalness={0.7}
+            roughness={0.3}
           />
         </mesh>
       );

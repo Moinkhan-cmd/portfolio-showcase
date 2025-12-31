@@ -22,15 +22,23 @@ export const Navigation = () => {
   const [activeSection, setActiveSection] = useState("");
   const navRef = useRef<HTMLElement>(null);
   const { scrollYProgress, scrollY } = useScroll();
-  const navScale = useTransform(scrollY, [0, 100], [1, 0.95]);
-  const navOpacity = useTransform(scrollY, [0, 50], [1, 0.98]);
-  const navBlur = useTransform(scrollY, [0, 100], [0, 20]);
+  // Optimize transforms - only update when needed
+  const navScale = useTransform(scrollY, [0, 100], [1, 0.95], { clamp: true });
+  const navOpacity = useTransform(scrollY, [0, 50], [1, 0.98], { clamp: true });
+  const navBlur = useTransform(scrollY, [0, 100], [0, 20], { clamp: true });
 
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setIsScrolled(window.scrollY > 50);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -47,7 +55,7 @@ export const Navigation = () => {
     const observerOptions: IntersectionObserverInit = {
       root: null,
       rootMargin: "-40% 0px -55% 0px",
-      threshold: 0.1,
+      threshold: [0, 0.1, 0.5],
     };
 
     const observer = new IntersectionObserver(observerCallback, observerOptions);
@@ -76,19 +84,25 @@ export const Navigation = () => {
 
   return (
     <>
-      {/* Scroll Progress Bar */}
+      {/* Scroll Progress Bar - Optimized */}
       <motion.div
         className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-primary/80 to-primary z-[60] origin-left"
-        style={{ scaleX: scrollYProgress }}
+        style={{ 
+          scaleX: scrollYProgress,
+          willChange: 'transform',
+          backfaceVisibility: 'hidden',
+          transform: 'translateZ(0)',
+        }}
       />
 
       <nav
         ref={navRef}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 will-change-transform ${
           isScrolled || isMobileMenuOpen
             ? "py-2 sm:py-3 backdrop-blur-xl bg-background/90 border-b border-border/50 shadow-sm"
             : "py-4 sm:py-5 bg-transparent"
         }`}
+        style={{ transform: 'translateZ(0)' }}
       >
         {/* Subtle top border */}
         <motion.div
@@ -242,13 +256,19 @@ export const Navigation = () => {
               <ThemeToggle />
             </motion.div>
             <motion.button
-              className="text-foreground p-2 rounded-lg hover:bg-primary/10 transition-all duration-200 relative group"
-              onClick={() => setIsMobileMenuOpen((v) => !v)}
+              className="text-foreground p-2.5 rounded-lg hover:bg-primary/10 active:bg-primary/20 transition-all duration-200 relative group touch-manipulation"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsMobileMenuOpen((v) => !v);
+              }}
               aria-label="Toggle menu"
+              aria-expanded={isMobileMenuOpen}
               type="button"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               whileFocus={{ outline: "2px solid hsl(var(--primary))", outlineOffset: "2px" }}
+              style={{ WebkitTapHighlightColor: "transparent" }}
             >
               {/* Ripple effect */}
               <motion.span
@@ -266,8 +286,9 @@ export const Navigation = () => {
                     animate={{ rotate: 0, opacity: 1 }}
                     exit={{ rotate: 90, opacity: 0 }}
                     transition={{ duration: 0.2 }}
+                    className="relative z-10"
                   >
-                    <X size={20} className="sm:w-5 sm:h-5" />
+                    <X size={22} className="sm:w-6 sm:h-6" />
                   </motion.div>
                 ) : (
                   <motion.div
@@ -276,8 +297,9 @@ export const Navigation = () => {
                     animate={{ rotate: 0, opacity: 1 }}
                     exit={{ rotate: -90, opacity: 0 }}
                     transition={{ duration: 0.2 }}
+                    className="relative z-10"
                   >
-                    <Menu size={20} className="sm:w-5 sm:h-5" />
+                    <Menu size={22} className="sm:w-6 sm:h-6" />
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -289,105 +311,114 @@ export const Navigation = () => {
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
+              initial={{ opacity: 0, height: 0, marginTop: 0 }}
+              animate={{ opacity: 1, height: "auto", marginTop: "1rem" }}
+              exit={{ opacity: 0, height: 0, marginTop: 0 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="lg:hidden mt-4 sm:mt-6 overflow-hidden"
+              className="lg:hidden overflow-hidden"
+              style={{ marginTop: isMobileMenuOpen ? "1rem" : "0" }}
             >
-              <div className="rounded-xl border border-border/50 bg-background/95 backdrop-blur-xl shadow-lg p-2 max-h-[calc(100vh-96px)] overflow-y-auto">
-              <motion.ul
-                initial={{ y: -10 }}
-                animate={{ y: 0 }}
-                exit={{ y: -10 }}
-                transition={{ duration: 0.3 }}
-                className="flex flex-col gap-1"
-              >
-                {navLinks.map((link, index) => {
-                  const isActive = activeSection === link.href.substring(1);
-                  return (
-                    <motion.li
-                      key={link.name}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05, duration: 0.2 }}
-                    >
-                      <motion.button
-                        type="button"
-                        onClick={() => scrollToSection(link.href)}
-                        className={`w-full text-left py-2.5 sm:py-3 px-4 rounded-lg transition-all duration-200 relative overflow-hidden group ${
-                          isActive
-                            ? "text-primary bg-primary/10"
-                            : "text-muted-foreground hover:text-foreground hover:bg-primary/5"
-                        }`}
-                        whileHover={{ x: 4, scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        whileFocus={{ outline: "2px solid hsl(var(--primary))", outlineOffset: "2px" }}
-                      >
-                        {/* Shimmer effect */}
-                        <motion.span
-                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
-                          initial={{ x: "-100%" }}
-                          whileHover={{ x: "200%" }}
-                          transition={{ duration: 0.6 }}
-                        />
-
-                        {/* Active indicator */}
-                        <motion.span
-                          className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r-full"
-                          initial={{ scaleY: 0 }}
-                          animate={{ scaleY: isActive ? 1 : 0 }}
-                          transition={{ duration: 0.3 }}
-                        />
-
-                        <span className="relative z-10 flex items-center gap-2">
-                          {link.name}
-                          {isActive && (
-                            <motion.span
-                              initial={{ scale: 0, rotate: -180 }}
-                              animate={{ scale: 1, rotate: 0 }}
-                              className="w-1.5 h-1.5 bg-primary rounded-full"
-                            />
-                          )}
-                        </span>
-                      </motion.button>
-                    </motion.li>
-                  );
-                })}
-              </motion.ul>
-
-              {/* Mobile CTA */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: navLinks.length * 0.05 + 0.1 }}
-                className="mt-4 pt-4 border-t border-border/50"
-              >
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+              <div className="rounded-xl border border-border/50 bg-background/95 backdrop-blur-xl shadow-lg p-3 sm:p-4 max-h-[calc(100vh-120px)] overflow-y-auto">
+                <motion.ul
+                  initial={{ y: -10 }}
+                  animate={{ y: 0 }}
+                  exit={{ y: -10 }}
+                  transition={{ duration: 0.3 }}
+                  className="flex flex-col gap-1.5"
                 >
-                  <Button
-                    variant="hero"
-                    size="sm"
-                    onClick={() => scrollToSection("#contact")}
-                    className="w-full relative overflow-hidden"
+                  {navLinks.map((link, index) => {
+                    const isActive = activeSection === link.href.substring(1);
+                    return (
+                      <motion.li
+                        key={link.name}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.05, duration: 0.2 }}
+                        className="relative z-10"
+                      >
+                        <motion.button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            scrollToSection(link.href);
+                          }}
+                          className={`w-full text-left py-3 sm:py-3.5 px-4 rounded-lg transition-all duration-200 relative overflow-visible group touch-manipulation ${
+                            isActive
+                              ? "text-primary bg-primary/10 border border-primary/20"
+                              : "text-muted-foreground hover:text-foreground hover:bg-primary/5 border border-transparent"
+                          }`}
+                          whileHover={{ x: 4, scale: 1.01 }}
+                          whileTap={{ scale: 0.97, x: 2 }}
+                          style={{ WebkitTapHighlightColor: "transparent" }}
+                        >
+                          {/* Shimmer effect */}
+                          <motion.span
+                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent rounded-lg"
+                            initial={{ x: "-100%" }}
+                            whileHover={{ x: "200%" }}
+                            transition={{ duration: 0.6 }}
+                          />
+
+                          {/* Active indicator */}
+                          <motion.span
+                            className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r-full"
+                            initial={{ scaleY: 0 }}
+                            animate={{ scaleY: isActive ? 1 : 0 }}
+                            transition={{ duration: 0.3 }}
+                          />
+
+                          <span className="relative z-10 flex items-center gap-2 text-sm sm:text-base font-medium">
+                            {link.name}
+                            {isActive && (
+                              <motion.span
+                                initial={{ scale: 0, rotate: -180 }}
+                                animate={{ scale: 1, rotate: 0 }}
+                                className="w-1.5 h-1.5 bg-primary rounded-full"
+                              />
+                            )}
+                          </span>
+                        </motion.button>
+                      </motion.li>
+                    );
+                  })}
+                </motion.ul>
+
+                {/* Mobile CTA */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: navLinks.length * 0.05 + 0.1 }}
+                  className="mt-4 pt-4 border-t border-border/50"
+                >
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    <motion.span
-                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                      animate={{
-                        x: ["-100%", "200%"],
+                    <Button
+                      variant="hero"
+                      size="sm"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        scrollToSection("#contact");
                       }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        ease: "linear",
-                      }}
-                    />
-                    <span className="relative z-10">Hire Me</span>
-                  </Button>
+                      className="w-full relative overflow-hidden touch-manipulation"
+                      style={{ WebkitTapHighlightColor: "transparent" }}
+                    >
+                      <motion.span
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                        animate={{
+                          x: ["-100%", "200%"],
+                        }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
+                      />
+                      <span className="relative z-10 font-medium">Hire Me</span>
+                    </Button>
+                  </motion.div>
                 </motion.div>
-              </motion.div>
               </div>
             </motion.div>
           )}

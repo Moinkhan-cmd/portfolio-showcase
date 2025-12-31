@@ -24,7 +24,10 @@ export const AboutSection = () => {
           setIsVisible(true);
         }
       },
-      { threshold: 0.2 }
+      { 
+        threshold: 0.2,
+        rootMargin: '50px'
+      }
     );
 
     if (sectionRef.current) {
@@ -38,18 +41,34 @@ export const AboutSection = () => {
     <section 
       id="about" 
       ref={sectionRef}
-      className="section-padding relative"
+      className="section-padding relative overflow-hidden"
     >
       <AboutBackground3D />
-      <div className="container mx-auto container-padding">
+      
+      {/* Enhanced dark overlay for better text contrast with gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/85 to-background/70 pointer-events-none z-10" />
+      
+      {/* Additional radial gradient overlay for center focus */}
+      <div className="absolute inset-0 bg-radial-gradient from-transparent via-background/40 to-background/70 pointer-events-none z-10" 
+           style={{
+             background: 'radial-gradient(ellipse at center, transparent 0%, hsl(222 47% 6% / 0.4) 50%, hsl(222 47% 6% / 0.7) 100%)'
+           }} 
+      />
+      
+      <div className="container mx-auto container-padding relative z-20">
         <div className="max-w-4xl mx-auto">
           {/* Section Header */}
-          <div className={`text-center mb-10 sm:mb-16 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}>
-            <span className="text-primary text-sm font-medium uppercase tracking-wider">About Me</span>
-            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold mt-3 sm:mt-4">
+          <motion.div 
+            initial={{ opacity: 0, y: -30 }}
+            animate={isVisible ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-10 sm:mb-16 relative z-20"
+          >
+            <span className="text-primary text-sm font-medium uppercase tracking-wider drop-shadow-sm">About Me</span>
+            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold mt-3 sm:mt-4 text-foreground drop-shadow-md">
               Get to Know <span className="gradient-text">Me</span>
             </h2>
-          </div>
+          </motion.div>
 
           {/* Content */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 items-center">
@@ -106,22 +125,24 @@ export const AboutSection = () => {
             </motion.div>
 
             {/* Text Content */}
-            <div 
-              className={`${isVisible ? 'animate-slide-up' : 'opacity-0'}`}
-              style={{ animationDelay: '0.3s' }}
+            <motion.div 
+              initial={{ opacity: 0, x: 50 }}
+              animate={isVisible ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="relative z-20"
             >
-              <p className="text-base sm:text-lg text-muted-foreground leading-relaxed mb-4 sm:mb-6">
-               I’m a passionate front-end web developer with a strong interest in building seamless digital experiences that blend modern design with clean, efficient 
+              <p className="text-base sm:text-lg text-foreground leading-relaxed mb-4 sm:mb-6 font-medium drop-shadow-sm">
+               I'm a passionate front-end web developer with a strong interest in building seamless digital experiences that blend modern design with clean, efficient 
                code. I enjoy turning ideas into responsive, user-friendly interfaces using HTML, CSS, JavaScript, React and modern tools.
               </p>
-              <p className="text-base sm:text-lg text-muted-foreground leading-relaxed mb-6 sm:mb-8">
-                I’m continuously learning and improving my skills while working on real-world projects that focus on performance, accessibility, and visual appeal. Currently, I’m looking for opportunities
+              <p className="text-base sm:text-lg text-foreground leading-relaxed mb-6 sm:mb-8 font-medium drop-shadow-sm">
+                I'm continuously learning and improving my skills while working on real-world projects that focus on performance, accessibility, and visual appeal. Currently, I'm looking for opportunities
                  where I can grow as a developer, collaborate with creative teams, and contribute to meaningful, impactful products.
               </p>
 
               {/* Tech Stack */}
               <div>
-                <h3 className="font-display text-base sm:text-lg font-semibold mb-3 sm:mb-4">Tech Stack</h3>
+                <h3 className="font-display text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-foreground drop-shadow-sm">Tech Stack</h3>
                 <div className="flex flex-wrap gap-2 sm:gap-3">
                   {techStack.map((tech, index) => (
                     <motion.span
@@ -137,7 +158,7 @@ export const AboutSection = () => {
                   ))}
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>
