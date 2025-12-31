@@ -41,17 +41,17 @@ export const AboutSection = () => {
     <section 
       id="about" 
       ref={sectionRef}
-      className="section-padding relative overflow-hidden"
+      className="section-padding relative overflow-hidden min-h-screen"
     >
       <AboutBackground3D />
       
-      {/* Enhanced dark overlay for better text contrast with gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/85 to-background/70 pointer-events-none z-10" />
+      {/* Enhanced dark overlay for better text contrast with gradient - lighter to show 3D */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/65 to-background/50 pointer-events-none z-10" />
       
-      {/* Additional radial gradient overlay for center focus */}
-      <div className="absolute inset-0 bg-radial-gradient from-transparent via-background/40 to-background/70 pointer-events-none z-10" 
+      {/* Additional radial gradient overlay for center focus - lighter */}
+      <div className="absolute inset-0 pointer-events-none z-10" 
            style={{
-             background: 'radial-gradient(ellipse at center, transparent 0%, hsl(222 47% 6% / 0.4) 50%, hsl(222 47% 6% / 0.7) 100%)'
+             background: 'radial-gradient(ellipse at center, transparent 0%, hsl(222 47% 6% / 0.2) 50%, hsl(222 47% 6% / 0.5) 100%)'
            }} 
       />
       

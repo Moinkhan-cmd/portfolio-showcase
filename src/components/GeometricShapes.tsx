@@ -27,11 +27,11 @@ export const GeometricShapes = () => {
           <meshStandardMaterial
             color={shape.color}
             emissive={shape.color}
-            emissiveIntensity={0.2}
+            emissiveIntensity={0.5}
             metalness={0.7}
             roughness={0.3}
             transparent
-            opacity={0.4}
+            opacity={0.6}
             wireframe={i % 2 === 0}
           />
         </mesh>

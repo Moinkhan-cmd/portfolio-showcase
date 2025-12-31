@@ -32,11 +32,11 @@ export const DNA = () => {
         <meshStandardMaterial
           color="#06b6d4"
           emissive="#06b6d4"
-          emissiveIntensity={0.3}
+          emissiveIntensity={0.6}
           metalness={0.9}
           roughness={0.1}
           transparent
-          opacity={0.5}
+          opacity={0.8}
         />
       </mesh>
     );
@@ -47,11 +47,11 @@ export const DNA = () => {
         <meshStandardMaterial
           color="#8b5cf6"
           emissive="#8b5cf6"
-          emissiveIntensity={0.3}
+          emissiveIntensity={0.6}
           metalness={0.9}
           roughness={0.1}
           transparent
-          opacity={0.5}
+          opacity={0.8}
         />
       </mesh>
     );

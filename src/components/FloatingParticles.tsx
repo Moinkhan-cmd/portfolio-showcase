@@ -56,11 +56,11 @@ export const FloatingParticles = () => {
           <meshStandardMaterial
             color={particle.color}
             emissive={particle.color}
-            emissiveIntensity={0.4}
+            emissiveIntensity={0.7}
             metalness={0.6}
             roughness={0.4}
             transparent
-            opacity={0.5}
+            opacity={0.7}
           />
         </mesh>
       ))}
