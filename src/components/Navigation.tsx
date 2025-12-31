@@ -178,8 +178,8 @@ export const Navigation = () => {
       <nav
         ref={navRef}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled 
-            ? "py-2 sm:py-3 backdrop-blur-xl bg-background/80 border-b border-border/50 shadow-sm" 
+          isScrolled || isMobileMenuOpen
+            ? "py-2 sm:py-3 backdrop-blur-xl bg-background/90 border-b border-border/50 shadow-sm"
             : "py-4 sm:py-5 bg-transparent"
         }`}
       >
@@ -386,8 +386,9 @@ export const Navigation = () => {
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="lg:hidden mt-4 sm:mt-6 pb-4 overflow-hidden"
+              className="lg:hidden mt-4 sm:mt-6 overflow-hidden"
             >
+              <div className="rounded-xl border border-border/50 bg-background/95 backdrop-blur-xl shadow-lg p-2 max-h-[calc(100vh-96px)] overflow-y-auto">
               <motion.ul
                 initial={{ y: -10 }}
                 animate={{ y: 0 }}
@@ -480,6 +481,7 @@ export const Navigation = () => {
                   </Button>
                 </motion.div>
               </motion.div>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
