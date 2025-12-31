@@ -95,3 +95,4 @@ When deploying to production (Netlify, Vercel, etc.):
    - `VITE_EMAILJS_PUBLIC_KEY`
 3. Redeploy your application
 
+

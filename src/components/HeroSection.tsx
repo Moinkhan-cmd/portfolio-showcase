@@ -10,7 +10,7 @@ import myPhoto from "@/images/my photo.jpg";
 const socialLinks = [
   { icon: Github, href: "https://github.com/Moinkhan-cmd", label: "GitHub" },
   { icon: Linkedin, href: "https://www.linkedin.com/in/moin-bhatti-65363a255", label: "LinkedIn" },
-  { icon: Mail, href: "#", label: "Email" },
+  { icon: Mail, href: "https://mail.google.com/mail/?view=cm&fs=1&to=moinbhatti59%40gmail.com", label: "Email" },
 ] as const;
 
 export const HeroSection = () => {
