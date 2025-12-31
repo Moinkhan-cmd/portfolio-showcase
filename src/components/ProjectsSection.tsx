@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import weatherAppImage from "@/images/weather-app.png";
 import resumeBuilderImage from "@/images/resume-builder.png";
+import { ProjectsBackground3D } from "./ProjectsBackground3D";
 
 
 const projects = [
@@ -411,8 +412,18 @@ export const ProjectsSection = () => {
       ref={sectionRef}
       className="section-padding relative overflow-hidden"
     >
+      <ProjectsBackground3D />
+      
+      {/* Overlay for text contrast */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/65 to-background/50 pointer-events-none z-10" />
+      <div className="absolute inset-0 pointer-events-none z-10" 
+           style={{
+             background: 'radial-gradient(ellipse at center, transparent 0%, hsl(222 47% 6% / 0.2) 50%, hsl(222 47% 6% / 0.5) 100%)'
+           }} 
+      />
+      
       {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-10 opacity-30">
         <motion.div
           className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl"
           animate={{
@@ -444,7 +455,7 @@ export const ProjectsSection = () => {
       {/* Grid pattern overlay */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border)/0.15)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.15)_1px,transparent_1px)] bg-[size:60px_60px] sm:bg-[size:80px_80px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_70%)] pointer-events-none" />
 
-      <div className="container mx-auto container-padding relative z-10">
+      <div className="container mx-auto container-padding relative z-20">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}

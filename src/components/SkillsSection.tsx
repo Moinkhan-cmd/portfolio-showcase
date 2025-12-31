@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Code2, Database, Users, Wrench, Code } from "lucide-react";
 import { motion } from "framer-motion";
+import { SkillsBackground3D } from "./SkillsBackground3D";
 
 const skillCategories = [
   {
@@ -80,12 +81,22 @@ export const SkillsSection = () => {
     <section
       id="skills"
       ref={sectionRef}
-      className="section-padding relative bg-secondary/30"
+      className="section-padding relative bg-secondary/30 overflow-hidden"
     >
+      <SkillsBackground3D />
+      
+      {/* Overlay for text contrast */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/65 to-background/50 pointer-events-none z-10" />
+      <div className="absolute inset-0 pointer-events-none z-10" 
+           style={{
+             background: 'radial-gradient(ellipse at center, transparent 0%, hsl(222 47% 6% / 0.2) 50%, hsl(222 47% 6% / 0.5) 100%)'
+           }} 
+      />
+      
       {/* Background decoration */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border)/0.2)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.2)_1px,transparent_1px)] bg-[size:80px_80px]" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border)/0.2)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.2)_1px,transparent_1px)] bg-[size:80px_80px] opacity-30 z-10" />
 
-      <div className="container mx-auto container-padding relative z-10">
+      <div className="container mx-auto container-padding relative z-20">
         {/* Section Header */}
         <div className={`text-center mb-10 sm:mb-16 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}>
           <span className="text-primary text-sm font-medium uppercase tracking-wider">Skills</span>

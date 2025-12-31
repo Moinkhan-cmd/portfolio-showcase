@@ -26,6 +26,14 @@ export const HeroSection = () => {
     <section className="relative min-h-screen overflow-hidden px-4">
       {/* 3D Background */}
       <HeroBackground3D />
+      
+      {/* Overlay for text contrast */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/60 to-background/40 pointer-events-none z-[1]" />
+      <div className="absolute inset-0 pointer-events-none z-[1]" 
+           style={{
+             background: 'radial-gradient(ellipse at center, transparent 0%, hsl(222 47% 6% / 0.15) 50%, hsl(222 47% 6% / 0.4) 100%)'
+           }} 
+      />
 
       <div className="container mx-auto container-padding relative z-10 flex min-h-screen flex-col justify-center pt-28 pb-20 sm:pt-32 sm:pb-28">
         <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-12">

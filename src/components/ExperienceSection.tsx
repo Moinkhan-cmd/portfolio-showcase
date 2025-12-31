@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Briefcase, Calendar } from "lucide-react";
 import { motion } from "framer-motion";
+import { ExperienceBackground3D } from "./ExperienceBackground3D";
 
 const experiences = [
   {
@@ -42,15 +43,25 @@ export const ExperienceSection = () => {
     <section
       id="experience"
       ref={sectionRef}
-      className="section-padding relative bg-secondary/30"
+      className="section-padding relative bg-secondary/30 overflow-hidden"
     >
+      <ExperienceBackground3D />
+      
+      {/* Overlay for text contrast */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/65 to-background/50 pointer-events-none z-10" />
+      <div className="absolute inset-0 pointer-events-none z-10" 
+           style={{
+             background: 'radial-gradient(ellipse at center, transparent 0%, hsl(222 47% 6% / 0.2) 50%, hsl(222 47% 6% / 0.5) 100%)'
+           }} 
+      />
+      
       {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden opacity-30 z-10">
         <div className="absolute top-1/2 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -translate-x-1/2" />
         <div className="absolute bottom-0 right-0 w-80 h-80 bg-primary/5 rounded-full blur-3xl translate-x-1/2" />
       </div>
 
-      <div className="container mx-auto container-padding relative z-10">
+      <div className="container mx-auto container-padding relative z-20">
         {/* Section Header */}
         <div className={`text-center mb-10 sm:mb-16 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}>
           <span className="text-primary text-sm font-medium uppercase tracking-wider">Experience</span>

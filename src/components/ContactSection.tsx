@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import emailjs from "@emailjs/browser";
+import { ContactBackground3D } from "./ContactBackground3D";
 
 const socialLinks = [
   { name: "GitHub", icon: Github, url: "https://github.com/Moinkhan-cmd", label: "github.com/Moinkhan-cmd" },
@@ -95,15 +96,24 @@ export const ContactSection = () => {
     <section
       id="contact"
       ref={sectionRef}
-      className="section-padding relative"
+      className="section-padding relative overflow-hidden"
     >
+      <ContactBackground3D />
+      
+      {/* Overlay for text contrast */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/65 to-background/50 pointer-events-none z-10" />
+      <div className="absolute inset-0 pointer-events-none z-10" 
+           style={{
+             background: 'radial-gradient(ellipse at center, transparent 0%, hsl(222 47% 6% / 0.2) 50%, hsl(222 47% 6% / 0.5) 100%)'
+           }} 
+      />
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-0 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 left-0 w-80 h-80 bg-primary/5 rounded-full blur-3xl" />
       </div>
 
-      <div className="container mx-auto container-padding relative z-10">
+      <div className="container mx-auto container-padding relative z-20">
         {/* Section Header */}
         <div className={`text-center mb-10 sm:mb-16 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}>
           <span className="text-primary text-sm font-medium uppercase tracking-wider">Contact</span>
