@@ -1,0 +1,29 @@
+// Firebase Storage Security Rules
+// Copy these rules to Firebase Console > Storage > Rules
+
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Public read access for portfolio images
+    // Anyone can read images (thumbnails, project images, certificates)
+    match /projects/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAuthenticated(); // Only authenticated users can upload
+    }
+    
+    match /certifications/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAuthenticated(); // Only authenticated users can upload
+    }
+    
+    // Note: In production, you may want to restrict write access to admin only
+    // For now, any authenticated user can upload (Firebase Auth will handle admin-only access via your app)
+  }
+}
+

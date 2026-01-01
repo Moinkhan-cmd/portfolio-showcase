@@ -1,0 +1,56 @@
+// Firebase Firestore Security Rules
+// Copy these rules to Firebase Console > Firestore Database > Rules
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return isAuthenticated() && 
+             request.auth.token.email == request.resource.data.adminEmail;
+    }
+    
+    // Public read access for portfolio data
+    // Anyone can read projects, certifications, experience, and skills
+    match /projects/{projectId} {
+      allow read: if true;
+      allow write: if isAuthenticated() && 
+                      request.auth.token.email == resource.data.get('adminEmail', '') ||
+                      request.auth.token.email == get(/databases/$(database)/documents/admin/config).data.adminEmail;
+    }
+    
+    match /certifications/{certId} {
+      allow read: if true;
+      allow write: if isAuthenticated() && 
+                      request.auth.token.email == resource.data.get('adminEmail', '') ||
+                      request.auth.token.email == get(/databases/$(database)/documents/admin/config).data.adminEmail;
+    }
+    
+    match /experience/{expId} {
+      allow read: if true;
+      allow write: if isAuthenticated() && 
+                      request.auth.token.email == resource.data.get('adminEmail', '') ||
+                      request.auth.token.email == get(/databases/$(database)/documents/admin/config).data.adminEmail;
+    }
+    
+    match /skills/{skillId} {
+      allow read: if true;
+      allow write: if isAuthenticated() && 
+                      request.auth.token.email == resource.data.get('adminEmail', '') ||
+                      request.auth.token.email == get(/databases/$(database)/documents/admin/config).data.adminEmail;
+    }
+    
+    // Admin configuration (optional - for storing admin email)
+    match /admin/config {
+      allow read: if isAuthenticated();
+      allow write: if false; // Only set via Firebase Console
+    }
+  }
+}
+
