@@ -1,64 +1,41 @@
-import { useEffect, useRef, useState } from "react";
-import { Code2, Database, Users, Wrench, Code } from "lucide-react";
+import { useEffect, useRef, useState, useMemo } from "react";
+import { Code2, Database, Users, Wrench, Code, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { SkillsBackground3D } from "./SkillsBackground3D";
+import { useSkills } from "@/hooks/useSkills";
+import type { Skill } from "@/lib/admin/skills";
 
-const skillCategories = [
-  {
-    title: "Frontend Development",
-    icon: Code2,
-    skills: [
-      { name: "HTML5 & CSS3" },
-      { name: "JavaScript" },
-      { name: "React.js" },
-      { name: "Tailwind CSS" },
-      { name: "Responsive UI Design" },
-    ],
-  },
-  {
-    title: "Backend & Database",
-    icon: Database,
-    skills: [
-      { name: "Node.js" },
-      { name: "Express.js" },
-      { name: "PHP" },
-      { name: "MySQL" },
-    ],
-  },
-  {
-    title: "Programming Languages",
-    icon: Code,
-    skills: [
-      { name: "JavaScript" },
-      { name: "Java" },
-      { name: "Python" },
-      { name: "C / C++" },
-    ],
-  },
-  {
-    title: "Tools & Platforms",
-    icon: Wrench,
-    skills: [
-      { name: "Git & GitHub" },
-      { name: "VS Code" },
-      { name: "XAMPP" },
-    ],
-  },
-  {
-    title: "Soft Skills",
-    icon: Users,
-    skills: [
-      { name: "Team Collaboration" },
-      { name: "Communication" },
-      { name: "Problem Solving" },
-      { name: "Time Management" },
-    ],
-  },
-];
+// Icon mapping for categories
+const categoryIcons: Record<string, typeof Code2> = {
+  "Frontend Development": Code2,
+  "Backend & Database": Database,
+  "Programming Languages": Code,
+  "Tools & Platforms": Wrench,
+  "Soft Skills": Users,
+};
 
 export const SkillsSection = () => {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
+  const { data: skills = [], isLoading } = useSkills();
+
+  // Group skills by category
+  const skillCategories = useMemo(() => {
+    const grouped = skills.reduce((acc, skill) => {
+      const category = skill.category || "Other";
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push(skill);
+      return acc;
+    }, {} as Record<string, Skill[]>);
+
+    return Object.entries(grouped).map(([category, categorySkills]) => ({
+      title: category,
+      icon: categoryIcons[category] || Code,
+      skills: categorySkills,
+    }));
+  }, [skills]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -109,53 +86,67 @@ export const SkillsSection = () => {
         </div>
 
         {/* Skills Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto">
-          {skillCategories.map((category, categoryIndex) => (
-            <motion.div
-              key={category.title}
-              initial={{ opacity: 0, y: 30 }}
-              animate={isVisible ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: 0.1 + categoryIndex * 0.1 }}
-              whileHover={{ y: -8, scale: 1.02 }}
-              className="glass-enhanced rounded-xl sm:rounded-2xl p-4 sm:p-6 card-hover"
-            >
-              {/* Category Header */}
-              <motion.div 
-                className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6"
-                whileHover={{ x: 5 }}
-              >
-                <motion.div 
-                  className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-primary/10"
-                  whileHover={{ rotate: 360, scale: 1.1 }}
-                  transition={{ duration: 0.5 }}
+        {isLoading ? (
+          <div className="flex items-center justify-center min-h-[400px]">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        ) : skillCategories.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto">
+            {skillCategories.map((category, categoryIndex) => {
+              const IconComponent = category.icon;
+              return (
+                <motion.div
+                  key={category.title}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={isVisible ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.5, delay: 0.1 + categoryIndex * 0.1 }}
+                  whileHover={{ y: -8, scale: 1.02 }}
+                  className="glass-enhanced rounded-xl sm:rounded-2xl p-4 sm:p-6 card-hover"
                 >
-                  <category.icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
-                </motion.div>
-                <h3 className="font-display text-lg sm:text-xl font-semibold">{category.title}</h3>
-              </motion.div>
-
-              {/* Skills as Badges */}
-              <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                {category.skills.map((skill, skillIndex) => (
-                  <motion.span
-                    key={skill.name}
-                    initial={{ opacity: 0, scale: 0 }}
-                    animate={isVisible ? { opacity: 1, scale: 1 } : {}}
-                    transition={{ 
-                      duration: 0.3, 
-                      delay: 0.2 + categoryIndex * 0.1 + skillIndex * 0.05,
-                      type: "spring"
-                    }}
-                    whileHover={{ scale: 1.15, y: -3, rotate: 2 }}
-                    className="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium bg-primary/10 text-primary rounded-md sm:rounded-lg border border-primary/20 hover:bg-primary/20 hover:border-primary/40 transition-all duration-300 cursor-default magnetic-hover"
+                  {/* Category Header */}
+                  <motion.div 
+                    className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6"
+                    whileHover={{ x: 5 }}
                   >
-                    {skill.name}
-                  </motion.span>
-                ))}
-              </div>
-            </motion.div>
-          ))}
-        </div>
+                    <motion.div 
+                      className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-primary/10"
+                      whileHover={{ rotate: 360, scale: 1.1 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+                    </motion.div>
+                    <h3 className="font-display text-lg sm:text-xl font-semibold">{category.title}</h3>
+                  </motion.div>
+
+                  {/* Skills as Badges */}
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                    {category.skills.map((skill, skillIndex) => (
+                      <motion.span
+                        key={skill.id || skill.name}
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={isVisible ? { opacity: 1, scale: 1 } : {}}
+                        transition={{ 
+                          duration: 0.3, 
+                          delay: 0.2 + categoryIndex * 0.1 + skillIndex * 0.05,
+                          type: "spring"
+                        }}
+                        whileHover={{ scale: 1.15, y: -3, rotate: 2 }}
+                        className="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium bg-primary/10 text-primary rounded-md sm:rounded-lg border border-primary/20 hover:bg-primary/20 hover:border-primary/40 transition-all duration-300 cursor-default magnetic-hover"
+                      >
+                        {skill.icon && <span className="mr-1">{skill.icon}</span>}
+                        {skill.name}
+                      </motion.span>
+                    ))}
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">No skills available yet.</p>
+          </div>
+        )}
       </div>
     </section>
   );
