@@ -115,8 +115,8 @@ export const HeroSection = () => {
                     <a 
                       href={href} 
                       aria-label={label} 
-                      target={href === "#" ? undefined : "_blank"} 
-                      rel={href === "#" ? undefined : "noopener noreferrer"}
+                      target="_blank" 
+                      rel="noopener noreferrer"
                     >
                       <Icon className="h-5 w-5" />
                     </a>
