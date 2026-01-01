@@ -1,43 +1,17 @@
 import { useRef, useState, type CSSProperties } from "react";
-import { ExternalLink, Github, Folder, Sparkles, ArrowRight } from "lucide-react";
+import { ExternalLink, Github, Folder, Sparkles, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import weatherAppImage from "@/images/weather-app.png";
-import resumeBuilderImage from "@/images/resume-builder.png";
 import { ProjectsBackground3D } from "./ProjectsBackground3D";
+import { useProjects } from "@/hooks/useProjects";
+import type { Project } from "@/lib/admin/projects";
 
+interface ProjectCardProps {
+  project: Project;
+  index: number;
+}
 
-const projects = [
-  {
-    title: "Project Name Here",
-    description:
-      "Brief description of what this project does. Explain the problem it solves and key features.",
-    techStack: ["React", "TypeScript", "Tailwind CSS"],
-    liveUrl: "#",
-    githubUrl: "https://github.com/Moinkhan-cmd",
-    image: null,
-  },
-  {
-    title: "Resume Builder",
-    description:
-      "A user-friendly resume builder that enables real-time resume creation with a clean UI, responsive layout, and instant preview for professional results.",
-    techStack: ["HTML", "CSS", "JavaScript"],
-    liveUrl: "https://inquisitive-manatee-1675af.netlify.app/",
-    githubUrl: "git@github.com:Moinkhan-cmd/Resume-builder.git",
-    image: resumeBuilderImage,
-  },
-  {
-    title: "Weather Application",
-    description:
-      "A beautiful weather app that displays current conditions and forecasts using a weather API.",
-    techStack: ["HTML", "CSS", "JavaScript", "API"],
-    liveUrl: "https://inspiring-speculoos-f9e5d7.netlify.app/",
-    githubUrl: "https://github.com/Moinkhan-cmd/Weather-App",
-    image: weatherAppImage,
-  },
-];
-
-const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: number }) => {
+const ProjectCard = ({ project, index }: ProjectCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -138,9 +112,9 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: n
               ease: "linear",
             }}          />
 
-          {project.image ? (
+          {project.thumbnail ? (
             <motion.img
-              src={project.image}
+              src={project.thumbnail}
               alt={project.title}
               className="w-full h-full object-cover"
               animate={{
@@ -309,7 +283,7 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: n
           </motion.div>
 
           <p className="text-muted-foreground text-xs sm:text-sm mb-3 sm:mb-4 leading-relaxed line-clamp-2 sm:line-clamp-3">
-            {project.description}
+            {project.shortDescription}
           </p>
 
           {/* Tech Stack */}
@@ -405,6 +379,12 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: n
 
 export const ProjectsSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
+  const { data: projects = [], isLoading } = useProjects();
+
+  // Filter featured projects or show all if none are featured
+  const displayProjects = projects.filter((p) => p.featured).length > 0
+    ? projects.filter((p) => p.featured)
+    : projects;
 
   return (
     <section
@@ -497,11 +477,21 @@ export const ProjectsSection = () => {
         </motion.div>
 
         {/* Projects Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 max-w-6xl mx-auto">
-          {projects.map((project, index) => (
-            <ProjectCard key={project.title} project={project} index={index} />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="flex items-center justify-center min-h-[400px]">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        ) : displayProjects.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 max-w-6xl mx-auto">
+            {displayProjects.map((project, index) => (
+              <ProjectCard key={project.id || project.title} project={project} index={index} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">No projects available yet.</p>
+          </div>
+        )}
       </div>
     </section>
   );
