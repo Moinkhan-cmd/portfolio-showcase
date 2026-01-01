@@ -4,17 +4,19 @@ import { Suspense, useState, useEffect, useRef } from "react";
 import { DNA } from "./DNA";
 import { FloatingParticles } from "./FloatingParticles";
 import { GeometricShapes } from "./GeometricShapes";
+import { useScrollPause } from "@/hooks/useScrollPause";
 
 export const AboutBackground3D = () => {
   const [isVisible, setIsVisible] = useState(true); // Start as true to show immediately
   const containerRef = useRef<HTMLDivElement>(null);
+  const isScrolling = useScrollPause(200);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         setIsVisible(entry.isIntersecting);
       },
-      { threshold: 0, rootMargin: '200px' } // More lenient threshold
+      { threshold: 0.1, rootMargin: '50px' } // Only render when actually visible
     );
 
     if (containerRef.current) {
@@ -34,12 +36,13 @@ export const AboutBackground3D = () => {
     >
       {isVisible && (
         <Canvas
-          dpr={[1, 1.5]}
-          performance={{ min: 0.5 }}
+          dpr={[1, 1]}
+          performance={{ min: 0.3, max: 0.8 }}
+          frameloop={isScrolling ? "never" : "always"}
           gl={{ 
-            antialias: true,
+            antialias: false,
             alpha: true,
-            powerPreference: "high-performance"
+            powerPreference: "low-power"
           }}
           style={{ opacity: 0.4 }}
         >
@@ -67,11 +70,11 @@ export const AboutBackground3D = () => {
             <Stars 
               radius={15} 
               depth={5} 
-              count={150} 
-              factor={3} 
-              saturation={0.8} 
+              count={50} 
+              factor={2} 
+              saturation={0.6} 
               fade 
-              speed={0.5}
+              speed={0.3}
             />
             
             <OrbitControls 

@@ -1,5 +1,6 @@
 import { Github, Linkedin, Mail, Heart, Code2, Sparkles, ArrowUp } from "lucide-react";
 import { motion } from "framer-motion";
+import { FooterBackground3D } from "./FooterBackground3D";
 
 const socialLinks = [
   { icon: Github, url: "https://github.com/Moinkhan-cmd", label: "GitHub" },
@@ -30,8 +31,18 @@ export const Footer = () => {
   };
 
   return (
-    <footer className="relative mt-20 border-t border-primary/20 bg-background">
-      <div className="container mx-auto container-padding py-12 sm:py-16">
+    <footer className="relative mt-20 border-t border-primary/20 bg-background overflow-hidden">
+      <FooterBackground3D />
+      
+      {/* Overlay for text contrast */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/65 to-background/50 pointer-events-none z-10" />
+      <div className="absolute inset-0 pointer-events-none z-10" 
+           style={{
+             background: 'radial-gradient(ellipse at center, transparent 0%, hsl(222 47% 6% / 0.2) 50%, hsl(222 47% 6% / 0.5) 100%)'
+           }} 
+      />
+      
+      <div className="container mx-auto container-padding py-12 sm:py-16 relative z-20">
         {/* Main Footer Content - Three Columns */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 mb-8">
           

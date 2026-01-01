@@ -1,12 +1,12 @@
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera, Stars } from "@react-three/drei";
 import { Suspense, useState, useEffect, useRef } from "react";
-import { useRef as useRef3D, useFrame } from "@react-three/fiber";
+import { useScrollPause } from "@/hooks/useScrollPause";
 import * as THREE from "three";
 
 // Professional timeline-like elements
 const TimelineElements = () => {
-  const groupRef = useRef3D<THREE.Group>(null);
+  const groupRef = useRef<THREE.Group>(null);
 
   useFrame((state) => {
     if (groupRef.current) {
@@ -26,7 +26,7 @@ const TimelineElements = () => {
     <group ref={groupRef}>
       {elements.map((element, i) => (
         <mesh key={i} position={element.position as [number, number, number]}>
-          <cylinderGeometry args={[element.size, element.size, element.size * 2, 16]} />
+          <cylinderGeometry args={[element.size, element.size, element.size * 2, 8]} />
           <meshStandardMaterial
             color={element.color}
             emissive={element.color}
@@ -44,10 +44,10 @@ const TimelineElements = () => {
 
 // Floating professional icons
 const ProfessionalParticles = () => {
-  const groupRef = useRef3D<THREE.Group>(null);
+  const groupRef = useRef<THREE.Group>(null);
   const particles: Array<{ position: [number, number, number]; speed: number; size: number }> = [];
 
-  for (let i = 0; i < 35; i++) {
+  for (let i = 0; i < 18; i++) { // Reduced from 35
     particles.push({
       position: [
         (Math.random() - 0.5) * 18,
@@ -80,7 +80,7 @@ const ProfessionalParticles = () => {
     <group ref={groupRef}>
       {particles.map((particle, i) => (
         <mesh key={i} position={particle.position}>
-          <sphereGeometry args={[particle.size, 16, 16]} />
+          <sphereGeometry args={[particle.size, 8, 8]} />
           <meshStandardMaterial
             color={i % 2 === 0 ? "#06b6d4" : "#8b5cf6"}
             emissive={i % 2 === 0 ? "#06b6d4" : "#8b5cf6"}
@@ -99,13 +99,14 @@ const ProfessionalParticles = () => {
 export const ExperienceBackground3D = () => {
   const [isVisible, setIsVisible] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
+  const isScrolling = useScrollPause(200);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         setIsVisible(entry.isIntersecting);
       },
-      { threshold: 0, rootMargin: '200px' }
+      { threshold: 0.1, rootMargin: '50px' }
     );
 
     if (containerRef.current) {
@@ -124,12 +125,13 @@ export const ExperienceBackground3D = () => {
     >
       {isVisible && (
         <Canvas
-          dpr={[1, 1.5]}
-          performance={{ min: 0.5 }}
+          dpr={[1, 1]}
+          performance={{ min: 0.3, max: 0.8 }}
+          frameloop={isVisible && !isScrolling ? "always" : "never"}
           gl={{ 
-            antialias: true,
+            antialias: false,
             alpha: true,
-            powerPreference: "high-performance"
+            powerPreference: "low-power"
           }}
           style={{ opacity: 0.3 }}
         >
@@ -146,11 +148,11 @@ export const ExperienceBackground3D = () => {
             <Stars 
               radius={15} 
               depth={5} 
-              count={110} 
-              factor={2.5} 
-              saturation={0.7} 
+              count={50} 
+              factor={2} 
+              saturation={0.6} 
               fade 
-              speed={0.4}
+              speed={0.3}
             />
             
             <OrbitControls 

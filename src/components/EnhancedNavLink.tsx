@@ -116,6 +116,8 @@ export const EnhancedNavLink = ({ link, isActive, onClick, index }: EnhancedNavL
           style={{
             background: "linear-gradient(90deg, #06b6d4, #8b5cf6, #ec4899, #06b6d4)",
             backgroundSize: "200% 100%",
+            boxShadow: "0 0 15px rgba(6, 182, 212, 0.6)",
+            transform: "translateZ(8px)"
           }}
           initial={{ scaleX: 0, opacity: 0 }}
           animate={{ 
@@ -127,10 +129,6 @@ export const EnhancedNavLink = ({ link, isActive, onClick, index }: EnhancedNavL
           transition={{ 
             scaleX: { duration: 0.3 },
             backgroundPosition: { duration: 2, repeat: Infinity, ease: "linear" }
-          }}
-          style={{ 
-            boxShadow: "0 0 15px rgba(6, 182, 212, 0.6)",
-            transform: "translateZ(8px)"
           }}
         />
 

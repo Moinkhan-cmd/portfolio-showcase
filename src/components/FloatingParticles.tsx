@@ -12,7 +12,7 @@ interface Particle {
 
 export const FloatingParticles = () => {
   const groupRef = useRef<THREE.Group>(null);
-  const count = 40;
+  const count = 20; // Reduced from 40 for better performance
   const particles: Particle[] = [];
 
   // Generate random particles
@@ -52,7 +52,7 @@ export const FloatingParticles = () => {
     <group ref={groupRef}>
       {particles.map((particle, i) => (
         <mesh key={i} position={particle.initialPosition}>
-          <sphereGeometry args={[particle.size, 16, 16]} />
+          <sphereGeometry args={[particle.size, 8, 8]} />
           <meshStandardMaterial
             color={particle.color}
             emissive={particle.color}

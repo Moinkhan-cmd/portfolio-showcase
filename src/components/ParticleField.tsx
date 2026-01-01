@@ -6,7 +6,7 @@ export const ParticleField = () => {
   const pointsRef = useRef<THREE.Points>(null);
   
   const [positions, colors] = useMemo(() => {
-    const count = 5000;
+    const count = 1000; // Reduced from 5000 for better performance
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     

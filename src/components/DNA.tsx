@@ -15,7 +15,7 @@ export const DNA = () => {
   const spheres: JSX.Element[] = [];
   const helixHeight = 6;
   const helixRadius = 1.5;
-  const sphereCount = 30;
+  const sphereCount = 20; // Reduced from 30
 
   for (let i = 0; i < sphereCount; i++) {
     const t = (i / sphereCount) * Math.PI * 4;
@@ -28,7 +28,7 @@ export const DNA = () => {
 
     spheres.push(
       <mesh key={`sphere1-${i}`} position={[x1, y, z1]}>
-        <sphereGeometry args={[0.15, 32, 32]} />
+        <sphereGeometry args={[0.15, 12, 12]} />
         <meshStandardMaterial
           color="#06b6d4"
           emissive="#06b6d4"
@@ -43,7 +43,7 @@ export const DNA = () => {
 
     spheres.push(
       <mesh key={`sphere2-${i}`} position={[x2, y, z2]}>
-        <sphereGeometry args={[0.15, 32, 32]} />
+        <sphereGeometry args={[0.15, 12, 12]} />
         <meshStandardMaterial
           color="#8b5cf6"
           emissive="#8b5cf6"
@@ -59,7 +59,7 @@ export const DNA = () => {
     if (i % 3 === 0) {
       spheres.push(
         <mesh key={`connector-${i}`} position={[0, y, 0]}>
-          <cylinderGeometry args={[0.05, 0.05, helixRadius * 2, 8]} />
+          <cylinderGeometry args={[0.05, 0.05, helixRadius * 2, 6]} />
           <meshStandardMaterial
             color="#fff"
             emissive="#06b6d4"

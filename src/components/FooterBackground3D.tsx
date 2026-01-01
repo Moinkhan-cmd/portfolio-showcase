@@ -4,42 +4,38 @@ import { Suspense, useState, useEffect, useRef } from "react";
 import { useScrollPause } from "@/hooks/useScrollPause";
 import * as THREE from "three";
 
-// Creative floating shapes
-const CreativeShapes = () => {
+// Footer-themed celebration elements
+const CelebrationElements = () => {
   const groupRef = useRef<THREE.Group>(null);
 
   useFrame((state) => {
     if (groupRef.current) {
-      groupRef.current.rotation.y = state.clock.getElapsedTime() * 0.2;
-      groupRef.current.rotation.x = Math.sin(state.clock.getElapsedTime() * 0.08) * 0.2;
+      groupRef.current.rotation.y = state.clock.getElapsedTime() * 0.15;
+      groupRef.current.rotation.x = Math.sin(state.clock.getElapsedTime() * 0.08) * 0.1;
     }
   });
 
-  const shapes = [
-    { position: [3, 2, -2], color: "#06b6d4", size: 0.7, type: "torus" },
-    { position: [-3, -2, 2], color: "#8b5cf6", size: 0.6, type: "cone" },
-    { position: [0, 3, 0], color: "#ec4899", size: 0.5, type: "torus" },
-    { position: [-2, -3, -1], color: "#f59e0b", size: 0.65, type: "cone" },
-    { position: [4, -1, 1], color: "#06b6d4", size: 0.55, type: "torus" },
+  const elements = [
+    { position: [3, 2, -2], color: "#06b6d4", size: 0.6, type: "star" },
+    { position: [-3, -2, 2], color: "#8b5cf6", size: 0.5, type: "star" },
+    { position: [0, 3, 0], color: "#ec4899", size: 0.45, type: "star" },
+    { position: [-2, -3, -1], color: "#f59e0b", size: 0.55, type: "star" },
+    { position: [4, -1, 1], color: "#06b6d4", size: 0.5, type: "star" },
   ];
 
   return (
     <group ref={groupRef}>
-      {shapes.map((shape, i) => (
-        <mesh key={i} position={shape.position as [number, number, number]}>
-          {shape.type === "torus" ? (
-            <torusGeometry args={[shape.size * 0.7, shape.size * 0.3, 8, 16]} />
-          ) : (
-            <coneGeometry args={[shape.size, shape.size * 1.5, 6]} />
-          )}
+      {elements.map((element, i) => (
+        <mesh key={i} position={element.position as [number, number, number]}>
+          <octahedronGeometry args={[element.size, 0]} />
           <meshStandardMaterial
-            color={shape.color}
-            emissive={shape.color}
-            emissiveIntensity={0.5}
+            color={element.color}
+            emissive={element.color}
+            emissiveIntensity={0.6}
             metalness={0.8}
             roughness={0.2}
             transparent
-            opacity={0.6}
+            opacity={0.7}
             wireframe={i % 2 === 0}
           />
         </mesh>
@@ -48,20 +44,21 @@ const CreativeShapes = () => {
   );
 };
 
-// Floating code-like particles
-const CodeParticles = () => {
+// Floating celebration particles
+const CelebrationParticles = () => {
   const groupRef = useRef<THREE.Group>(null);
-  const particles: Array<{ position: [number, number, number]; speed: number; size: number }> = [];
+  const particles: Array<{ position: [number, number, number]; speed: number; size: number; color: string }> = [];
 
-  for (let i = 0; i < 15; i++) { // Reduced from 30
+  for (let i = 0; i < 22; i++) { // Reduced from 45
     particles.push({
       position: [
-        (Math.random() - 0.5) * 16,
-        (Math.random() - 0.5) * 16,
-        (Math.random() - 0.5) * 16,
+        (Math.random() - 0.5) * 22,
+        (Math.random() - 0.5) * 22,
+        (Math.random() - 0.5) * 22,
       ],
-      speed: 0.15 + Math.random() * 0.25,
-      size: 0.06 + Math.random() * 0.1,
+      speed: 0.2 + Math.random() * 0.3,
+      size: 0.08 + Math.random() * 0.12,
+      color: ["#06b6d4", "#8b5cf6", "#ec4899", "#f59e0b"][i % 4],
     });
   }
 
@@ -71,12 +68,14 @@ const CodeParticles = () => {
         const particle = particles[i];
         const time = state.clock.getElapsedTime();
         
-        const y = particle.position[1] + Math.sin(time * particle.speed + i) * 1.2;
-        const x = particle.position[0] + Math.cos(time * particle.speed * 0.6 + i) * 0.7;
-        const z = particle.position[2] + Math.sin(time * particle.speed * 0.4 + i) * 0.7;
+        const y = particle.position[1] + Math.sin(time * particle.speed + i) * 1.6;
+        const x = particle.position[0] + Math.cos(time * particle.speed * 0.7 + i) * 0.9;
+        const z = particle.position[2] + Math.sin(time * particle.speed * 0.5 + i) * 0.9;
         
         child.position.set(x, y, z);
-        child.rotation.y += 0.015;
+        child.rotation.y += 0.01;
+        child.rotation.x += 0.005;
+        child.rotation.z += 0.008;
       });
     }
   });
@@ -85,15 +84,15 @@ const CodeParticles = () => {
     <group ref={groupRef}>
       {particles.map((particle, i) => (
         <mesh key={i} position={particle.position}>
-          <boxGeometry args={[particle.size, particle.size * 1.5, particle.size, 1, 1, 1]} />
+          <sphereGeometry args={[particle.size, 8, 8]} />
           <meshStandardMaterial
-            color={i % 3 === 0 ? "#06b6d4" : i % 3 === 1 ? "#8b5cf6" : "#ec4899"}
-            emissive={i % 3 === 0 ? "#06b6d4" : i % 3 === 1 ? "#8b5cf6" : "#ec4899"}
-            emissiveIntensity={0.6}
+            color={particle.color}
+            emissive={particle.color}
+            emissiveIntensity={0.7}
             metalness={0.6}
             roughness={0.4}
             transparent
-            opacity={0.65}
+            opacity={0.7}
           />
         </mesh>
       ))}
@@ -101,7 +100,43 @@ const CodeParticles = () => {
   );
 };
 
-export const ProjectsBackground3D = () => {
+// Heart-shaped elements for "Made with ❤️" theme
+const HeartElements = () => {
+  const groupRef = useRef<THREE.Group>(null);
+
+  useFrame((state) => {
+    if (groupRef.current) {
+      groupRef.current.rotation.y = state.clock.getElapsedTime() * 0.12;
+    }
+  });
+
+  const hearts = [
+    { position: [2, 2, -2], color: "#ec4899", size: 0.4 },
+    { position: [-2, -2, 2], color: "#f59e0b", size: 0.35 },
+    { position: [0, 3, 0], color: "#ec4899", size: 0.3 },
+  ];
+
+  return (
+    <group ref={groupRef}>
+      {hearts.map((heart, i) => (
+        <mesh key={i} position={heart.position as [number, number, number]}>
+          <torusGeometry args={[heart.size, heart.size * 0.3, 6, 12]} />
+          <meshStandardMaterial
+            color={heart.color}
+            emissive={heart.color}
+            emissiveIntensity={0.6}
+            metalness={0.7}
+            roughness={0.3}
+            transparent
+            opacity={0.6}
+          />
+        </mesh>
+      ))}
+    </group>
+  );
+};
+
+export const FooterBackground3D = () => {
   const [isVisible, setIsVisible] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const isScrolling = useScrollPause(200);
@@ -150,12 +185,13 @@ export const ProjectsBackground3D = () => {
               position={[0, 5, 5]} 
               angle={0.5} 
               penumbra={0.5} 
-              intensity={0.8} 
+              intensity={0.85} 
               color="#f59e0b"
             />
             
-            <CreativeShapes />
-            <CodeParticles />
+            <CelebrationElements />
+            <CelebrationParticles />
+            <HeartElements />
             
             <Stars 
               radius={15} 

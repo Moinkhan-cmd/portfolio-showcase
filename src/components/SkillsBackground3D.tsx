@@ -1,13 +1,13 @@
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera, Stars } from "@react-three/drei";
 import { Suspense, useState, useEffect, useRef } from "react";
 import { FloatingParticles } from "./FloatingParticles";
-import { useRef as useRef3D, useFrame } from "@react-three/fiber";
+import { useScrollPause } from "@/hooks/useScrollPause";
 import * as THREE from "three";
 
 // Tech-themed geometric shapes
 const TechShapes = () => {
-  const groupRef = useRef3D<THREE.Group>(null);
+  const groupRef = useRef<THREE.Group>(null);
 
   useFrame((state) => {
     if (groupRef.current) {
@@ -48,13 +48,14 @@ const TechShapes = () => {
 export const SkillsBackground3D = () => {
   const [isVisible, setIsVisible] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
+  const isScrolling = useScrollPause(200);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         setIsVisible(entry.isIntersecting);
       },
-      { threshold: 0, rootMargin: '200px' }
+      { threshold: 0.1, rootMargin: '50px' }
     );
 
     if (containerRef.current) {
@@ -73,12 +74,13 @@ export const SkillsBackground3D = () => {
     >
       {isVisible && (
         <Canvas
-          dpr={[1, 1.5]}
-          performance={{ min: 0.5 }}
+          dpr={[1, 1]}
+          performance={{ min: 0.3, max: 0.8 }}
+          frameloop={isVisible && !isScrolling ? "always" : "never"}
           gl={{ 
-            antialias: true,
+            antialias: false,
             alpha: true,
-            powerPreference: "high-performance"
+            powerPreference: "low-power"
           }}
           style={{ opacity: 0.35 }}
         >
@@ -95,11 +97,11 @@ export const SkillsBackground3D = () => {
             <Stars 
               radius={15} 
               depth={5} 
-              count={120} 
-              factor={2.5} 
-              saturation={0.7} 
+              count={50} 
+              factor={2} 
+              saturation={0.6} 
               fade 
-              speed={0.4}
+              speed={0.3}
             />
             
             <OrbitControls 

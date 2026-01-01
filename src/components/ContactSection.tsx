@@ -144,7 +144,7 @@ export const ContactSection = () => {
               </div>
               <div>
                 <p className="font-medium text-sm sm:text-base">Location</p>
-                <p className="text-muted-foreground text-xs sm:text-sm">Your City, Country</p>
+                <p className="text-muted-foreground text-xs sm:text-sm">Patan, India</p>
               </div>
             </div>
 

@@ -5,13 +5,25 @@ import { AnimatedSphere } from "./AnimatedSphere";
 import { FloatingCube } from "./FloatingCube";
 import { ParticleField } from "./ParticleField";
 import { WaveGeometry } from "./WaveGeometry";
+import { useScrollPause } from "@/hooks/useScrollPause";
 
 export const HeroBackground3D = () => {
+  const isScrolling = useScrollPause(200);
+  
   return (
     <div className="absolute inset-0 z-0">
-      <Canvas>
+      <Suspense fallback={null}>
+        <Canvas
+          dpr={[1, 1]}
+          performance={{ min: 0.3, max: 0.8 }}
+          frameloop={isScrolling ? "never" : "always"}
+          gl={{ 
+            antialias: false,
+            alpha: true,
+            powerPreference: "low-power"
+          }}
+        >
         <PerspectiveCamera makeDefault position={[0, 0, 8]} />
-        <Suspense fallback={null}>
           {/* Lighting */}
           <ambientLight intensity={0.3} />
           <pointLight position={[10, 10, 10]} intensity={1} color="#06b6d4" />
@@ -29,8 +41,8 @@ export const HeroBackground3D = () => {
           <FloatingCube position={[3, 3, -5]} color="#ec4899" speed={0.6} />
           <FloatingCube position={[-3, -2, -3]} color="#f59e0b" speed={1} />
           
-          {/* Stars background */}
-          <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
+          {/* Stars background - reduced */}
+          <Stars radius={100} depth={50} count={1000} factor={2} saturation={0} fade speed={0.5} />
           
           {/* Subtle orbit controls for interactivity */}
           <OrbitControls 
@@ -41,8 +53,8 @@ export const HeroBackground3D = () => {
             maxPolarAngle={Math.PI / 2}
             minPolarAngle={Math.PI / 2}
           />
-        </Suspense>
       </Canvas>
+      </Suspense>
     </div>
   );
 };

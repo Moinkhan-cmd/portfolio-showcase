@@ -1,12 +1,12 @@
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera, Stars } from "@react-three/drei";
 import { Suspense, useState, useEffect, useRef } from "react";
-import { useRef as useRef3D, useFrame } from "@react-three/fiber";
+import { useScrollPause } from "@/hooks/useScrollPause";
 import * as THREE from "three";
 
 // Communication-themed rings
 const CommunicationRings = () => {
-  const groupRef = useRef3D<THREE.Group>(null);
+  const groupRef = useRef<THREE.Group>(null);
 
   useFrame((state) => {
     if (groupRef.current) {
@@ -26,7 +26,7 @@ const CommunicationRings = () => {
     <group ref={groupRef}>
       {rings.map((ring, i) => (
         <mesh key={i} position={ring.position as [number, number, number]}>
-          <torusGeometry args={[ring.size, ring.thickness, 16, 32]} />
+          <torusGeometry args={[ring.size, ring.thickness, 8, 16]} />
           <meshStandardMaterial
             color={ring.color}
             emissive={ring.color}
@@ -45,10 +45,10 @@ const CommunicationRings = () => {
 
 // Message-like particles
 const MessageParticles = () => {
-  const groupRef = useRef3D<THREE.Group>(null);
+  const groupRef = useRef<THREE.Group>(null);
   const particles: Array<{ position: [number, number, number]; speed: number; size: number }> = [];
 
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < 20; i++) { // Reduced from 40
     particles.push({
       position: [
         (Math.random() - 0.5) * 20,
@@ -81,7 +81,7 @@ const MessageParticles = () => {
     <group ref={groupRef}>
       {particles.map((particle, i) => (
         <mesh key={i} position={particle.position}>
-          <boxGeometry args={[particle.size, particle.size * 0.6, particle.size * 0.3]} />
+          <boxGeometry args={[particle.size, particle.size * 0.6, particle.size * 0.3, 1, 1, 1]} />
           <meshStandardMaterial
             color={i % 4 === 0 ? "#06b6d4" : i % 4 === 1 ? "#8b5cf6" : i % 4 === 2 ? "#ec4899" : "#f59e0b"}
             emissive={i % 4 === 0 ? "#06b6d4" : i % 4 === 1 ? "#8b5cf6" : i % 4 === 2 ? "#ec4899" : "#f59e0b"}
@@ -100,13 +100,14 @@ const MessageParticles = () => {
 export const ContactBackground3D = () => {
   const [isVisible, setIsVisible] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
+  const isScrolling = useScrollPause(200);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         setIsVisible(entry.isIntersecting);
       },
-      { threshold: 0, rootMargin: '200px' }
+      { threshold: 0.1, rootMargin: '50px' }
     );
 
     if (containerRef.current) {
@@ -125,12 +126,13 @@ export const ContactBackground3D = () => {
     >
       {isVisible && (
         <Canvas
-          dpr={[1, 1.5]}
-          performance={{ min: 0.5 }}
+          dpr={[1, 1]}
+          performance={{ min: 0.3, max: 0.8 }}
+          frameloop={isVisible && !isScrolling ? "always" : "never"}
           gl={{ 
-            antialias: true,
+            antialias: false,
             alpha: true,
-            powerPreference: "high-performance"
+            powerPreference: "low-power"
           }}
           style={{ opacity: 0.35 }}
         >
@@ -154,11 +156,11 @@ export const ContactBackground3D = () => {
             <Stars 
               radius={15} 
               depth={5} 
-              count={140} 
-              factor={3} 
-              saturation={0.8} 
+              count={50} 
+              factor={2} 
+              saturation={0.6} 
               fade 
-              speed={0.5}
+              speed={0.3}
             />
             
             <OrbitControls 
