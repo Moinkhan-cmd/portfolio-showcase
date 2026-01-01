@@ -191,20 +191,44 @@ export const HeroSection = () => {
                   <Sparkles className="w-6 h-6 text-primary" />
                 </motion.div>
                 
-                {/* Status badge */}
+                {/* Premium Status Badge */}
                 <motion.div 
-                  className="absolute -bottom-4 left-1/2 -translate-x-1/2 glass-card px-5 py-2.5 rounded-full flex items-center gap-2"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.8 }}
-                  style={{ transform: "translateX(-50%) translateZ(50px)" }}
+                  className="absolute -bottom-6 left-1/2 -translate-x-1/2"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.8, duration: 0.5 }}
                 >
-                  <motion.span 
-                    className="h-2.5 w-2.5 rounded-full bg-green-400"
-                    animate={{ scale: [1, 1.3, 1], opacity: [1, 0.7, 1] }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
-                  />
-                  <span className="text-sm font-medium text-foreground">Open to Work</span>
+                  <div className="relative group">
+                    {/* Glow background */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/30 via-green-400/40 to-emerald-500/30 rounded-full blur-lg opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
+                    
+                    {/* Main badge */}
+                    <div className="relative flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-emerald-600/90 to-green-500/90 border border-emerald-400/30 shadow-lg shadow-emerald-500/20">
+                      {/* Animated pulse ring */}
+                      <div className="relative flex items-center justify-center">
+                        <motion.span 
+                          className="absolute h-4 w-4 rounded-full bg-white/30"
+                          animate={{ opacity: [0.5, 0, 0.5] }}
+                          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                        />
+                        <span className="relative h-2.5 w-2.5 rounded-full bg-white shadow-sm shadow-white/50" />
+                      </div>
+                      
+                      {/* Text with icon */}
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-semibold text-white tracking-wide">
+                          Available for Hire
+                        </span>
+                        <motion.span
+                          className="text-white/90"
+                          animate={{ opacity: [1, 0.6, 1] }}
+                          transition={{ duration: 1.5, repeat: Infinity }}
+                        >
+                          ✨
+                        </motion.span>
+                      </div>
+                    </div>
+                  </div>
                 </motion.div>
               </motion.div>
             </div>
