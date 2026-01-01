@@ -8,6 +8,7 @@ import { CertificationsSection } from "@/components/CertificationsSection";
 import { ContactSection } from "@/components/ContactSection";
 import { Footer } from "@/components/Footer";
 import { SectionDivider } from "@/components/SectionDivider";
+import { ScrollReveal } from "@/components/ScrollReveal";
 
 const Index = () => {
   return (
@@ -25,25 +26,39 @@ const Index = () => {
         <HeroSection />
 
         <SectionDivider />
-        <AboutSection />
+        <ScrollReveal variant="fadeUp" delay={0.1}>
+          <AboutSection />
+        </ScrollReveal>
 
         <SectionDivider />
-        <SkillsSection />
+        <ScrollReveal variant="fadeUp" delay={0.1}>
+          <SkillsSection />
+        </ScrollReveal>
 
         <SectionDivider />
-        <ProjectsSection />
+        <ScrollReveal variant="fadeUp" delay={0.1}>
+          <ProjectsSection />
+        </ScrollReveal>
 
         <SectionDivider />
-        <ExperienceSection />
+        <ScrollReveal variant="fadeUp" delay={0.1}>
+          <ExperienceSection />
+        </ScrollReveal>
 
         <SectionDivider />
-        <CertificationsSection />
+        <ScrollReveal variant="fadeUp" delay={0.1}>
+          <CertificationsSection />
+        </ScrollReveal>
 
         <SectionDivider />
-        <ContactSection />
+        <ScrollReveal variant="fadeUp" delay={0.1}>
+          <ContactSection />
+        </ScrollReveal>
 
         <SectionDivider />
-        <Footer />
+        <ScrollReveal variant="fadeUp" delay={0.1}>
+          <Footer />
+        </ScrollReveal>
       </div>
     </main>
   );
