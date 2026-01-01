@@ -7,14 +7,14 @@ const experiences = [
   {
     title: "Web Development Intern",
     company: "Remote Position",
-    duration: "Month Year – Month Year",
+    duration: "July 2025 – September 2025",
     responsibilities: [
       "Built and maintained responsive web interfaces using modern frontend technologies",
       "Collaborated with development team using Git for version control and code reviews",
       "Optimized UI components for better performance and user experience",
       "Debugged and resolved frontend issues to improve application stability",
     ],
-    current: true,
+    current: false,
   },
 ];
 
