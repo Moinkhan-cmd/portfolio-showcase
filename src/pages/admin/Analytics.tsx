@@ -243,7 +243,7 @@ export const AdminAnalytics = () => {
         </CardHeader>
         <CardContent>
           <Tabs value={period} onValueChange={(value) => setPeriod(value as "daily" | "weekly" | "monthly")}>
-            <TabsList>
+            <TabsList className="grid w-full max-w-md grid-cols-3">
               <TabsTrigger value="daily">Daily</TabsTrigger>
               <TabsTrigger value="weekly">Weekly</TabsTrigger>
               <TabsTrigger value="monthly">Monthly</TabsTrigger>
