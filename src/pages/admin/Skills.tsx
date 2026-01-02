@@ -26,6 +26,13 @@ import { useToast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2, Loader2 } from "lucide-react";
 import { getSkills, createSkill, updateSkill, deleteSkill, Skill } from "@/lib/admin/skills";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export const AdminSkills = () => {
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -51,8 +58,13 @@ export const AdminSkills = () => {
     try {
       setLoading(true);
       const data = await getSkills();
-      setSkills(data);
+      // Filter out any invalid skills (missing required fields)
+      const validSkills = data.filter(
+        (skill) => skill && skill.id && skill.name && skill.category
+      );
+      setSkills(validSkills);
     } catch (error: any) {
+      console.error("Error fetching skills:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to fetch skills",
@@ -88,11 +100,30 @@ export const AdminSkills = () => {
     });
   };
 
+  const handleDialogOpenChange = (open: boolean) => {
+    if (!open && !isSubmitting) {
+      // Only reset form if dialog is closing and not submitting
+      resetForm();
+    }
+    setDialogOpen(open);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
+      // Validate required fields
+      if (!formData.name?.trim() || !formData.category?.trim()) {
+        toast({
+          title: "Error",
+          description: "Please fill in all required fields",
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       if (selectedSkill?.id) {
         await updateSkill(selectedSkill.id, formData);
         toast({ title: "Success", description: "Skill updated successfully" });
@@ -101,16 +132,21 @@ export const AdminSkills = () => {
         toast({ title: "Success", description: "Skill created successfully" });
       }
 
+      // Close dialog first
       setDialogOpen(false);
+      // Reset form
       resetForm();
-      fetchSkills();
+      // Refetch skills after a short delay to ensure Firestore has updated
+      setTimeout(() => {
+        fetchSkills();
+      }, 500);
     } catch (error: any) {
+      console.error("Error saving skill:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to save skill",
         variant: "destructive",
       });
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -133,14 +169,38 @@ export const AdminSkills = () => {
     }
   };
 
-  // Group skills by category
+  // Define category order
+  const categoryOrder = [
+    "Frontend Development",
+    "Backend & Database",
+    "Programming Languages",
+    "Tools & Platforms",
+    "Soft Skills",
+  ];
+
+  // Group skills by category (with safety checks)
   const groupedSkills = skills.reduce((acc, skill) => {
+    // Skip skills without required fields
+    if (!skill || !skill.category || !skill.id) {
+      return acc;
+    }
     if (!acc[skill.category]) {
       acc[skill.category] = [];
     }
     acc[skill.category].push(skill);
     return acc;
   }, {} as Record<string, Skill[]>);
+
+  // Sort categories according to defined order
+  const sortedCategories = Object.keys(groupedSkills).sort((a, b) => {
+    const indexA = categoryOrder.indexOf(a);
+    const indexB = categoryOrder.indexOf(b);
+    // If category is not in order list, put it at the end
+    if (indexA === -1 && indexB === -1) return a.localeCompare(b);
+    if (indexA === -1) return 1;
+    if (indexB === -1) return -1;
+    return indexA - indexB;
+  });
 
   if (loading) {
     return (
@@ -165,14 +225,23 @@ export const AdminSkills = () => {
 
       {Object.keys(groupedSkills).length > 0 ? (
         <div className="space-y-6">
-          {Object.entries(groupedSkills).map(([category, categorySkills]) => (
-            <Card key={category}>
-              <CardHeader>
-                <CardTitle>{category}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {categorySkills.map((skill) => (
+          {sortedCategories.map((category) => {
+            const categorySkills = groupedSkills[category] || [];
+            // Filter out any skills without IDs to prevent rendering issues
+            const validSkills = categorySkills.filter((skill) => skill && skill.id);
+            
+            if (validSkills.length === 0) {
+              return null;
+            }
+            
+            return (
+              <Card key={category}>
+                <CardHeader>
+                  <CardTitle>{category}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {validSkills.map((skill) => (
                     <div
                       key={skill.id}
                       className="flex items-center justify-between p-3 border rounded-lg"
@@ -209,11 +278,12 @@ export const AdminSkills = () => {
                         </Button>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       ) : (
         <Card>
@@ -227,7 +297,7 @@ export const AdminSkills = () => {
         </Card>
       )}
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <Dialog open={dialogOpen} onOpenChange={handleDialogOpenChange}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
@@ -252,13 +322,21 @@ export const AdminSkills = () => {
 
             <div className="space-y-2">
               <Label htmlFor="category">Category *</Label>
-              <Input
-                id="category"
+              <Select
                 value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                placeholder="e.g., Frontend Development"
-                required
-              />
+                onValueChange={(value) => setFormData({ ...formData, category: value })}
+              >
+                <SelectTrigger id="category">
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Frontend Development">Frontend Development</SelectItem>
+                  <SelectItem value="Backend & Database">Backend & Database</SelectItem>
+                  <SelectItem value="Programming Languages">Programming Languages</SelectItem>
+                  <SelectItem value="Tools & Platforms">Tools & Platforms</SelectItem>
+                  <SelectItem value="Soft Skills">Soft Skills</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
@@ -292,7 +370,12 @@ export const AdminSkills = () => {
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => handleDialogOpenChange(false)}
+                disabled={isSubmitting}
+              >
                 Cancel
               </Button>
               <Button type="submit" disabled={isSubmitting}>

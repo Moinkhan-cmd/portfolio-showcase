@@ -19,6 +19,15 @@ export const SkillsSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const { data: skills = [], isLoading } = useSkills();
 
+  // Define category order
+  const categoryOrder = [
+    "Frontend Development",
+    "Backend & Database",
+    "Programming Languages",
+    "Tools & Platforms",
+    "Soft Skills",
+  ];
+
   // Group skills by category
   const skillCategories = useMemo(() => {
     const grouped = skills.reduce((acc, skill) => {
@@ -30,7 +39,18 @@ export const SkillsSection = () => {
       return acc;
     }, {} as Record<string, Skill[]>);
 
-    return Object.entries(grouped).map(([category, categorySkills]) => ({
+    // Sort categories according to defined order
+    const sortedEntries = Object.entries(grouped).sort((a, b) => {
+      const indexA = categoryOrder.indexOf(a[0]);
+      const indexB = categoryOrder.indexOf(b[0]);
+      // If category is not in order list, put it at the end
+      if (indexA === -1 && indexB === -1) return a[0].localeCompare(b[0]);
+      if (indexA === -1) return 1;
+      if (indexB === -1) return -1;
+      return indexA - indexB;
+    });
+
+    return sortedEntries.map(([category, categorySkills]) => ({
       title: category,
       icon: categoryIcons[category] || Code,
       skills: categorySkills,
