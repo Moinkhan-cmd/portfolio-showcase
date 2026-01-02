@@ -11,6 +11,7 @@ import {
   LogOut,
   Menu,
   X,
+  BarChart3,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
@@ -18,6 +19,7 @@ import { cn } from "@/lib/utils";
 
 const navigation = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard, exact: true },
+  { name: "Analytics", href: "/admin/analytics", icon: BarChart3, exact: false },
   { name: "Projects", href: "/admin/projects", icon: FolderKanban, exact: false },
   { name: "Certifications", href: "/admin/certifications", icon: Award, exact: false },
   { name: "Experience", href: "/admin/experience", icon: Briefcase, exact: false },

@@ -8,8 +8,10 @@ import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
 import { AdminLayout } from "@/components/admin/AdminLayout";
+import { AnalyticsTracker } from "@/components/AnalyticsTracker";
 import { AdminLogin } from "@/pages/admin/Login";
 import { AdminDashboard } from "@/pages/admin/Dashboard";
+import { AdminAnalytics } from "@/pages/admin/Analytics";
 import { AdminProjects } from "@/pages/admin/Projects";
 import { AdminCertifications } from "@/pages/admin/Certifications";
 import { AdminExperience } from "@/pages/admin/Experience";
@@ -28,6 +30,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <AnalyticsTracker />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/admin/login" element={<AdminLogin />} />
@@ -40,6 +43,7 @@ const App = () => (
                 }
               >
                 <Route index element={<AdminDashboard />} />
+                <Route path="analytics" element={<AdminAnalytics />} />
                 <Route path="projects" element={<AdminProjects />} />
                 <Route path="certifications" element={<AdminCertifications />} />
                 <Route path="experience" element={<AdminExperience />} />
