@@ -5,13 +5,70 @@ import { SkillsBackground3D } from "./SkillsBackground3D";
 import { useSkills } from "@/hooks/useSkills";
 import type { Skill } from "@/lib/admin/skills";
 
-// Icon mapping for categories
-const categoryIcons: Record<string, typeof Code2> = {
-  "Frontend Development": Code2,
-  "Backend & Database": Database,
-  "Programming Languages": Code,
-  "Tools & Platforms": Wrench,
-  "Soft Skills": Users,
+// Category enum system (matches admin panel)
+type SkillCategory = 
+  | "frontend_development"
+  | "backend_database"
+  | "programming_languages"
+  | "tools_platform"
+  | "soft_skills";
+
+// Category display labels mapping
+const CATEGORY_LABELS: Record<SkillCategory, string> = {
+  frontend_development: "Frontend Development",
+  backend_database: "Backend & Database",
+  programming_languages: "Programming Languages",
+  tools_platform: "Tools & Platform",
+  soft_skills: "Soft Skills",
+};
+
+// Icon mapping for categories (using enum keys)
+const categoryIcons: Record<SkillCategory, typeof Code2> = {
+  frontend_development: Code2,
+  backend_database: Database,
+  programming_languages: Code,
+  tools_platform: Wrench,
+  soft_skills: Users,
+};
+
+// Normalize category to enum - handles both old strings and enum values
+const normalizeCategory = (category: unknown): SkillCategory => {
+  if (typeof category !== "string") return "tools_platform";
+  const trimmed = category.trim().toLowerCase();
+  if (!trimmed) return "tools_platform";
+
+  // Migration: map old category strings to new enum values
+  const migrationMap: Record<string, SkillCategory> = {
+    "frontend development": "frontend_development",
+    "backend & database": "backend_database",
+    "backend and database": "backend_database",
+    "programming languages": "programming_languages",
+    "tools & platform": "tools_platform",
+    "tools and platform": "tools_platform",
+    "tools & platforms": "tools_platform",
+    "tools and platforms": "tools_platform",
+    "soft skills": "soft_skills",
+  };
+
+  // Check migration map first
+  if (migrationMap[trimmed]) {
+    return migrationMap[trimmed];
+  }
+
+  // Check if already in enum format
+  const enumValues: SkillCategory[] = [
+    "frontend_development",
+    "backend_database",
+    "programming_languages",
+    "tools_platform",
+    "soft_skills",
+  ];
+  if (enumValues.includes(trimmed as SkillCategory)) {
+    return trimmed as SkillCategory;
+  }
+
+  // Default fallback
+  return "tools_platform";
 };
 
 export const SkillsSection = () => {
@@ -19,31 +76,31 @@ export const SkillsSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const { data: skills = [], isLoading } = useSkills();
 
-  // Define category order
-  const categoryOrder = [
-    "Frontend Development",
-    "Backend & Database",
-    "Programming Languages",
-    "Tools & Platforms",
-    "Soft Skills",
+  // Category display order (using enum values)
+  const categoryOrder: SkillCategory[] = [
+    "frontend_development",
+    "backend_database",
+    "programming_languages",
+    "tools_platform",
+    "soft_skills",
   ];
 
-  // Group skills by category
+  // Group skills by category (normalized to enum)
   const skillCategories = useMemo(() => {
     const grouped = skills.reduce((acc, skill) => {
-      const category = skill.category || "Other";
+      if (!skill?.id) return acc;
+      const category = normalizeCategory(skill.category);
       if (!acc[category]) {
         acc[category] = [];
       }
       acc[category].push(skill);
       return acc;
-    }, {} as Record<string, Skill[]>);
+    }, {} as Record<SkillCategory, Skill[]>);
 
     // Sort categories according to defined order
     const sortedEntries = Object.entries(grouped).sort((a, b) => {
-      const indexA = categoryOrder.indexOf(a[0]);
-      const indexB = categoryOrder.indexOf(b[0]);
-      // If category is not in order list, put it at the end
+      const indexA = categoryOrder.indexOf(a[0] as SkillCategory);
+      const indexB = categoryOrder.indexOf(b[0] as SkillCategory);
       if (indexA === -1 && indexB === -1) return a[0].localeCompare(b[0]);
       if (indexA === -1) return 1;
       if (indexB === -1) return -1;
@@ -51,8 +108,8 @@ export const SkillsSection = () => {
     });
 
     return sortedEntries.map(([category, categorySkills]) => ({
-      title: category,
-      icon: categoryIcons[category] || Code,
+      title: CATEGORY_LABELS[category as SkillCategory] || "Tools & Platform",
+      icon: categoryIcons[category as SkillCategory] || Wrench,
       skills: categorySkills,
     }));
   }, [skills]);
