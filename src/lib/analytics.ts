@@ -131,19 +131,27 @@ export const trackPageView = async (pagePath: string, pageTitle?: string) => {
     const statsSnap = await getDoc(statsRef);
     
     if (statsSnap.exists()) {
-      await updateDoc(statsRef, {
+      const updateData: any = {
         pageViews: increment(1),
         [`deviceTypes.${deviceType}`]: increment(1),
         [`countries.${country}`]: increment(1),
         [`trafficSources.${trafficSource}`]: increment(1),
-        newVisitors: isNewVisitor && isNewSession ? increment(1) : increment(0),
         lastUpdated: serverTimestamp(),
-      });
+      };
+      
+      if (isNewVisitor && isNewSession) {
+        updateData.newVisitors = increment(1);
+        updateData.uniqueVisitors = increment(1);
+      } else if (isNewSession) {
+        updateData.uniqueVisitors = increment(1);
+      }
+      
+      await updateDoc(statsRef, updateData);
     } else {
       await setDoc(statsRef, {
         date: today,
         pageViews: 1,
-        uniqueVisitors: 1,
+        uniqueVisitors: isNewSession ? 1 : 0,
         newVisitors: isNewVisitor && isNewSession ? 1 : 0,
         deviceTypes: {
           [deviceType]: 1,
@@ -256,19 +264,18 @@ export const getAnalyticsData = async (period: "daily" | "weekly" | "monthly" = 
     const daysBack = periods[period] || 1;
     const startDate = new Date(now);
     startDate.setDate(startDate.getDate() - daysBack);
+    const startDateStr = startDate.toISOString().split("T")[0];
     
     const statsRef = collection(db, "analytics_daily_stats");
-    const q = query(
-      statsRef,
-      where("date", ">=", startDate.toISOString().split("T")[0]),
-      orderBy("date", "desc")
-    );
+    const q = query(statsRef, orderBy("date", "desc"));
     
     const snapshot = await getDocs(q);
-    const stats = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const stats = snapshot.docs
+      .map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      .filter((stat: any) => stat.date >= startDateStr);
     
     return stats;
   } catch (error) {
@@ -309,13 +316,18 @@ export const getPageViews = async (limitCount: number = 100) => {
 export const getActiveUsers = async () => {
   try {
     const usersRef = collection(db, "analytics_users");
-    const q = query(usersRef, orderBy("lastActive", "desc"), limit(50));
-    
-    const snapshot = await getDocs(q);
-    const users = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const snapshot = await getDocs(usersRef);
+    const users = snapshot.docs
+      .map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      .sort((a: any, b: any) => {
+        const aTime = a.lastActive?.toDate?.() || a.lastActive || new Date(0);
+        const bTime = b.lastActive?.toDate?.() || b.lastActive || new Date(0);
+        return bTime.getTime() - aTime.getTime();
+      })
+      .slice(0, 50);
     
     return users;
   } catch (error) {
@@ -329,18 +341,15 @@ export const getActiveVisitors = async () => {
   try {
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
     const pageViewsRef = collection(db, "analytics_page_views");
-    const q = query(
-      pageViewsRef,
-      where("timestamp", ">", Timestamp.fromDate(fiveMinutesAgo)),
-      orderBy("timestamp", "desc")
-    );
+    const q = query(pageViewsRef, orderBy("timestamp", "desc"), limit(100));
     
     const snapshot = await getDocs(q);
     const sessions = new Set<string>();
     
     snapshot.docs.forEach((doc) => {
       const data = doc.data();
-      if (data.sessionId) {
+      const timestamp = data.timestamp?.toDate?.() || data.timestamp;
+      if (timestamp && new Date(timestamp) > fiveMinutesAgo && data.sessionId) {
         sessions.add(data.sessionId);
       }
     });

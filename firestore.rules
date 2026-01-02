@@ -36,6 +36,28 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAuthenticated();
     }
+    
+    // Analytics collections - public write for tracking, admin read only
+    match /analytics_page_views/{viewId} {
+      allow read: if isAuthenticated();
+      allow create: if true; // Allow anonymous tracking
+      allow update, delete: if isAuthenticated();
+    }
+    
+    match /analytics_daily_stats/{statId} {
+      allow read: if isAuthenticated();
+      allow write: if true; // Allow tracking from client
+    }
+    
+    match /analytics_visitors/{visitorId} {
+      allow read: if isAuthenticated();
+      allow write: if true; // Allow tracking from client
+    }
+    
+    match /analytics_users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated(); // Only authenticated users can track their activity
+    }
   }
 }
 
