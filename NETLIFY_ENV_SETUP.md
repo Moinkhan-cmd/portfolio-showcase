@@ -144,3 +144,4 @@ VITE_ADMIN_EMAIL=your-admin-email@example.com
 **After adding all variables and redeploying, your site should work perfectly!** 🎉
 
 
+
