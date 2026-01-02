@@ -1,6 +1,6 @@
 # Firebase Admin Panel Setup Guide
 
-This guide will walk you through setting up Firebase for the admin panel. The admin panel uses Firebase Authentication, Firestore, and Storage to manage your portfolio content.
+This guide will walk you through setting up Firebase for the admin panel. The admin panel uses Firebase Authentication and Firestore to manage your portfolio content. Images are hosted externally (ImgBB, Cloudinary, GitHub raw URLs, etc.) and stored as URLs in Firestore - no Firebase Storage needed, keeping everything on the free Spark plan!
 
 ## 📋 Prerequisites
 
@@ -46,38 +46,19 @@ This guide will walk you through setting up Firebase for the admin panel. The ad
 ### Set Firestore Security Rules
 
 1. In Firestore Database, click on the **Rules** tab
-2. Copy the contents of `firestore.rules` file from this project
-3. Replace the existing rules with the copied rules
-4. **Important**: Replace `adminEmail` in the rules with your actual admin email (the one you created in Authentication)
-5. Click **Publish**
+2. Open the `firestore.rules` file from this project in your code editor
+3. Copy **ALL** the contents of that file (select all with Ctrl+A, then Ctrl+C)
+4. Go back to Firebase Console (Rules tab)
+5. Delete all the existing rules in the editor
+6. Paste the rules you copied (Ctrl+V)
+7. Click **Publish** button (top right)
+8. ✅ You should see a green success message
 
-**Example rule modification:**
-```
-// Replace this line in the rules:
-function isAdmin() {
-  return isAuthenticated() && 
-         request.auth.token.email == 'your-admin-email@example.com';
-}
-```
+**Note**: The current rules allow public read access (so your portfolio can display content) but restrict write access to authenticated admin users only. The admin email check is handled in your app code, not in the rules.
 
-**Note**: The current rules allow public read access (so your portfolio can display content) but restrict write access to authenticated admin users only.
+## 🔑 Step 4: Get Firebase Configuration
 
-## 📦 Step 4: Set Up Cloud Storage
-
-1. Click on **Storage** in the left sidebar
-2. Click **Get started**
-3. Select **Start in test mode** (we'll update rules later)
-4. Choose the same location as Firestore
-5. Click **Done**
-
-### Set Storage Security Rules
-
-1. In Storage, click on the **Rules** tab
-2. Copy the contents of `storage.rules` file from this project
-3. Replace the existing rules with the copied rules
-4. Click **Publish**
-
-## 🔑 Step 5: Get Firebase Configuration
+**Important**: This admin panel uses **URL-based images only**. Images are hosted externally (ImgBB, Cloudinary, GitHub raw URLs, etc.) and stored as URLs in Firestore. No Firebase Storage setup is required, keeping everything on the free Spark plan.
 
 1. Click on the **Project Settings** (gear icon) next to "Project Overview"
 2. Scroll down to **"Your apps"** section
@@ -92,25 +73,33 @@ const firebaseConfig = {
   apiKey: "AIzaSy...",
   authDomain: "your-project.firebaseapp.com",
   projectId: "your-project-id",
-  storageBucket: "your-project.appspot.com",
   messagingSenderId: "123456789",
   appId: "1:123456789:web:abc123..."
 };
 ```
 
-## ⚙️ Step 6: Configure Environment Variables
+**Note**: `storageBucket` is not needed since we're using URL-based images.
+
+## ⚙️ Step 5: Configure Environment Variables
 
 ### Local Development (.env file)
 
-1. Create a `.env` file in your project root (if it doesn't exist)
-2. Add the following variables:
+**📝 What is a .env file?**  
+It's a file that stores your secret keys (like passwords) so they're not visible in your code. The `.env` file is already in `.gitignore`, so it won't be uploaded to GitHub.
+
+**Steps:**
+
+1. **Create a `.env` file** in your project root folder (same folder where `package.json` is)
+   - In VS Code: Right-click in the folder → New File → name it `.env` (with the dot!)
+   - Make sure it's in the root, not in a subfolder
+
+2. **Copy and paste this template**, then replace the values with YOUR Firebase config:
 
 ```env
 # Firebase Configuration
 VITE_FIREBASE_API_KEY=your-api-key-here
 VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=your-project-id
-VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
 VITE_FIREBASE_MESSAGING_SENDER_ID=123456789
 VITE_FIREBASE_APP_ID=1:123456789:web:abc123...
 
@@ -123,8 +112,19 @@ VITE_EMAILJS_TEMPLATE_ID=your-template-id
 VITE_EMAILJS_PUBLIC_KEY=your-public-key
 ```
 
-3. Replace all the placeholder values with your actual Firebase configuration values
-4. **Important**: Make sure `.env` is in your `.gitignore` file (it should be already)
+**Note**: `VITE_FIREBASE_STORAGE_BUCKET` is not needed since we use URL-based images.
+
+3. **Replace the placeholder values** with your actual Firebase configuration:
+   - Copy each value from your Firebase config (from Step 4)
+   - Paste it after the `=` sign in the `.env` file
+   - **Important**: 
+     - No spaces around the `=` sign
+     - No quotes around the values
+     - For `VITE_ADMIN_EMAIL`, use the exact email you created in Firebase Authentication (Step 2)
+
+4. **Save the file** (Ctrl+S or Cmd+S)
+
+5. **Double-check**: Make sure `.env` is in your `.gitignore` file (it should be already - this keeps your secrets safe!)
 
 ### Netlify Production Environment Variables
 
@@ -136,7 +136,6 @@ VITE_EMAILJS_PUBLIC_KEY=your-public-key
    - `VITE_FIREBASE_API_KEY`
    - `VITE_FIREBASE_AUTH_DOMAIN`
    - `VITE_FIREBASE_PROJECT_ID`
-   - `VITE_FIREBASE_STORAGE_BUCKET`
    - `VITE_FIREBASE_MESSAGING_SENDER_ID`
    - `VITE_FIREBASE_APP_ID`
    - `VITE_ADMIN_EMAIL` (your admin email)
@@ -146,7 +145,7 @@ VITE_EMAILJS_PUBLIC_KEY=your-public-key
 
 5. After adding all variables, **redeploy your site** in Netlify
 
-## 🎯 Step 7: Test the Setup
+## 🎯 Step 6: Test the Setup
 
 ### Local Testing
 
@@ -178,7 +177,7 @@ VITE_EMAILJS_PUBLIC_KEY=your-public-key
 
 - **Public Read Access**: The Firestore rules allow anyone to read projects, certifications, experience, and skills. This is intentional so your portfolio website can display the content.
 - **Admin-Only Write Access**: Only users authenticated with your admin email can create, update, or delete content.
-- **Image Storage**: Images are stored in Firebase Storage with public read access but authenticated write access.
+- **Image URLs**: Images are hosted externally (ImgBB, Cloudinary, GitHub raw URLs, etc.) and stored as URL strings in Firestore. No Firebase Storage needed!
 - **First Time Setup**: When you first log in, the database will be empty. Use the admin panel to add your first project, certification, experience entry, or skill.
 
 ## 🔧 Troubleshooting
@@ -192,10 +191,11 @@ VITE_EMAILJS_PUBLIC_KEY=your-public-key
 - Verify your admin email matches `VITE_ADMIN_EMAIL` exactly
 - Make sure you're logged in with the correct admin account
 
-### Images not uploading
-- Check Storage rules are published
-- Verify `VITE_FIREBASE_STORAGE_BUCKET` is correct
-- Check browser console for specific error messages
+### Images not displaying
+- Verify image URLs are accessible (try opening them in a new tab)
+- Check browser console for CORS or 404 errors
+- Ensure URLs are complete (include https://)
+- For GitHub raw URLs, use the raw file URL, not the repository page
 
 ### Environment variables not working in Netlify
 - Make sure all variables start with `VITE_`
@@ -211,7 +211,6 @@ VITE_EMAILJS_PUBLIC_KEY=your-public-key
 
 - [Firebase Documentation](https://firebase.google.com/docs)
 - [Firestore Security Rules](https://firebase.google.com/docs/firestore/security/get-started)
-- [Firebase Storage Rules](https://firebase.google.com/docs/storage/security)
 - [Firebase Authentication](https://firebase.google.com/docs/auth)
 
 ## ✅ Checklist
@@ -221,8 +220,6 @@ VITE_EMAILJS_PUBLIC_KEY=your-public-key
 - [ ] Admin user created in Authentication
 - [ ] Firestore database created
 - [ ] Firestore security rules updated and published
-- [ ] Storage bucket created
-- [ ] Storage security rules updated and published
 - [ ] Firebase configuration copied
 - [ ] Environment variables added to `.env` (local)
 - [ ] Environment variables added to Netlify (production)

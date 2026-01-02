@@ -76,3 +76,4 @@ export const deleteCertification = async (id: string): Promise<void> => {
   await deleteDoc(doc(db, "certifications", id));
 };
 
+

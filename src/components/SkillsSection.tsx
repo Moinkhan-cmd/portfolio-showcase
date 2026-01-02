@@ -91,61 +91,61 @@ export const SkillsSection = () => {
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
         ) : skillCategories.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto">
             {skillCategories.map((category, categoryIndex) => {
               const IconComponent = category.icon;
               return (
-                <motion.div
-                  key={category.title}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={isVisible ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.5, delay: 0.1 + categoryIndex * 0.1 }}
-                  whileHover={{ y: -8, scale: 1.02 }}
-                  className="glass-enhanced rounded-xl sm:rounded-2xl p-4 sm:p-6 card-hover"
+            <motion.div
+              key={category.title}
+              initial={{ opacity: 0, y: 30 }}
+              animate={isVisible ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.5, delay: 0.1 + categoryIndex * 0.1 }}
+              whileHover={{ y: -8, scale: 1.02 }}
+              className="glass-enhanced rounded-xl sm:rounded-2xl p-4 sm:p-6 card-hover"
+            >
+              {/* Category Header */}
+              <motion.div 
+                className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6"
+                whileHover={{ x: 5 }}
+              >
+                <motion.div 
+                  className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-primary/10"
+                  whileHover={{ rotate: 360, scale: 1.1 }}
+                  transition={{ duration: 0.5 }}
                 >
-                  {/* Category Header */}
-                  <motion.div 
-                    className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6"
-                    whileHover={{ x: 5 }}
-                  >
-                    <motion.div 
-                      className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-primary/10"
-                      whileHover={{ rotate: 360, scale: 1.1 }}
-                      transition={{ duration: 0.5 }}
-                    >
                       <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
-                    </motion.div>
-                    <h3 className="font-display text-lg sm:text-xl font-semibold">{category.title}</h3>
-                  </motion.div>
-
-                  {/* Skills as Badges */}
-                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                    {category.skills.map((skill, skillIndex) => (
-                      <motion.span
-                        key={skill.id || skill.name}
-                        initial={{ opacity: 0, scale: 0 }}
-                        animate={isVisible ? { opacity: 1, scale: 1 } : {}}
-                        transition={{ 
-                          duration: 0.3, 
-                          delay: 0.2 + categoryIndex * 0.1 + skillIndex * 0.05,
-                          type: "spring"
-                        }}
-                        whileHover={{ scale: 1.15, y: -3, rotate: 2 }}
-                        className="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium bg-primary/10 text-primary rounded-md sm:rounded-lg border border-primary/20 hover:bg-primary/20 hover:border-primary/40 transition-all duration-300 cursor-default magnetic-hover"
-                      >
-                        {skill.icon && <span className="mr-1">{skill.icon}</span>}
-                        {skill.name}
-                      </motion.span>
-                    ))}
-                  </div>
                 </motion.div>
+                <h3 className="font-display text-lg sm:text-xl font-semibold">{category.title}</h3>
+              </motion.div>
+
+              {/* Skills as Badges */}
+              <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                {category.skills.map((skill, skillIndex) => (
+                  <motion.span
+                        key={skill.id || skill.name}
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={isVisible ? { opacity: 1, scale: 1 } : {}}
+                    transition={{ 
+                      duration: 0.3, 
+                      delay: 0.2 + categoryIndex * 0.1 + skillIndex * 0.05,
+                      type: "spring"
+                    }}
+                    whileHover={{ scale: 1.15, y: -3, rotate: 2 }}
+                    className="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium bg-primary/10 text-primary rounded-md sm:rounded-lg border border-primary/20 hover:bg-primary/20 hover:border-primary/40 transition-all duration-300 cursor-default magnetic-hover"
+                  >
+                        {skill.icon && <span className="mr-1">{skill.icon}</span>}
+                    {skill.name}
+                  </motion.span>
+                ))}
+              </div>
+            </motion.div>
               );
             })}
           </div>
         ) : (
           <div className="text-center py-12">
             <p className="text-muted-foreground">No skills available yet.</p>
-          </div>
+        </div>
         )}
       </div>
     </section>

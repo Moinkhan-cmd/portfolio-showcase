@@ -27,7 +27,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2, Loader2, ExternalLink, Github } from "lucide-react";
 import { getProjects, createProject, updateProject, deleteProject, Project } from "@/lib/admin/projects";
-import { uploadImage, getImagePath, deleteImage } from "@/lib/admin/storage";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 
@@ -56,10 +55,7 @@ export const AdminProjects = () => {
   });
 
   const [techStackInput, setTechStackInput] = useState("");
-  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
-  const [thumbnailPreview, setThumbnailPreview] = useState<string>("");
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [additionalImagesInput, setAdditionalImagesInput] = useState("");
 
   useEffect(() => {
     fetchProjects();
@@ -98,8 +94,7 @@ export const AdminProjects = () => {
         featured: project.featured,
       });
       setTechStackInput(project.techStack.join(", "));
-      setThumbnailPreview(project.thumbnail);
-      setImagePreviews(project.images);
+      setAdditionalImagesInput(project.images.join("\n"));
     } else {
       resetForm();
     }
@@ -122,39 +117,7 @@ export const AdminProjects = () => {
       featured: false,
     });
     setTechStackInput("");
-    setThumbnailFile(null);
-    setThumbnailPreview("");
-    setImageFiles([]);
-    setImagePreviews([]);
-  };
-
-  const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setThumbnailFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setThumbnailPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    setImageFiles([...imageFiles, ...files]);
-    files.forEach((file) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreviews((prev) => [...prev, reader.result as string]);
-      };
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const removeImage = (index: number) => {
-    setImageFiles((prev) => prev.filter((_, i) => i !== index));
-    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+    setAdditionalImagesInput("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -167,23 +130,14 @@ export const AdminProjects = () => {
         .map((tech) => tech.trim())
         .filter((tech) => tech.length > 0);
 
-      let thumbnailUrl = formData.thumbnail;
-      if (thumbnailFile) {
-        const thumbnailPath = getImagePath("projects/thumbnails", thumbnailFile.name);
-        thumbnailUrl = await uploadImage(thumbnailFile, thumbnailPath);
-      }
-
-      const imageUrls = [...formData.images];
-      for (const file of imageFiles) {
-        const imagePath = getImagePath("projects/images", file.name);
-        const url = await uploadImage(file, imagePath);
-        imageUrls.push(url);
-      }
+      const imageUrls = additionalImagesInput
+        .split("\n")
+        .map((url) => url.trim())
+        .filter((url) => url.length > 0);
 
       const projectData = {
         ...formData,
         techStack,
-        thumbnail: thumbnailUrl,
         images: imageUrls,
       };
 
@@ -219,22 +173,6 @@ export const AdminProjects = () => {
     if (!selectedProject?.id) return;
 
     try {
-      // Delete images from storage
-      if (selectedProject.thumbnail) {
-        try {
-          await deleteImage(selectedProject.thumbnail);
-        } catch (e) {
-          console.error("Error deleting thumbnail:", e);
-        }
-      }
-      for (const imageUrl of selectedProject.images) {
-        try {
-          await deleteImage(imageUrl);
-        } catch (e) {
-          console.error("Error deleting image:", e);
-        }
-      }
-
       await deleteProject(selectedProject.id);
       toast({
         title: "Success",
@@ -478,51 +416,60 @@ export const AdminProjects = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="thumbnail">Thumbnail Image</Label>
+              <Label htmlFor="thumbnail">Thumbnail Image URL</Label>
               <Input
                 id="thumbnail"
-                type="file"
-                accept="image/*"
-                onChange={handleThumbnailChange}
+                type="url"
+                value={formData.thumbnail}
+                onChange={(e) =>
+                  setFormData({ ...formData, thumbnail: e.target.value })
+                }
+                placeholder="https://example.com/image.jpg"
               />
-              {thumbnailPreview && (
+              <p className="text-xs text-muted-foreground">
+                Use ImgBB, Cloudinary, GitHub raw URLs, or any image hosting service
+              </p>
+              {formData.thumbnail && (
                 <img
-                  src={thumbnailPreview}
+                  src={formData.thumbnail}
                   alt="Thumbnail preview"
                   className="w-full h-40 object-cover rounded-lg mt-2"
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                  }}
                 />
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="images">Additional Images</Label>
-              <Input
+              <Label htmlFor="images">Additional Image URLs (one per line)</Label>
+              <Textarea
                 id="images"
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleImagesChange}
+                value={additionalImagesInput}
+                onChange={(e) => setAdditionalImagesInput(e.target.value)}
+                placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg"
+                rows={4}
               />
-              {imagePreviews.length > 0 && (
+              <p className="text-xs text-muted-foreground">
+                Enter image URLs, one per line
+              </p>
+              {additionalImagesInput && (
                 <div className="grid grid-cols-4 gap-2 mt-2">
-                  {imagePreviews.map((preview, index) => (
-                    <div key={index} className="relative">
-                      <img
-                        src={preview}
-                        alt={`Preview ${index + 1}`}
-                        className="w-full h-24 object-cover rounded-lg"
-                      />
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="icon"
-                        className="absolute top-1 right-1 h-6 w-6"
-                        onClick={() => removeImage(index)}
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  ))}
+                  {additionalImagesInput
+                    .split("\n")
+                    .filter((url) => url.trim().length > 0)
+                    .map((url, index) => (
+                      <div key={index} className="relative">
+                        <img
+                          src={url.trim()}
+                          alt={`Preview ${index + 1}`}
+                          className="w-full h-24 object-cover rounded-lg"
+                          onError={(e) => {
+                            e.currentTarget.style.display = "none";
+                          }}
+                        />
+                      </div>
+                    ))}
                 </div>
               )}
             </div>
@@ -555,8 +502,7 @@ export const AdminProjects = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the project
-              and all associated images.
+              This action cannot be undone. This will permanently delete the project.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -570,4 +516,5 @@ export const AdminProjects = () => {
     </div>
   );
 };
+
 

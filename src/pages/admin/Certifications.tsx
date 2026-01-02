@@ -32,7 +32,6 @@ import {
   deleteCertification,
   Certification,
 } from "@/lib/admin/certifications";
-import { uploadImage, getImagePath, deleteImage } from "@/lib/admin/storage";
 
 export const AdminCertifications = () => {
   const [certs, setCerts] = useState<Certification[]>([]);
@@ -52,8 +51,6 @@ export const AdminCertifications = () => {
     description: "",
   });
 
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>("");
 
   useEffect(() => {
     fetchCerts();
@@ -86,7 +83,6 @@ export const AdminCertifications = () => {
         imageUrl: cert.imageUrl,
         description: cert.description || "",
       });
-      setImagePreview(cert.imageUrl);
     } else {
       resetForm();
     }
@@ -103,20 +99,6 @@ export const AdminCertifications = () => {
       imageUrl: "",
       description: "",
     });
-    setImageFile(null);
-    setImagePreview("");
-  };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -124,13 +106,7 @@ export const AdminCertifications = () => {
     setIsSubmitting(true);
 
     try {
-      let imageUrl = formData.imageUrl;
-      if (imageFile) {
-        const imagePath = getImagePath("certifications", imageFile.name);
-        imageUrl = await uploadImage(imageFile, imagePath);
-      }
-
-      const certData = { ...formData, imageUrl };
+      const certData = { ...formData };
 
       if (selectedCert?.id) {
         await updateCertification(selectedCert.id, certData);
@@ -158,13 +134,6 @@ export const AdminCertifications = () => {
     if (!selectedCert?.id) return;
 
     try {
-      if (selectedCert.imageUrl) {
-        try {
-          await deleteImage(selectedCert.imageUrl);
-        } catch (e) {
-          console.error("Error deleting image:", e);
-        }
-      }
       await deleteCertification(selectedCert.id);
       toast({ title: "Success", description: "Certification deleted successfully" });
       setDeleteDialogOpen(false);
@@ -334,18 +303,25 @@ export const AdminCertifications = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="image">Certificate Image</Label>
+              <Label htmlFor="imageUrl">Certificate Image URL</Label>
               <Input
-                id="image"
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
+                id="imageUrl"
+                type="url"
+                value={formData.imageUrl}
+                onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                placeholder="https://example.com/certificate.jpg"
               />
-              {imagePreview && (
+              <p className="text-xs text-muted-foreground">
+                Use ImgBB, Cloudinary, GitHub raw URLs, or any image hosting service
+              </p>
+              {formData.imageUrl && (
                 <img
-                  src={imagePreview}
+                  src={formData.imageUrl}
                   alt="Preview"
                   className="w-full h-40 object-cover rounded-lg mt-2"
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                  }}
                 />
               )}
             </div>
@@ -393,4 +369,5 @@ export const AdminCertifications = () => {
     </div>
   );
 };
+
 

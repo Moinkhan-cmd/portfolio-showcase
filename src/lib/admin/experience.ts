@@ -77,3 +77,4 @@ export const deleteExperience = async (id: string): Promise<void> => {
   await deleteDoc(doc(db, "experience", id));
 };
 
+
