@@ -1,6 +1,6 @@
-import { ArrowDown, Download, Github, Linkedin, Mail, Sparkles, ExternalLink } from "lucide-react";
+import { ArrowDown, Download, Github, Linkedin, Mail, Sparkles, ExternalLink, Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform, useInView } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import myPhoto from "@/images/my photo.jpg";
 
@@ -14,6 +14,7 @@ const roles = ["Frontend Developer", "UI/UX Designer", "React Specialist", "Crea
 
 export const HeroSection = () => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const [currentRole, setCurrentRole] = useState(0);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   
@@ -22,6 +23,7 @@ export const HeroSection = () => {
   const springConfig = { damping: 25, stiffness: 150 };
   const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [8, -8]), springConfig);
   const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-8, 8]), springConfig);
+  const isInView = useInView(contentRef, { once: true, amount: 0.3 });
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -274,24 +276,8 @@ export const HeroSection = () => {
                 whileHover={{ scale: 1.02 }}
                 transition={{ duration: 0.4 }}
               >
-                {/* Enhanced greeting with icon and 3D effect */}
                 {/* Animated border */}
                 <motion.div
-                  initial={{ opacity: 0, y: 20, rotateX: -20 }}
-                  animate={isInView ? { opacity: 1, y: 0, rotateX: 0 } : { opacity: 0, y: 20, rotateX: -20 }}
-                  transition={{ delay: 0.3 }}
-                  className="flex items-center justify-center lg:justify-start gap-3 mb-4 relative"
-                  style={{ transformStyle: "preserve-3d" }}
-                >
-                  <motion.div
-                    animate={{ rotate: [0, 10, -10, 0] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  >
-                    <Sparkles className="w-5 h-5 text-primary" />
-                  </motion.div>
-                  <p className="text-xl sm:text-2xl text-muted-foreground font-light italic">
-                    Hey there! I'm
-                  </p>
                   className="absolute inset-0 rounded-3xl"
                   style={{
                     background: "conic-gradient(from 0deg, hsl(var(--primary)), hsl(280 70% 50%), hsl(340 70% 50%), hsl(var(--primary)))",
@@ -302,178 +288,19 @@ export const HeroSection = () => {
                 >
                   <div className="w-full h-full rounded-3xl bg-background" />
                 </motion.div>
-                
-                {/* Enhanced Name with gradient and animation */}
-                <motion.h1 
-                  className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl mb-6 relative font-bold font-hero"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.8, delay: 0.4 }}
-                  style={{ 
-                    transformStyle: "preserve-3d",
-                    perspective: "1000px",
-                  }}
-                >
-                  <motion.span 
-                    className="gradient-text block leading-tight relative" 
-                    style={{ 
-                      textShadow: "0 0 60px hsl(175 80% 50% / 0.4), 0 0 100px hsl(175 80% 50% / 0.2)",
-                      letterSpacing: "-0.01em",
-                      fontFamily: "var(--font-hero)",
-                      transformStyle: "preserve-3d",
-                    }}
-                    animate={{
-                      textShadow: [
-                        "0 0 60px hsl(175 80% 50% / 0.4), 0 0 100px hsl(175 80% 50% / 0.2)",
-                        "0 0 80px hsl(175 80% 50% / 0.6), 0 0 120px hsl(175 80% 50% / 0.3)",
-                        "0 0 60px hsl(175 80% 50% / 0.4), 0 0 100px hsl(175 80% 50% / 0.2)",
-                      ],
-                    }}
-                    transition={{ duration: 3, repeat: Infinity }}
-                  >
-                    Moinkhan
-                  </motion.span>
-                  <motion.span 
-                    className="gradient-text block leading-tight -mt-2 relative" 
-                    style={{ 
-                      textShadow: "0 0 60px hsl(200 90% 60% / 0.4), 0 0 100px hsl(200 90% 60% / 0.2)",
-                      letterSpacing: "-0.01em",
-                      fontFamily: "var(--font-hero)",
-                      transformStyle: "preserve-3d",
-                    }}
-                    animate={{
-                      textShadow: [
-                        "0 0 60px hsl(200 90% 60% / 0.4), 0 0 100px hsl(200 90% 60% / 0.2)",
-                        "0 0 80px hsl(200 90% 60% / 0.6), 0 0 120px hsl(200 90% 60% / 0.3)",
-                        "0 0 60px hsl(200 90% 60% / 0.4), 0 0 100px hsl(200 90% 60% / 0.2)",
-                      ],
-                    }}
-                    transition={{ duration: 3, repeat: Infinity, delay: 0.5 }}
-                  >
-                    Bhatti
-                  </motion.span>
-                  
-                  {/* Decorative elements */}
-                  <motion.span
-                    className="absolute -right-6 -top-4 text-primary/50 text-5xl"
-                    animate={{ 
-                      rotate: [0, 20, 0],
-                      scale: [1, 1.15, 1],
-                    }}
-                    transition={{ duration: 4, repeat: Infinity }}
-                  >
-                    ✦
-                  </motion.span>
-                </motion.h1>
 
                 <img
                   src={myPhoto}
                   alt="Moinkhan Bhatti"
-                  className="absolute inset-1 w-[calc(100%-8px)] h-[calc(100%-8px)] object-cover object-center rounded-[20px]"
+                  className="absolute inset-1 w-[calc(100%-8px)] h-[calc(100%-8px)] object-cover rounded-[20px]"
+                  style={{ objectPosition: "center 20%" }}
                 />
 
                 {/* Overlay gradient */}
                 <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
 
-                {/* Animated Role Badge with 3D */}
                 {/* Shimmer effect */}
                 <motion.div
-                  initial={{ opacity: 0, y: 20, rotateX: -15, scale: 0.9 }}
-                  animate={isInView ? { opacity: 1, y: 0, rotateX: 0, scale: 1 } : { opacity: 0, y: 20, rotateX: -15, scale: 0.9 }}
-                  transition={{ delay: 0.6 }}
-                  className="mb-8 relative"
-                  style={{ transformStyle: "preserve-3d", perspective: "1000px" }}
-                  whileHover={{ 
-                    rotateY: 5,
-                    scale: 1.05,
-                    transition: { duration: 0.3 }
-                  }}
-                >
-                  <div className="inline-flex items-center gap-3 glass-card px-6 py-3 rounded-full border-2 border-primary/30 backdrop-blur-xl relative" style={{ transformStyle: "preserve-3d" }}>
-                    {/* 3D glow behind badge */}
-                    <motion.div
-                      className="absolute inset-0 rounded-full bg-primary/20 blur-xl"
-                      style={{ transform: "translateZ(-20px)" }}
-                      animate={{
-                        opacity: [0.3, 0.6, 0.3],
-                        scale: [1, 1.1, 1],
-                      }}
-                      transition={{ duration: 3, repeat: Infinity }}
-                    />
-                    <motion.div style={{ transform: "translateZ(10px)" }}>
-                      <Code2 className="w-5 h-5 text-primary" />
-                    </motion.div>
-                    <motion.span 
-                      className="text-lg font-semibold text-foreground relative z-10"
-                      style={{ transform: "translateZ(10px)" }}
-                    >
-                      <AnimatedRole />
-                    </motion.span>
-                    <motion.div 
-                      style={{ transform: "translateZ(10px)" }}
-                      animate={{ 
-                        rotate: [0, 10, -10, 0],
-                        y: [0, -5, 0]
-                      }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    >
-                      <Rocket className="w-5 h-5 text-primary" />
-                    </motion.div>
-                  </div>
-                </motion.div>
-
-                {/* Enhanced Description with 3D */}
-                <motion.div 
-                  className="mt-8 text-lg sm:text-xl max-w-2xl mx-auto lg:mx-0 mb-8 relative"
-                  initial={{ opacity: 0, rotateX: -10 }}
-                  animate={isInView ? { opacity: 1, rotateX: 0 } : { opacity: 0, rotateX: -10 }}
-                  transition={{ delay: 0.8 }}
-                  style={{ transformStyle: "preserve-3d" }}
-                  whileHover={{ 
-                    rotateY: 2,
-                    scale: 1.02,
-                    transition: { duration: 0.3 }
-                  }}
-                >
-                  {/* 3D depth layers */}
-                  <motion.div
-                    className="absolute inset-0 rounded-3xl bg-primary/10 blur-2xl"
-                    style={{ transform: "translateZ(-40px)" }}
-                    animate={{
-                      scale: [1, 1.1, 1],
-                      opacity: [0.2, 0.4, 0.2],
-                    }}
-                    transition={{ duration: 4, repeat: Infinity }}
-                  />
-                  
-                  <div 
-                    className="relative p-8 rounded-3xl glass-card border-2 border-primary/20 backdrop-blur-xl shadow-2xl"
-                    style={{
-                      background: "linear-gradient(135deg, hsl(222 47% 12% / 0.9) 0%, hsl(222 47% 8% / 0.7) 100%)",
-                      transform: "translateZ(20px)",
-                      transformStyle: "preserve-3d",
-                    }}
-                  >
-                    {/* Decorative corner accent */}
-                    <div className="absolute top-0 left-0 w-20 h-20 border-t-2 border-l-2 border-primary/30 rounded-tl-3xl" />
-                    <div className="absolute bottom-0 right-0 w-20 h-20 border-b-2 border-r-2 border-primary/30 rounded-br-3xl" />
-                    
-                    <motion.span
-                      className="absolute -top-4 left-8 px-4 py-1.5 text-xs font-mono text-primary bg-background rounded-full border-2 border-primary/30 shadow-lg"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 1 }}
-                    >
-                      {"< about-me />"}
-                    </motion.span>
-                    
-                    <p className="text-muted-foreground leading-relaxed font-light text-base sm:text-lg mt-4">
-                      <TypingText 
-                        text="Crafting exceptional digital experiences through innovative frontend solutions. Specializing in React, TypeScript, and modern web technologies to build fast, beautiful, and user-centric applications."
-                      />
-                    </p>
-                  </div>
-                </motion.div>
                   className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
                   animate={{ x: ["-100%", "200%"] }}
                   transition={{ duration: 3, repeat: Infinity, repeatDelay: 3 }}
@@ -581,6 +408,7 @@ export const HeroSection = () => {
                       </a>
                     </Button>
                   </motion.div>
+                </motion.div>
               {/* Sparkle decorations */}
               {[
                 { top: "-5%", right: "10%" },
