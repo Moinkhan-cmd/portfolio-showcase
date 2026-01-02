@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { motion, useMotionValue, useSpring, useTransform, useInView } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import myPhoto from "@/images/my photo.jpg";
+import { HeroBackground3D } from "./HeroBackground3D";
 
 const socialLinks = [
   { icon: Github, href: "https://github.com/Moinkhan-cmd", label: "GitHub" },
@@ -53,24 +54,30 @@ export const HeroSection = () => {
       onMouseMove={handleMouseMove}
       className="relative min-h-screen overflow-hidden bg-background pt-20"
     >
-      {/* Animated gradient mesh background */}
-      <div className="absolute inset-0 overflow-hidden">
+      {/* 3D Background */}
+      <HeroBackground3D />
+      
+      {/* Gradient overlay for better text contrast */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background/60 pointer-events-none z-[1]" />
+      
+      {/* Animated gradient mesh background - reduced opacity to show 3D */}
+      <div className="absolute inset-0 overflow-hidden z-[1]">
         <motion.div
-          className="absolute -top-1/2 -left-1/2 w-full h-full rounded-full blur-3xl opacity-30"
+          className="absolute -top-1/2 -left-1/2 w-full h-full rounded-full blur-3xl opacity-20"
           style={{ background: "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)" }}
           animate={{ x: [0, 100, 0], y: [0, 50, 0] }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
         />
         <motion.div
-          className="absolute -bottom-1/2 -right-1/2 w-full h-full rounded-full blur-3xl opacity-20"
+          className="absolute -bottom-1/2 -right-1/2 w-full h-full rounded-full blur-3xl opacity-15"
           style={{ background: "radial-gradient(circle, hsl(280 70% 50%) 0%, transparent 70%)" }}
           animate={{ x: [0, -100, 0], y: [0, -50, 0] }}
           transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
         />
         
-        {/* Grid overlay */}
+        {/* Grid overlay - subtle */}
         <div 
-          className="absolute inset-0 opacity-[0.02]"
+          className="absolute inset-0 opacity-[0.015]"
           style={{
             backgroundImage: `linear-gradient(hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)`,
             backgroundSize: '60px 60px'
@@ -78,9 +85,9 @@ export const HeroSection = () => {
         />
       </div>
 
-      {/* Floating cursor light */}
+      {/* Floating cursor light - enhanced */}
       <motion.div
-        className="pointer-events-none fixed w-96 h-96 rounded-full opacity-10 blur-3xl z-40"
+        className="pointer-events-none fixed w-96 h-96 rounded-full opacity-15 blur-3xl z-40 transition-opacity duration-300"
         style={{
           background: "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)",
           left: mousePos.x - 192,
@@ -89,7 +96,7 @@ export const HeroSection = () => {
       />
 
       {/* Main content - Asymmetric split layout */}
-      <div className="relative z-10 min-h-screen flex flex-col lg:flex-row">
+      <div className="relative z-20 min-h-screen flex flex-col lg:flex-row">
         
         {/* Left side - Typography focused */}
         <div className="flex-1 flex flex-col justify-center px-6 sm:px-12 lg:px-20 py-32 lg:py-0">

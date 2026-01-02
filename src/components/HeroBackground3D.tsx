@@ -35,7 +35,7 @@ export const HeroBackground3D = () => {
           <ParticleField />
           <WaveGeometry />
           
-          {/* Floating Cubes - Enhanced with more variety */}
+          {/* Floating Cubes - Enhanced with more variety and depth */}
           <FloatingCube position={[-4, 2, -3]} color="#06b6d4" speed={0.8} />
           <FloatingCube position={[4, -1, -4]} color="#8b5cf6" speed={1.2} />
           <FloatingCube position={[3, 3, -5]} color="#ec4899" speed={0.6} />
@@ -44,16 +44,20 @@ export const HeroBackground3D = () => {
           <FloatingCube position={[5, 2, -5]} color="#f59e0b" speed={1.1} />
           <FloatingCube position={[0, 4, -6]} color="#3b82f6" speed={0.7} />
           <FloatingCube position={[-2, -4, -4]} color="#a855f7" speed={1.3} />
+          <FloatingCube position={[2, -3, -5]} color="#ec4899" speed={0.85} />
+          <FloatingCube position={[-1, 3, -4]} color="#06b6d4" speed={1.05} />
           
-          {/* Stars background - reduced */}
-          <Stars radius={100} depth={50} count={1000} factor={2} saturation={0} fade speed={0.5} />
+          {/* Stars background - enhanced */}
+          <Stars radius={100} depth={50} count={1500} factor={2.5} saturation={0.2} fade speed={0.8} />
           
-          {/* Subtle orbit controls for interactivity */}
+          {/* Interactive orbit controls */}
           <OrbitControls 
             enableZoom={false} 
             enablePan={false}
             autoRotate
-            autoRotateSpeed={0.5}
+            autoRotateSpeed={0.6}
+            enableDamping={true}
+            dampingFactor={0.05}
             maxPolarAngle={Math.PI / 2}
             minPolarAngle={Math.PI / 2}
           />
