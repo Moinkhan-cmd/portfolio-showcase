@@ -373,229 +373,72 @@ export const Navigation = () => {
                 />
               </motion.a>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center flex-1 justify-end min-w-0">
-            <ul className="flex items-center gap-0.5 xl:gap-1 flex-wrap justify-end">
-              {navLinks.map((link, index) => (
-                <EnhancedNavLink 
-                  key={link.name}
-                  link={link}
-                  isActive={activeSection === link.href.substring(1)}
-                  onClick={() => scrollToSection(link.href)}
-                  index={index}
-                />
-              ))}
-            </ul>
+              {/* Desktop Navigation with enhanced effects */}
+              <nav className="hidden lg:flex items-center flex-1 justify-end min-w-0">
+                <ul className="flex items-center gap-0.5 xl:gap-1 flex-wrap justify-end">
+                  {navLinks.map((link, index) => (
+                    <EnhancedNavLink 
+                      key={link.name}
+                      link={link}
+                      isActive={activeSection === link.href.substring(1)}
+                      onClick={() => scrollToSection(link.href)}
+                      index={index}
+                    />
+                  ))}
+                </ul>
 
-            {/* Right side actions */}
-            <div className="flex items-center gap-2 xl:gap-3 ml-4 xl:ml-8 flex-shrink-0">
-              {/* Theme Toggle */}
-              <motion.div
-                whileHover={{ scale: 1.1, rotate: 15 }}
-                whileTap={{ scale: 0.9 }}
-                whileFocus={{ outline: "2px solid hsl(var(--primary))", outlineOffset: "2px", borderRadius: "50%" }}
-              >
-                <ThemeToggle />
-              </motion.div>
-
-              {/* Hire Me Button with effects */}
-              <motion.div
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                whileFocus={{ scale: 1.05, outline: "2px solid hsl(var(--primary))", outlineOffset: "2px", borderRadius: "8px" }}
-              >
-                <Button
-                  variant="hero"
-                  size="sm"
-                  onClick={() => scrollToSection("#contact")}
-                  className="relative overflow-hidden group"
-                >
-                  {/* Shimmer effect */}
-                  <motion.span
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                    animate={{
-                      x: ["-100%", "200%"],
+                {/* Right side actions with enhanced effects */}
+                <div className="flex items-center gap-2 xl:gap-3 ml-4 xl:ml-8 flex-shrink-0">
+                  {/* Enhanced Theme Toggle */}
+                  <motion.div
+                    className="relative"
+                    whileHover={{ 
+                      scale: 1.15, 
+                      rotate: [0, -10, 10, -10, 0],
+                      y: -2,
                     }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: "linear",
-                      repeatDelay: 1,
+                    whileTap={{ scale: 0.85 }}
+                    whileFocus={{ 
+                      outline: "2px solid hsl(var(--primary))", 
+                      outlineOffset: "3px", 
+                      borderRadius: "50%",
+                      boxShadow: "0 0 15px hsl(var(--primary) / 0.5)"
                     }}
-                  />
-
-                  {/* Glow on hover */}
-                  <motion.span
-                    className="absolute inset-0 bg-primary/30 rounded-lg blur-lg -z-10 opacity-0"
-                    whileHover={{ opacity: 1, scale: 1.2 }}
-                    transition={{ duration: 0.3 }}
-                  />
-
-                  <span className="relative z-10 font-medium">Hire Me</span>
-                </Button>
-              </motion.div>
-            </div>
-          </nav>
-
-          {/* Mobile/Tablet Menu Button */}
-          <div className="flex items-center gap-2 sm:gap-3 lg:hidden flex-shrink-0">
-            <motion.div
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              <ThemeToggle />
-            </motion.div>
-            <motion.button
-              className="text-foreground p-2.5 rounded-lg hover:bg-primary/10 active:bg-primary/20 transition-all duration-200 relative group touch-manipulation"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setIsMobileMenuOpen((v) => !v);
-              }}
-              aria-label="Toggle menu"
-              aria-expanded={isMobileMenuOpen}
-              type="button"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              whileFocus={{ outline: "2px solid hsl(var(--primary))", outlineOffset: "2px" }}
-              style={{ WebkitTapHighlightColor: "transparent" }}
-            >
-              {/* Ripple effect */}
-              <motion.span
-                className="absolute inset-0 bg-primary/20 rounded-lg"
-                initial={{ scale: 0, opacity: 0.5 }}
-                whileTap={{ scale: 2, opacity: 0 }}
-                transition={{ duration: 0.4 }}
-              />
-
-              <AnimatePresence mode="wait" initial={false}>
-                {isMobileMenuOpen ? (
-                  <motion.div
-                    key="close"
-                    initial={{ rotate: -90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: 90, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="relative z-10"
+                    transition={{ type: "spring", stiffness: 400, damping: 15 }}
                   >
-                    <X size={22} className="sm:w-6 sm:h-6" />
+                    {/* Glow ring on hover */}
+                    <motion.div
+                      className="absolute inset-0 rounded-full bg-primary/20 blur-md opacity-0"
+                      whileHover={{ opacity: 1, scale: 1.5 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                    <div className="relative z-10">
+                      <ThemeToggle />
+                    </div>
                   </motion.div>
-                ) : (
+
+                  {/* Enhanced Hire Me Button */}
                   <motion.div
-                    key="menu"
-                    initial={{ rotate: 90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: -90, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="relative z-10"
-                  >
-                    <Menu size={22} className="sm:w-6 sm:h-6" />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.button>
-          </div>
-        </div>
-
-        {/* Mobile Navigation */}
-        <AnimatePresence>
-          {isMobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0, marginTop: 0 }}
-              animate={{ opacity: 1, height: "auto", marginTop: "1rem" }}
-              exit={{ opacity: 0, height: 0, marginTop: 0 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="lg:hidden overflow-hidden"
-              style={{ marginTop: isMobileMenuOpen ? "1rem" : "0" }}
-            >
-              <div className="rounded-xl border border-border/50 bg-background/95 backdrop-blur-xl shadow-lg p-3 sm:p-4 max-h-[calc(100vh-120px)] overflow-y-auto">
-                <motion.ul
-                  initial={{ y: -10 }}
-                  animate={{ y: 0 }}
-                  exit={{ y: -10 }}
-                  transition={{ duration: 0.3 }}
-                  className="flex flex-col gap-1.5"
-                >
-                  {navLinks.map((link, index) => {
-                    const isActive = activeSection === link.href.substring(1);
-                    return (
-                      <motion.li
-                        key={link.name}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.05, duration: 0.2 }}
-                        className="relative z-10"
-                      >
-                        <motion.button
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            scrollToSection(link.href);
-                          }}
-                          className={`w-full text-left py-3 sm:py-3.5 px-4 rounded-lg transition-all duration-200 relative overflow-visible group touch-manipulation ${
-                            isActive
-                              ? "text-primary bg-primary/10 border border-primary/20"
-                              : "text-muted-foreground hover:text-foreground hover:bg-primary/5 border border-transparent"
-                          }`}
-                          whileHover={{ x: 4, scale: 1.01 }}
-                          whileTap={{ scale: 0.97, x: 2 }}
-                          style={{ WebkitTapHighlightColor: "transparent" }}
-                        >
-                          {/* Shimmer effect */}
-                          <motion.span
-                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent rounded-lg"
-                            initial={{ x: "-100%" }}
-                            whileHover={{ x: "200%" }}
-                            transition={{ duration: 0.6 }}
-                          />
-
-                          {/* Active indicator */}
-                          <motion.span
-                            className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r-full"
-                            initial={{ scaleY: 0 }}
-                            animate={{ scaleY: isActive ? 1 : 0 }}
-                            transition={{ duration: 0.3 }}
-                          />
-
-                          <span className="relative z-10 flex items-center gap-2 text-sm sm:text-base font-medium">
-                            {link.name}
-                            {isActive && (
-                              <motion.span
-                                initial={{ scale: 0, rotate: -180 }}
-                                animate={{ scale: 1, rotate: 0 }}
-                                className="w-1.5 h-1.5 bg-primary rounded-full"
-                              />
-                            )}
-                          </span>
-                        </motion.button>
-                      </motion.li>
-                    );
-                  })}
-                </motion.ul>
-
-                {/* Mobile CTA */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: navLinks.length * 0.05 + 0.1 }}
-                  className="mt-4 pt-4 border-t border-border/50"
-                >
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    whileHover={{ scale: 1.08, y: -3 }}
+                    whileTap={{ scale: 0.92 }}
+                    whileFocus={{ 
+                      scale: 1.08, 
+                      outline: "2px solid hsl(var(--primary))", 
+                      outlineOffset: "3px", 
+                      borderRadius: "12px",
+                      boxShadow: "0 0 25px hsl(var(--primary) / 0.6)"
+                    }}
+                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
                   >
                     <Button
                       variant="hero"
                       size="sm"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        scrollToSection("#contact");
-                      }}
-                      className="w-full relative overflow-hidden touch-manipulation"
-                      style={{ WebkitTapHighlightColor: "transparent" }}
+                      onClick={() => scrollToSection("#contact")}
+                      className="relative overflow-hidden group border border-primary/20"
                     >
+                      {/* Enhanced shimmer effect */}
                       <motion.span
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 via-primary/20 to-transparent"
                         animate={{
                           x: ["-100%", "200%"],
                         }}
@@ -603,18 +446,334 @@ export const Navigation = () => {
                           duration: 2,
                           repeat: Infinity,
                           ease: "linear",
+                          repeatDelay: 1,
                         }}
                       />
-                      <span className="relative z-10 font-medium">Hire Me</span>
+
+                      {/* Multi-layer glow on hover */}
+                      <motion.span
+                        className="absolute inset-0 bg-primary/40 rounded-lg blur-xl -z-10 opacity-0"
+                        whileHover={{ opacity: 1, scale: 1.3 }}
+                        transition={{ duration: 0.4 }}
+                      />
+                      <motion.span
+                        className="absolute inset-0 bg-cyan-400/30 rounded-lg blur-lg -z-20 opacity-0"
+                        whileHover={{ opacity: 1, scale: 1.2 }}
+                        transition={{ duration: 0.5, delay: 0.1 }}
+                      />
+
+                      {/* Pulsing border */}
+                      <motion.span
+                        className="absolute inset-0 rounded-lg border-2 border-primary/50"
+                        animate={{
+                          opacity: [0.5, 1, 0.5],
+                          scale: [1, 1.02, 1],
+                        }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        }}
+                        whileHover={{
+                          opacity: 1,
+                          borderColor: "hsl(var(--primary))",
+                        }}
+                      />
+
+                      <span className="relative z-10 font-semibold tracking-wide">Hire Me</span>
                     </Button>
                   </motion.div>
+                </div>
+              </nav>
+
+              {/* Enhanced Mobile/Tablet Menu Button */}
+              <div className="flex items-center gap-2 sm:gap-3 lg:hidden flex-shrink-0">
+                <motion.div
+                  whileHover={{ scale: 1.15, rotate: 15 }}
+                  whileTap={{ scale: 0.85 }}
+                  whileFocus={{ 
+                    outline: "2px solid hsl(var(--primary))", 
+                    outlineOffset: "2px", 
+                    borderRadius: "50%",
+                    boxShadow: "0 0 15px hsl(var(--primary) / 0.5)"
+                  }}
+                  transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                >
+                  <ThemeToggle />
                 </motion.div>
+                <motion.button
+                  className="text-foreground p-2.5 rounded-xl hover:bg-primary/10 active:bg-primary/20 transition-all duration-200 relative group touch-manipulation border border-transparent hover:border-primary/30"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsMobileMenuOpen((v) => !v);
+                  }}
+                  aria-label="Toggle menu"
+                  aria-expanded={isMobileMenuOpen}
+                  type="button"
+                  whileHover={{ 
+                    scale: 1.1, 
+                    rotate: [0, -5, 5, 0],
+                    boxShadow: "0 0 20px hsl(var(--primary) / 0.3)"
+                  }}
+                  whileTap={{ scale: 0.9 }}
+                  whileFocus={{ 
+                    outline: "2px solid hsl(var(--primary))", 
+                    outlineOffset: "3px",
+                    borderRadius: "12px",
+                    boxShadow: "0 0 25px hsl(var(--primary) / 0.5)"
+                  }}
+                  style={{ WebkitTapHighlightColor: "transparent" }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                >
+                  {/* Enhanced ripple effect */}
+                  <motion.span
+                    className="absolute inset-0 bg-primary/30 rounded-xl"
+                    initial={{ scale: 0, opacity: 0.6 }}
+                    whileTap={{ scale: 2.5, opacity: 0 }}
+                    transition={{ duration: 0.5 }}
+                  />
+
+                  {/* Glow effect on hover */}
+                  <motion.span
+                    className="absolute inset-0 bg-primary/20 rounded-xl blur-md opacity-0"
+                    whileHover={{ opacity: 1, scale: 1.3 }}
+                    transition={{ duration: 0.3 }}
+                  />
+
+                  {/* Shimmer effect */}
+                  <motion.span
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent rounded-xl"
+                    initial={{ x: "-100%" }}
+                    whileHover={{ x: "200%" }}
+                    transition={{ duration: 0.6 }}
+                  />
+
+                  <AnimatePresence mode="wait" initial={false}>
+                    {isMobileMenuOpen ? (
+                      <motion.div
+                        key="close"
+                        initial={{ rotate: -180, opacity: 0, scale: 0.5 }}
+                        animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                        exit={{ rotate: 180, opacity: 0, scale: 0.5 }}
+                        transition={{ 
+                          type: "spring", 
+                          stiffness: 300, 
+                          damping: 20,
+                          duration: 0.3 
+                        }}
+                        className="relative z-10"
+                      >
+                        <X size={22} className="sm:w-6 sm:h-6 drop-shadow-lg" />
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="menu"
+                        initial={{ rotate: 180, opacity: 0, scale: 0.5 }}
+                        animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                        exit={{ rotate: -180, opacity: 0, scale: 0.5 }}
+                        transition={{ 
+                          type: "spring", 
+                          stiffness: 300, 
+                          damping: 20,
+                          duration: 0.3 
+                        }}
+                        className="relative z-10"
+                      >
+                        <Menu size={22} className="sm:w-6 sm:h-6 drop-shadow-lg" />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.button>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </nav>
+        </div>
+
+              {/* Enhanced Mobile Navigation */}
+              <AnimatePresence>
+                {isMobileMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0, marginTop: 0, y: -20 }}
+                    animate={{ opacity: 1, height: "auto", marginTop: "1rem", y: 0 }}
+                    exit={{ opacity: 0, height: 0, marginTop: 0, y: -20 }}
+                    transition={{ 
+                      type: "spring",
+                      stiffness: 300,
+                      damping: 30,
+                      duration: 0.4 
+                    }}
+                    className="lg:hidden overflow-hidden"
+                    style={{ marginTop: isMobileMenuOpen ? "1rem" : "0" }}
+                  >
+                    <motion.div
+                      className="rounded-2xl border border-border/50 bg-background/98 backdrop-blur-2xl shadow-2xl p-3 sm:p-4 max-h-[calc(100vh-120px)] overflow-y-auto relative overflow-hidden"
+                      initial={{ scale: 0.95 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      {/* Animated background gradient */}
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-purple-500/5 opacity-50"
+                        animate={{
+                          backgroundPosition: ["0% 0%", "100% 100%"],
+                        }}
+                        transition={{
+                          duration: 10,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
+                      />
+
+                      {/* Top border glow */}
+                      <motion.div
+                        className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/50 to-transparent"
+                        initial={{ scaleX: 0 }}
+                        animate={{ scaleX: 1 }}
+                        transition={{ duration: 0.5, delay: 0.2 }}
+                      />
+
+                      <motion.ul
+                        initial={{ y: -10, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: -10, opacity: 0 }}
+                        transition={{ duration: 0.3, delay: 0.1 }}
+                        className="flex flex-col gap-2 relative z-10"
+                      >
+                        {navLinks.map((link, index) => {
+                          const isActive = activeSection === link.href.substring(1);
+                          return (
+                            <motion.li
+                              key={link.name}
+                              initial={{ opacity: 0, x: -20, scale: 0.9 }}
+                              animate={{ opacity: 1, x: 0, scale: 1 }}
+                              transition={{ 
+                                delay: index * 0.08, 
+                                duration: 0.3,
+                                type: "spring",
+                                stiffness: 300,
+                                damping: 25
+                              }}
+                              className="relative z-10"
+                            >
+                              <motion.button
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  scrollToSection(link.href);
+                                }}
+                                className={`w-full text-left py-3.5 sm:py-4 px-4 rounded-xl transition-all duration-300 relative overflow-visible group touch-manipulation ${
+                                  isActive
+                                    ? "text-primary bg-primary/15 border border-primary/30 shadow-lg shadow-primary/20"
+                                    : "text-muted-foreground hover:text-foreground hover:bg-primary/8 border border-transparent hover:border-primary/20"
+                                }`}
+                                whileHover={{ 
+                                  x: 6, 
+                                  scale: 1.02,
+                                  boxShadow: "0 4px 20px hsl(var(--primary) / 0.2)"
+                                }}
+                                whileTap={{ scale: 0.96, x: 3 }}
+                                style={{ WebkitTapHighlightColor: "transparent" }}
+                                transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                              >
+                                {/* Enhanced shimmer effect */}
+                                <motion.span
+                                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 via-primary/10 to-transparent rounded-xl"
+                                  initial={{ x: "-100%", skewX: -15 }}
+                                  whileHover={{ x: "200%", skewX: -15 }}
+                                  transition={{ duration: 0.7 }}
+                                />
+
+                                {/* Enhanced active indicator with glow */}
+                                <motion.span
+                                  className="absolute left-0 top-0 bottom-0 w-[3px] bg-gradient-to-b from-primary via-cyan-400 to-purple-500 rounded-r-full"
+                                  initial={{ scaleY: 0 }}
+                                  animate={{ scaleY: isActive ? 1 : 0 }}
+                                  transition={{ duration: 0.4, type: "spring" }}
+                                  style={{
+                                    boxShadow: isActive ? "0 0 10px hsl(var(--primary) / 0.6)" : "none",
+                                  }}
+                                />
+
+                                {/* Background glow for active */}
+                                <motion.span
+                                  className="absolute inset-0 bg-primary/10 rounded-xl blur-sm"
+                                  initial={{ opacity: 0 }}
+                                  animate={{ opacity: isActive ? 1 : 0 }}
+                                  transition={{ duration: 0.3 }}
+                                />
+
+                                <span className="relative z-10 flex items-center gap-3 text-sm sm:text-base font-semibold">
+                                  {link.name}
+                                  {isActive && (
+                                    <motion.span
+                                      initial={{ scale: 0, rotate: -180 }}
+                                      animate={{ scale: 1, rotate: 0 }}
+                                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                                      className="w-2 h-2 bg-primary rounded-full shadow-lg shadow-primary/50"
+                                    />
+                                  )}
+                                </span>
+                              </motion.button>
+                            </motion.li>
+                          );
+                        })}
+                      </motion.ul>
+
+                      {/* Enhanced Mobile CTA */}
+                      <motion.div
+                        initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{ 
+                          delay: navLinks.length * 0.08 + 0.2,
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 25
+                        }}
+                        className="mt-4 pt-4 border-t border-border/50 relative z-10"
+                      >
+                        <motion.div
+                          whileHover={{ scale: 1.03, y: -2 }}
+                          whileTap={{ scale: 0.97 }}
+                          transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                        >
+                          <Button
+                            variant="hero"
+                            size="sm"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              scrollToSection("#contact");
+                            }}
+                            className="w-full relative overflow-hidden touch-manipulation border border-primary/20"
+                            style={{ WebkitTapHighlightColor: "transparent" }}
+                          >
+                            <motion.span
+                              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 via-primary/20 to-transparent"
+                              animate={{
+                                x: ["-100%", "200%"],
+                              }}
+                              transition={{
+                                duration: 2,
+                                repeat: Infinity,
+                                ease: "linear",
+                              }}
+                            />
+                            {/* Glow effect */}
+                            <motion.span
+                              className="absolute inset-0 bg-primary/30 rounded-lg blur-xl opacity-0"
+                              whileHover={{ opacity: 1, scale: 1.2 }}
+                              transition={{ duration: 0.3 }}
+                            />
+                            <span className="relative z-10 font-semibold tracking-wide">Hire Me</span>
+                          </Button>
+                        </motion.div>
+                      </motion.div>
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
+      </motion.nav>
     </>
   );
 };
