@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-import { getAnalytics, Analytics, isSupported } from "firebase/analytics";
+import { getAnalytics, Analytics } from "firebase/analytics";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -23,11 +23,13 @@ export const db = getFirestore(app);
 // Initialize Analytics (only in browser environment)
 let analytics: Analytics | null = null;
 if (typeof window !== "undefined") {
-  isSupported().then((supported) => {
-    if (supported) {
-      analytics = getAnalytics(app);
-    }
-  });
+  try {
+    // Try to initialize analytics synchronously
+    analytics = getAnalytics(app);
+  } catch (error) {
+    // Analytics might not be supported or initialized
+    console.warn("Analytics initialization failed:", error);
+  }
 }
 
 export { analytics };
