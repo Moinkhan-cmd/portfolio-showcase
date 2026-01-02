@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { Menu, X, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
 import { AnimatedLogo } from "./AnimatedLogo";
 import { EnhancedNavLink } from "./EnhancedNavLink";
 
@@ -21,28 +21,38 @@ export const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const navRef = useRef<HTMLElement>(null);
   const { scrollYProgress, scrollY } = useScroll();
-  // Optimize transforms - only update when needed
-  const navScale = useTransform(scrollY, [0, 100], [1, 0.95], { clamp: true });
-  const navOpacity = useTransform(scrollY, [0, 50], [1, 0.98], { clamp: true });
-  const navBlur = useTransform(scrollY, [0, 100], [0, 20], { clamp: true });
+  
+  // Advanced scroll-based transforms
+  const navY = useTransform(scrollY, [0, 100], [0, -100], { clamp: false });
+  const navScale = useTransform(scrollY, [0, 100], [1, 0.9], { clamp: true });
+  const navOpacity = useTransform(scrollY, [0, 50, 100], [1, 0.95, 0.85], { clamp: true });
+  const navBlur = useTransform(scrollY, [0, 100], [0, 15], { clamp: true });
+  const borderOpacity = useTransform(scrollY, [0, 50], [0, 1], { clamp: true });
+  const shadowIntensity = useTransform(scrollY, [0, 100], [0, 0.3], { clamp: true });
 
-  useEffect(() => {
-    let ticking = false;
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          setIsScrolled(window.scrollY > 50);
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  // Hide/show navbar on scroll
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    const current = latest;
+    const previous = lastScrollY;
+    
+    if (current < previous && current > 100) {
+      // Scrolling up - show navbar
+      setIsVisible(true);
+    } else if (current > previous && current > 100) {
+      // Scrolling down - hide navbar
+      setIsVisible(false);
+    } else if (current < 50) {
+      // Near top - always show
+      setIsVisible(true);
+    }
+    
+    setLastScrollY(current);
+    setIsScrolled(current > 50);
+  });
 
   useEffect(() => {
     const observerCallback: IntersectionObserverCallback = (entries) => {
@@ -85,110 +95,283 @@ export const Navigation = () => {
 
   return (
     <>
-      {/* Scroll Progress Bar - Optimized */}
+      {/* Enhanced Scroll Progress Bar with gradient */}
       <motion.div
-        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-primary/80 to-primary z-[9998] origin-left"
+        className="fixed top-0 left-0 right-0 h-[2px] z-[9998] origin-left"
         style={{ 
           scaleX: scrollYProgress,
           willChange: 'transform',
           backfaceVisibility: 'hidden',
           transform: 'translateZ(0)',
         }}
-      />
+      >
+        <div className="h-full w-full bg-gradient-to-r from-transparent via-primary via-cyan-400 via-purple-500 to-transparent opacity-80" />
+        <motion.div
+          className="absolute top-0 right-0 h-full w-32 bg-gradient-to-l from-primary to-transparent"
+          animate={{
+            x: ["-100%", "200%"],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+        />
+      </motion.div>
 
-      <nav
+      {/* Animated background particles effect */}
+      <motion.div
+        className="absolute inset-0 overflow-hidden pointer-events-none"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isScrolled ? 0.3 : 0.1 }}
+        transition={{ duration: 0.5 }}
+        aria-hidden="true"
+      >
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 bg-primary rounded-full"
+            style={{
+              left: `${15 + i * 15}%`,
+              top: "50%",
+            }}
+            animate={{
+              y: [0, -20, 0],
+              opacity: [0.3, 0.8, 0.3],
+              scale: [1, 1.5, 1],
+            }}
+            transition={{
+              duration: 3 + i * 0.5,
+              repeat: Infinity,
+              delay: i * 0.3,
+              ease: "easeInOut",
+            }}
+          />
+        ))}
+      </motion.div>
+
+      <motion.nav
         ref={navRef}
-        className={`fixed top-0 left-0 right-0 z-[9999] transition-all duration-300 will-change-transform ${
-          isScrolled || isMobileMenuOpen
-            ? "py-2 sm:py-3 backdrop-blur-xl bg-background/95 border-b border-border/50 shadow-sm"
-            : "py-4 sm:py-5 bg-background/80 backdrop-blur-sm"
-        }`}
+        className="fixed top-0 left-0 right-0 z-[9999] will-change-transform"
         style={{ 
+          y: isVisible ? 0 : navY,
+          scale: navScale,
+          opacity: isVisible ? navOpacity : 0,
+          filter: `blur(${navBlur.get()}px)`,
           transform: 'translateZ(0)',
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
+        }}
+        animate={{
+          y: isVisible ? 0 : -100,
+          opacity: isVisible ? 1 : 0,
+        }}
+        transition={{
+          type: "spring",
+          stiffness: 300,
+          damping: 30,
+          mass: 0.8,
         }}
       >
-        {/* Subtle top border */}
+        {/* Glassmorphism background with gradient */}
         <motion.div
-          className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: isScrolled ? 1 : 0 }}
+          className="absolute inset-0 backdrop-blur-xl"
+          style={{
+            background: isScrolled
+              ? "linear-gradient(135deg, hsl(var(--background) / 0.9) 0%, hsl(var(--background) / 0.85) 100%)"
+              : "linear-gradient(135deg, hsl(var(--background) / 0.7) 0%, hsl(var(--background) / 0.5) 100%)",
+            boxShadow: `0 8px 32px 0 rgba(0, 0, 0, ${shadowIntensity.get()})`,
+          }}
+          animate={{
+            background: isScrolled
+              ? "linear-gradient(135deg, hsl(var(--background) / 0.95) 0%, hsl(var(--background) / 0.9) 100%)"
+              : "linear-gradient(135deg, hsl(var(--background) / 0.8) 0%, hsl(var(--background) / 0.6) 100%)",
+          }}
           transition={{ duration: 0.3 }}
-          aria-hidden="true"
         />
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
-        <div className="flex items-center justify-between gap-2 sm:gap-4 min-h-[44px]">
-          {/* Logo - Signature Style */}
-          <motion.a
-            href="#"
-            className="font-signature text-lg sm:text-xl md:text-2xl lg:text-3xl text-foreground relative group flex items-center gap-1.5 sm:gap-2 min-w-0 flex-shrink-0"
-            onClick={(e) => {
-              e.preventDefault();
-              scrollToTop();
+        {/* Animated gradient border */}
+        <motion.div
+          className="absolute bottom-0 left-0 right-0 h-[1px]"
+          style={{
+            opacity: borderOpacity,
+            background: "linear-gradient(90deg, transparent 0%, hsl(var(--primary) / 0.5) 20%, hsl(var(--primary)) 50%, hsl(var(--primary) / 0.5) 80%, transparent 100%)",
+          }}
+        />
+
+        {/* Top shimmer border */}
+        <motion.div
+          className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/50 via-cyan-400/50 via-purple-500/50 to-transparent"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: isScrolled ? 0.6 : 0.3 }}
+          transition={{ duration: 0.3 }}
+          aria-hidden="true"
+        >
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+            animate={{
+              x: ["-100%", "200%"],
             }}
-            whileHover={{ scale: 1.05, y: -1 }}
-            whileTap={{ scale: 0.95 }}
-            whileFocus={{ outline: "2px solid hsl(var(--primary))", outlineOffset: "4px", borderRadius: "8px" }}
-          >
-            {/* Sparkle/Star effect with glow */}
-            <motion.span
-              className="relative flex-shrink-0"
-              animate={{ 
-                rotate: [0, 360],
-                scale: [1, 1.15, 1],
-              }}
-              transition={{ 
-                rotate: { duration: 20, repeat: Infinity, ease: "linear" },
-                scale: { duration: 2, repeat: Infinity, ease: "easeInOut" }
-              }}
-              whileHover={{ rotate: [0, 360], scale: 1.3 }}
-            >
-              <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-primary" />
-              {/* Glow around sparkle */}
-              <motion.span
-                className="absolute inset-0 bg-primary/40 rounded-full blur-md -z-10"
-                animate={{
-                  opacity: [0.3, 0.6, 0.3],
-                  scale: [1, 1.3, 1],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              />
-            </motion.span>
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+          />
+        </motion.div>
 
-            <motion.span 
-              className="relative z-10 italic font-light tracking-wider gradient-text truncate"
-              whileHover={{ scale: 1.02 }}
-            >
-              Moinkhan
-            </motion.span>
-            
-            {/* Animated underline with glow */}
-            <motion.span
-              className="absolute -bottom-0.5 left-0 h-[1.5px] bg-gradient-to-r from-primary via-primary/80 to-primary"
-              initial={{ width: 0 }}
-              whileHover={{ width: "100%" }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              style={{
-                boxShadow: "0 0 8px hsl(var(--primary) / 0.5)",
-              }}
-            />
+        {/* Glowing accent line */}
+        <motion.div
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent blur-sm"
+          animate={{
+            opacity: [0.3, 0.8, 0.3],
+            scaleX: [0.8, 1.2, 0.8],
+          }}
+          transition={{
+            duration: 3,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
 
-            {/* Shimmer effect on hover */}
-            <motion.span
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -z-10"
-              initial={{ x: "-100%" }}
-              whileHover={{ x: "200%" }}
-              transition={{ duration: 0.8, ease: "easeInOut" }}
-            />
-          </motion.a>
+        <div className={`relative transition-all duration-300 ${
+          isScrolled || isMobileMenuOpen
+            ? "py-2 sm:py-3"
+            : "py-4 sm:py-5"
+        }`}>
+
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div className="flex items-center justify-between gap-2 sm:gap-4 min-h-[44px]">
+              {/* Enhanced Logo with modern effects */}
+              <motion.a
+                href="#"
+                className="font-signature text-lg sm:text-xl md:text-2xl lg:text-3xl text-foreground relative group flex items-center gap-1.5 sm:gap-2 min-w-0 flex-shrink-0"
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToTop();
+                }}
+                whileHover={{ scale: 1.08, y: -2, rotate: [0, -2, 2, 0] }}
+                whileTap={{ scale: 0.92 }}
+                whileFocus={{ 
+                  outline: "2px solid hsl(var(--primary))", 
+                  outlineOffset: "4px", 
+                  borderRadius: "12px",
+                  boxShadow: "0 0 20px hsl(var(--primary) / 0.5)"
+                }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+              >
+                {/* Animated background glow */}
+                <motion.div
+                  className="absolute inset-0 -inset-x-2 -inset-y-1 rounded-xl bg-gradient-to-r from-primary/20 via-cyan-400/20 to-purple-500/20 opacity-0 blur-xl"
+                  whileHover={{ opacity: 1, scale: 1.2 }}
+                  transition={{ duration: 0.3 }}
+                />
+
+                {/* Sparkle/Star effect with enhanced glow */}
+                <motion.span
+                  className="relative flex-shrink-0 z-10"
+                  animate={{ 
+                    rotate: [0, 360],
+                    scale: [1, 1.2, 1],
+                  }}
+                  transition={{ 
+                    rotate: { duration: 20, repeat: Infinity, ease: "linear" },
+                    scale: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+                  }}
+                  whileHover={{ 
+                    rotate: [0, 360], 
+                    scale: 1.4,
+                    filter: "brightness(1.5)",
+                  }}
+                >
+                  <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-primary drop-shadow-lg" />
+                  
+                  {/* Multi-layer glow around sparkle */}
+                  <motion.span
+                    className="absolute inset-0 bg-primary/50 rounded-full blur-md -z-10"
+                    animate={{
+                      opacity: [0.4, 0.8, 0.4],
+                      scale: [1, 1.4, 1],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  />
+                  <motion.span
+                    className="absolute inset-0 bg-cyan-400/30 rounded-full blur-lg -z-20"
+                    animate={{
+                      opacity: [0.2, 0.5, 0.2],
+                      scale: [1.2, 1.6, 1.2],
+                    }}
+                    transition={{
+                      duration: 2.5,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                      delay: 0.3,
+                    }}
+                  />
+                </motion.span>
+
+                <motion.span 
+                  className="relative z-10 italic font-light tracking-wider gradient-text truncate"
+                  whileHover={{ 
+                    scale: 1.03,
+                    textShadow: "0 0 20px hsl(var(--primary) / 0.5)",
+                  }}
+                  transition={{ duration: 0.2 }}
+                >
+                  Moinkhan
+                </motion.span>
+                
+                {/* Enhanced animated underline with gradient */}
+                <motion.span
+                  className="absolute -bottom-1 left-0 h-[2px] rounded-full"
+                  initial={{ width: 0 }}
+                  whileHover={{ width: "100%" }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
+                >
+                  <motion.div
+                    className="h-full w-full bg-gradient-to-r from-primary via-cyan-400 to-purple-500"
+                    style={{
+                      boxShadow: "0 0 10px hsl(var(--primary) / 0.6), 0 0 20px hsl(var(--primary) / 0.3)",
+                    }}
+                    animate={{
+                      backgroundPosition: ["0%", "100%"],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                  />
+                </motion.span>
+
+                {/* Enhanced shimmer effect on hover */}
+                <motion.span
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 via-primary/20 to-transparent -z-10 rounded-lg"
+                  initial={{ x: "-100%", skewX: -15 }}
+                  whileHover={{ x: "200%", skewX: -15 }}
+                  transition={{ duration: 0.8, ease: "easeInOut" }}
+                />
+
+                {/* Pulsing ring effect */}
+                <motion.span
+                  className="absolute inset-0 rounded-xl border-2 border-primary/30 -z-10"
+                  animate={{
+                    scale: [1, 1.1, 1],
+                    opacity: [0.5, 0.8, 0.5],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  whileHover={{
+                    scale: 1.15,
+                    opacity: 1,
+                  }}
+                />
+              </motion.a>
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center flex-1 justify-end min-w-0">
