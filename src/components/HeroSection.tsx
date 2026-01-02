@@ -265,11 +265,32 @@ export const HeroSection = () => {
                 {/* Main image container with enhanced 3D depth */}
                 <motion.div 
                   className="relative"
-                  whileHover={{ scale: 1.05 }}
+                  whileHover={{ scale: 1.05, rotateY: 5, rotateX: 5 }}
                   transition={{ duration: 0.4 }}
-                  style={{ transform: "translateZ(50px)" }}
+                  style={{ 
+                    transform: "translateZ(50px)",
+                    transformStyle: "preserve-3d",
+                  }}
                 >
-                  <div className="relative w-72 h-72 sm:w-80 sm:h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden border-4 border-primary/50 shadow-2xl">
+                  {/* 3D Depth layers behind image */}
+                  <motion.div
+                    className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 blur-3xl"
+                    style={{ transform: "translateZ(-100px) scale(1.5)" }}
+                    animate={{
+                      scale: [1.5, 1.7, 1.5],
+                      opacity: [0.3, 0.5, 0.3],
+                    }}
+                    transition={{ duration: 4, repeat: Infinity }}
+                  />
+                  
+                  <motion.div
+                    className="absolute -inset-4 rounded-full border-2 border-primary/30"
+                    style={{ transform: "translateZ(-50px) scale(1.1)" }}
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                  />
+                  
+                  <div className="relative w-72 h-72 sm:w-80 sm:h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden border-4 border-primary/50 shadow-2xl" style={{ transformStyle: "preserve-3d" }}>
                     {/* Animated border gradient */}
                     <motion.div
                       className="absolute -inset-1 rounded-full"
@@ -287,7 +308,8 @@ export const HeroSection = () => {
                     <img 
                       src={myPhoto} 
                       alt="Moinkhan Bhatti - Frontend Developer" 
-                      className="w-full h-full object-cover object-center relative z-0"
+                      className="w-full h-full object-cover relative z-0"
+                      style={{ objectPosition: "center 30%" }}
                     />
                     
                     {/* Overlay shimmer effect */}
@@ -305,30 +327,61 @@ export const HeroSection = () => {
                     />
                   </div>
                   
-                  {/* Enhanced sparkle accents */}
-                  {[...Array(3)].map((_, i) => (
+                  {/* Enhanced sparkle accents with 3D positioning */}
+                  {[...Array(6)].map((_, i) => (
                     <motion.div
                       key={i}
                       className="absolute"
                       style={{
-                        top: `${i === 0 ? "-10%" : i === 1 ? "20%" : "80%"}%`,
-                        right: i === 1 ? "-15%" : "-10%",
-                        left: i === 2 ? "-10%" : undefined,
-                        transform: "translateZ(70px)",
+                        top: `${i === 0 ? "-10%" : i === 1 ? "10%" : i === 2 ? "30%" : i === 3 ? "70%" : i === 4 ? "90%" : "50%"}%`,
+                        right: i % 2 === 0 ? (i === 0 ? "-15%" : i === 2 ? "-12%" : "-10%") : undefined,
+                        left: i % 2 === 1 ? (i === 1 ? "-12%" : i === 3 ? "-15%" : "-10%") : undefined,
+                        transform: `translateZ(${60 + i * 10}px)`,
+                        transformStyle: "preserve-3d",
                       }}
                       animate={{ 
-                        rotate: 360, 
-                        scale: [1, 1.3, 1],
-                        opacity: [0.6, 1, 0.6],
+                        rotate: [0, 360], 
+                        rotateY: [0, 360],
+                        scale: [1, 1.4, 1],
+                        opacity: [0.5, 1, 0.5],
+                        y: [0, -15, 0],
                       }}
                       transition={{ 
-                        duration: 3 + i, 
+                        duration: 3 + i * 0.5, 
                         repeat: Infinity,
-                        delay: i * 0.5,
+                        delay: i * 0.3,
                       }}
                     >
-                      <Sparkles className="w-7 h-7 text-primary drop-shadow-lg" />
+                      <Sparkles className="w-6 h-6 sm:w-7 sm:h-7 text-primary drop-shadow-lg" style={{ filter: "drop-shadow(0 0 10px hsl(175 80% 50% / 0.8))" }} />
                     </motion.div>
+                  ))}
+                  
+                  {/* 3D Floating geometric shapes */}
+                  {[...Array(4)].map((_, i) => (
+                    <motion.div
+                      key={`shape-${i}`}
+                      className="absolute rounded-lg border-2 border-primary/20"
+                      style={{
+                        width: `${20 + i * 15}px`,
+                        height: `${20 + i * 15}px`,
+                        top: `${15 + i * 20}%`,
+                        left: i % 2 === 0 ? `${-15 + i * 5}%` : `${115 - i * 5}%`,
+                        transform: `translateZ(${40 + i * 20}px) rotate3d(${i}, ${i + 1}, ${i + 2}, 45deg)`,
+                        transformStyle: "preserve-3d",
+                      }}
+                      animate={{
+                        rotate: [0, 360],
+                        rotateX: [0, 360],
+                        rotateY: [0, 360],
+                        opacity: [0.2, 0.5, 0.2],
+                        scale: [1, 1.2, 1],
+                      }}
+                      transition={{
+                        duration: 8 + i * 2,
+                        repeat: Infinity,
+                        delay: i * 0.7,
+                      }}
+                    />
                   ))}
                   
                   {/* Premium Status Badge with enhanced design */}
@@ -387,19 +440,62 @@ export const HeroSection = () => {
               </div>
             </motion.div>
 
-            {/* Right: Enhanced Content with modern typography */}
-            <div className="order-1 lg:order-2 text-center lg:text-left">
+            {/* Right: Enhanced Content with modern typography and 3D effects */}
+            <motion.div 
+              className="order-1 lg:order-2 text-center lg:text-left relative"
+              style={{ 
+                transformStyle: "preserve-3d",
+                perspective: "1200px",
+              }}
+              initial={{ opacity: 0, x: 50, rotateY: -15 }}
+              animate={isInView ? { opacity: 1, x: 0, rotateY: 0 } : { opacity: 0, x: 50, rotateY: -15 }}
+              transition={{ duration: 1, delay: 0.3 }}
+            >
+              {/* 3D Background decorative elements */}
+              <motion.div
+                className="absolute -inset-10 opacity-20 pointer-events-none"
+                style={{
+                  background: "radial-gradient(circle at 30% 50%, hsl(175 80% 50% / 0.3) 0%, transparent 50%)",
+                  transform: "translateZ(-50px)",
+                  borderRadius: "50%",
+                }}
+                animate={{
+                  scale: [1, 1.2, 1],
+                  opacity: [0.2, 0.3, 0.2],
+                }}
+                transition={{ duration: 5, repeat: Infinity }}
+              />
+              
+              {/* Floating 3D text shadows */}
+              <motion.div
+                className="absolute inset-0 pointer-events-none opacity-10"
+                style={{
+                  background: "linear-gradient(135deg, transparent 0%, hsl(175 80% 50% / 0.1) 50%, transparent 100%)",
+                  transform: "translateZ(-30px) rotateY(5deg)",
+                  filter: "blur(20px)",
+                }}
+                animate={{
+                  transform: [
+                    "translateZ(-30px) rotateY(5deg)",
+                    "translateZ(-40px) rotateY(-5deg)",
+                    "translateZ(-30px) rotateY(5deg)",
+                  ],
+                }}
+                transition={{ duration: 8, repeat: Infinity }}
+              />
+              
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={isInView ? { opacity: 1 } : { opacity: 0 }}
                 transition={{ duration: 0.8, delay: 0.1 }}
               >
-                {/* Enhanced greeting with icon */}
+                {/* Enhanced greeting with icon and 3D effect */}
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 20, rotateX: -20 }}
+                  animate={isInView ? { opacity: 1, y: 0, rotateX: 0 } : { opacity: 0, y: 20, rotateX: -20 }}
                   transition={{ delay: 0.3 }}
-                  className="flex items-center justify-center lg:justify-start gap-3 mb-4"
+                  className="flex items-center justify-center lg:justify-start gap-3 mb-4 relative"
+                  style={{ transformStyle: "preserve-3d" }}
                 >
                   <motion.div
                     animate={{ rotate: [0, 10, -10, 0] }}
@@ -414,23 +510,53 @@ export const HeroSection = () => {
                 
                 {/* Enhanced Name with gradient and animation */}
                 <motion.h1 
-                  className="text-6xl sm:text-7xl lg:text-8xl xl:text-9xl mb-6 relative font-bold"
+                  className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl mb-6 relative font-bold font-hero"
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.8, delay: 0.4 }}
+                  style={{ 
+                    transformStyle: "preserve-3d",
+                    perspective: "1000px",
+                  }}
                 >
-                  <span className="gradient-text block leading-tight" style={{ 
-                    textShadow: "0 0 60px hsl(175 80% 50% / 0.4), 0 0 100px hsl(175 80% 50% / 0.2)",
-                    letterSpacing: "-0.02em",
-                  }}>
+                  <motion.span 
+                    className="gradient-text block leading-tight relative" 
+                    style={{ 
+                      textShadow: "0 0 60px hsl(175 80% 50% / 0.4), 0 0 100px hsl(175 80% 50% / 0.2)",
+                      letterSpacing: "-0.01em",
+                      fontFamily: "var(--font-hero)",
+                      transformStyle: "preserve-3d",
+                    }}
+                    animate={{
+                      textShadow: [
+                        "0 0 60px hsl(175 80% 50% / 0.4), 0 0 100px hsl(175 80% 50% / 0.2)",
+                        "0 0 80px hsl(175 80% 50% / 0.6), 0 0 120px hsl(175 80% 50% / 0.3)",
+                        "0 0 60px hsl(175 80% 50% / 0.4), 0 0 100px hsl(175 80% 50% / 0.2)",
+                      ],
+                    }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                  >
                     Moinkhan
-                  </span>
-                  <span className="gradient-text block leading-tight -mt-2" style={{ 
-                    textShadow: "0 0 60px hsl(200 90% 60% / 0.4), 0 0 100px hsl(200 90% 60% / 0.2)",
-                    letterSpacing: "-0.02em",
-                  }}>
+                  </motion.span>
+                  <motion.span 
+                    className="gradient-text block leading-tight -mt-2 relative" 
+                    style={{ 
+                      textShadow: "0 0 60px hsl(200 90% 60% / 0.4), 0 0 100px hsl(200 90% 60% / 0.2)",
+                      letterSpacing: "-0.01em",
+                      fontFamily: "var(--font-hero)",
+                      transformStyle: "preserve-3d",
+                    }}
+                    animate={{
+                      textShadow: [
+                        "0 0 60px hsl(200 90% 60% / 0.4), 0 0 100px hsl(200 90% 60% / 0.2)",
+                        "0 0 80px hsl(200 90% 60% / 0.6), 0 0 120px hsl(200 90% 60% / 0.3)",
+                        "0 0 60px hsl(200 90% 60% / 0.4), 0 0 100px hsl(200 90% 60% / 0.2)",
+                      ],
+                    }}
+                    transition={{ duration: 3, repeat: Infinity, delay: 0.5 }}
+                  >
                     Bhatti
-                  </span>
+                  </motion.span>
                   
                   {/* Decorative elements */}
                   <motion.span
@@ -445,33 +571,82 @@ export const HeroSection = () => {
                   </motion.span>
                 </motion.h1>
 
-                {/* Animated Role Badge */}
+                {/* Animated Role Badge with 3D */}
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 20, rotateX: -15, scale: 0.9 }}
+                  animate={isInView ? { opacity: 1, y: 0, rotateX: 0, scale: 1 } : { opacity: 0, y: 20, rotateX: -15, scale: 0.9 }}
                   transition={{ delay: 0.6 }}
-                  className="mb-8"
+                  className="mb-8 relative"
+                  style={{ transformStyle: "preserve-3d", perspective: "1000px" }}
+                  whileHover={{ 
+                    rotateY: 5,
+                    scale: 1.05,
+                    transition: { duration: 0.3 }
+                  }}
                 >
-                  <div className="inline-flex items-center gap-3 glass-card px-6 py-3 rounded-full border-2 border-primary/30 backdrop-blur-xl">
-                    <Code2 className="w-5 h-5 text-primary" />
-                    <span className="text-lg font-semibold text-foreground">
+                  <div className="inline-flex items-center gap-3 glass-card px-6 py-3 rounded-full border-2 border-primary/30 backdrop-blur-xl relative" style={{ transformStyle: "preserve-3d" }}>
+                    {/* 3D glow behind badge */}
+                    <motion.div
+                      className="absolute inset-0 rounded-full bg-primary/20 blur-xl"
+                      style={{ transform: "translateZ(-20px)" }}
+                      animate={{
+                        opacity: [0.3, 0.6, 0.3],
+                        scale: [1, 1.1, 1],
+                      }}
+                      transition={{ duration: 3, repeat: Infinity }}
+                    />
+                    <motion.div style={{ transform: "translateZ(10px)" }}>
+                      <Code2 className="w-5 h-5 text-primary" />
+                    </motion.div>
+                    <motion.span 
+                      className="text-lg font-semibold text-foreground relative z-10"
+                      style={{ transform: "translateZ(10px)" }}
+                    >
                       <AnimatedRole />
-                    </span>
-                    <Rocket className="w-5 h-5 text-primary animate-bounce" />
+                    </motion.span>
+                    <motion.div 
+                      style={{ transform: "translateZ(10px)" }}
+                      animate={{ 
+                        rotate: [0, 10, -10, 0],
+                        y: [0, -5, 0]
+                      }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      <Rocket className="w-5 h-5 text-primary" />
+                    </motion.div>
                   </div>
                 </motion.div>
 
-                {/* Enhanced Description */}
+                {/* Enhanced Description with 3D */}
                 <motion.div 
-                  className="mt-8 text-lg sm:text-xl max-w-2xl mx-auto lg:mx-0 mb-8"
-                  initial={{ opacity: 0 }}
-                  animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+                  className="mt-8 text-lg sm:text-xl max-w-2xl mx-auto lg:mx-0 mb-8 relative"
+                  initial={{ opacity: 0, rotateX: -10 }}
+                  animate={isInView ? { opacity: 1, rotateX: 0 } : { opacity: 0, rotateX: -10 }}
                   transition={{ delay: 0.8 }}
+                  style={{ transformStyle: "preserve-3d" }}
+                  whileHover={{ 
+                    rotateY: 2,
+                    scale: 1.02,
+                    transition: { duration: 0.3 }
+                  }}
                 >
+                  {/* 3D depth layers */}
+                  <motion.div
+                    className="absolute inset-0 rounded-3xl bg-primary/10 blur-2xl"
+                    style={{ transform: "translateZ(-40px)" }}
+                    animate={{
+                      scale: [1, 1.1, 1],
+                      opacity: [0.2, 0.4, 0.2],
+                    }}
+                    transition={{ duration: 4, repeat: Infinity }}
+                  />
+                  
                   <div 
                     className="relative p-8 rounded-3xl glass-card border-2 border-primary/20 backdrop-blur-xl shadow-2xl"
                     style={{
                       background: "linear-gradient(135deg, hsl(222 47% 12% / 0.9) 0%, hsl(222 47% 8% / 0.7) 100%)",
+                      transform: "translateZ(20px)",
+                      transformStyle: "preserve-3d",
                     }}
                   >
                     {/* Decorative corner accent */}
@@ -495,12 +670,13 @@ export const HeroSection = () => {
                   </div>
                 </motion.div>
 
-                {/* Enhanced Tech Stack Tags */}
+                {/* Enhanced Tech Stack Tags with 3D */}
                 <motion.div 
-                  className="mt-10 flex flex-wrap justify-center lg:justify-start gap-4"
-                  initial={{ opacity: 0 }}
-                  animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+                  className="mt-10 flex flex-wrap justify-center lg:justify-start gap-4 relative"
+                  initial={{ opacity: 0, rotateX: -10 }}
+                  animate={isInView ? { opacity: 1, rotateX: 0 } : { opacity: 0, rotateX: -10 }}
                   transition={{ delay: 1 }}
+                  style={{ transformStyle: "preserve-3d" }}
                 >
                   {[
                     { name: "React", icon: "⚛️" },
@@ -512,14 +688,22 @@ export const HeroSection = () => {
                     <motion.span 
                       key={tech.name}
                       className="group glass-card rounded-full px-6 py-3 text-sm font-semibold text-foreground/90 border-2 border-primary/30 cursor-default backdrop-blur-xl relative overflow-hidden"
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
+                      initial={{ opacity: 0, scale: 0.8, rotateX: -20 }}
+                      animate={isInView ? { opacity: 1, scale: 1, rotateX: 0 } : { opacity: 0, scale: 0.8, rotateX: -20 }}
                       transition={{ delay: 1.1 + i * 0.1, type: "spring", stiffness: 200 }}
+                      style={{ 
+                        transform: `translateZ(${i * 5}px)`,
+                        transformStyle: "preserve-3d",
+                      }}
                       whileHover={{ 
-                        scale: 1.1,
-                        boxShadow: "0 15px 40px hsl(175 80% 50% / 0.3)",
+                        scale: 1.15,
+                        rotateY: 10,
+                        rotateX: 5,
+                        boxShadow: "0 20px 50px hsl(175 80% 50% / 0.4)",
                         borderColor: "hsl(175 80% 50%)",
-                        y: -4,
+                        y: -6,
+                        z: 30,
+                        transition: { duration: 0.3 }
                       }}
                     >
                       <span className="relative z-10 flex items-center gap-2">
@@ -536,22 +720,25 @@ export const HeroSection = () => {
                   ))}
                 </motion.div>
 
-                {/* Enhanced CTA Buttons */}
+                {/* Enhanced CTA Buttons with 3D */}
                 <motion.div 
-                  className="mt-12 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-5"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                  className="mt-12 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-5 relative"
+                  initial={{ opacity: 0, y: 20, rotateX: -10 }}
+                  animate={isInView ? { opacity: 1, y: 0, rotateX: 0 } : { opacity: 0, y: 20, rotateX: -10 }}
                   transition={{ duration: 0.6, delay: 1.2 }}
+                  style={{ transformStyle: "preserve-3d" }}
                 >
                   <motion.div 
-                    whileHover={{ scale: 1.05, y: -3 }} 
+                    whileHover={{ scale: 1.08, y: -5, rotateY: 5, rotateX: -5, z: 20 }} 
                     whileTap={{ scale: 0.95 }}
+                    style={{ transformStyle: "preserve-3d" }}
                   >
                     <Button 
                       variant="hero" 
                       size="lg" 
                       onClick={() => scrollToSection("#projects")}
                       className="glow-on-hover btn-lift min-w-[200px] h-14 text-lg relative overflow-hidden group border-2 border-primary/30"
+                      style={{ transform: "translateZ(10px)", transformStyle: "preserve-3d" }}
                     >
                       <span className="relative z-10 flex items-center justify-center gap-2">
                         <Rocket className="w-5 h-5" />
@@ -567,13 +754,15 @@ export const HeroSection = () => {
                   </motion.div>
                   
                   <motion.div 
-                    whileHover={{ scale: 1.05, y: -3 }} 
+                    whileHover={{ scale: 1.08, y: -5, rotateY: -5, rotateX: -5, z: 20 }} 
                     whileTap={{ scale: 0.95 }}
+                    style={{ transformStyle: "preserve-3d" }}
                   >
                     <Button
                       variant="hero-outline"
                       size="lg"
                       className="btn-lift border-2 border-primary/50 bg-transparent hover:bg-primary/10 min-w-[200px] h-14 text-lg backdrop-blur-sm"
+                      style={{ transform: "translateZ(10px)", transformStyle: "preserve-3d" }}
                       asChild
                     >
                       <a href="https://drive.google.com/uc?export=download&id=1p42p9NpczSWy_-iLeVaO38ciHAMHXp9r" download="Moin_Bhatti_Resume.pdf">
@@ -584,12 +773,13 @@ export const HeroSection = () => {
                   </motion.div>
                 </motion.div>
 
-                {/* Enhanced Social Links */}
+                {/* Enhanced Social Links with 3D */}
                 <motion.div 
-                  className="mt-12 flex items-center justify-center lg:justify-start gap-6"
-                  initial={{ opacity: 0 }}
-                  animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+                  className="mt-12 flex items-center justify-center lg:justify-start gap-6 relative"
+                  initial={{ opacity: 0, rotateX: -10 }}
+                  animate={isInView ? { opacity: 1, rotateX: 0 } : { opacity: 0, rotateX: -10 }}
                   transition={{ duration: 0.6, delay: 1.4 }}
+                  style={{ transformStyle: "preserve-3d" }}
                 >
                   <span className="text-base text-muted-foreground font-light flex items-center gap-2">
                     <Zap className="w-4 h-4 text-primary" />
@@ -604,19 +794,27 @@ export const HeroSection = () => {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="w-14 h-14 rounded-2xl glass-card flex items-center justify-center border-2 border-primary/30 hover:border-primary/70 transition-all duration-300 backdrop-blur-xl relative overflow-hidden group"
-                        initial={{ opacity: 0, scale: 0, rotate: -180 }}
-                        animate={isInView ? { opacity: 1, scale: 1, rotate: 0 } : { opacity: 0, scale: 0, rotate: -180 }}
+                        initial={{ opacity: 0, scale: 0, rotate: -180, rotateY: -180 }}
+                        animate={isInView ? { opacity: 1, scale: 1, rotate: 0, rotateY: 0 } : { opacity: 0, scale: 0, rotate: -180, rotateY: -180 }}
                         transition={{ 
-                          duration: 0.5, 
+                          duration: 0.6, 
                           delay: 1.5 + index * 0.1, 
                           type: "spring",
                           stiffness: 200,
                         }}
+                        style={{ 
+                          transform: `translateZ(${index * 5}px)`,
+                          transformStyle: "preserve-3d",
+                        }}
                         whileHover={{ 
-                          scale: 1.2, 
-                          y: -5,
-                          rotate: 5,
-                          boxShadow: "0 15px 40px hsl(175 80% 50% / 0.4)",
+                          scale: 1.25, 
+                          y: -8,
+                          rotateY: 15,
+                          rotateX: -5,
+                          rotateZ: 5,
+                          z: 30,
+                          boxShadow: "0 20px 50px hsl(175 80% 50% / 0.5)",
+                          transition: { duration: 0.3 }
                         }}
                         whileTap={{ scale: 0.9 }}
                       >
@@ -632,7 +830,7 @@ export const HeroSection = () => {
                   </div>
                 </motion.div>
               </motion.div>
-            </div>
+            </motion.div>
           </div>
 
           {/* Enhanced Scroll Indicator */}

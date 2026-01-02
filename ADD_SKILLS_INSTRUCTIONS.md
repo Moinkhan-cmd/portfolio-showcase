@@ -90,3 +90,4 @@ I've created a simple HTML page that will add all your previous skills to Firest
 
 If you prefer to add them manually through the admin panel instead, check `ADD_SKILLS_GUIDE.md` for detailed instructions.
 
+

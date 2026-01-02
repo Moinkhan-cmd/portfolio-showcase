@@ -17,6 +17,7 @@ export default {
         display: ['Outfit', 'sans-serif'],
         body: ['Inter', 'sans-serif'],
         signature: ['Dancing Script', 'cursive'],
+        hero: ['Space Grotesk', 'Poppins', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
