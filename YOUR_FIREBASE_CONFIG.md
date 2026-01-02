@@ -48,3 +48,4 @@ This file is safe to have in your project because:
 
 However, if you want to be extra safe, you can delete this file after setting up your `.env` file.
 
+
