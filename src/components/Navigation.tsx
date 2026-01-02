@@ -87,7 +87,7 @@ export const Navigation = () => {
     <>
       {/* Scroll Progress Bar - Optimized */}
       <motion.div
-        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-primary/80 to-primary z-[60] origin-left"
+        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-primary/80 to-primary z-[9998] origin-left"
         style={{ 
           scaleX: scrollYProgress,
           willChange: 'transform',
