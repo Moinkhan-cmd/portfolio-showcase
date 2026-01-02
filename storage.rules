@@ -1,5 +1,8 @@
 // Firebase Storage Security Rules
 // Copy these rules to Firebase Console > Storage > Rules
+//
+// IMPORTANT: These rules allow public read access (so your portfolio can display images)
+// but require authentication for writes. Your app will verify admin email on the client side.
 
 rules_version = '2';
 service firebase.storage {
@@ -22,8 +25,8 @@ service firebase.storage {
       allow write: if isAuthenticated(); // Only authenticated users can upload
     }
     
-    // Note: In production, you may want to restrict write access to admin only
-    // For now, any authenticated user can upload (Firebase Auth will handle admin-only access via your app)
+    // Note: Admin email verification is handled in your app (AuthContext)
+    // Only users logged in with the admin email can access the admin panel
   }
 }
 

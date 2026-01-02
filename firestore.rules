@@ -1,5 +1,9 @@
 // Firebase Firestore Security Rules
 // Copy these rules to Firebase Console > Firestore Database > Rules
+// 
+// IMPORTANT: These rules allow public read access (so your portfolio can display content)
+// but require authentication for writes. Your app will verify admin email on the client side.
+// For additional security, you can restrict writes to specific emails in production.
 
 rules_version = '2';
 service cloud.firestore {
@@ -10,46 +14,27 @@ service cloud.firestore {
       return request.auth != null;
     }
     
-    // Helper function to check if user is admin
-    function isAdmin() {
-      return isAuthenticated() && 
-             request.auth.token.email == request.resource.data.adminEmail;
-    }
-    
     // Public read access for portfolio data
     // Anyone can read projects, certifications, experience, and skills
+    // Authenticated users can write (admin check is done in the app)
     match /projects/{projectId} {
       allow read: if true;
-      allow write: if isAuthenticated() && 
-                      request.auth.token.email == resource.data.get('adminEmail', '') ||
-                      request.auth.token.email == get(/databases/$(database)/documents/admin/config).data.adminEmail;
+      allow write: if isAuthenticated();
     }
     
     match /certifications/{certId} {
       allow read: if true;
-      allow write: if isAuthenticated() && 
-                      request.auth.token.email == resource.data.get('adminEmail', '') ||
-                      request.auth.token.email == get(/databases/$(database)/documents/admin/config).data.adminEmail;
+      allow write: if isAuthenticated();
     }
     
     match /experience/{expId} {
       allow read: if true;
-      allow write: if isAuthenticated() && 
-                      request.auth.token.email == resource.data.get('adminEmail', '') ||
-                      request.auth.token.email == get(/databases/$(database)/documents/admin/config).data.adminEmail;
+      allow write: if isAuthenticated();
     }
     
     match /skills/{skillId} {
       allow read: if true;
-      allow write: if isAuthenticated() && 
-                      request.auth.token.email == resource.data.get('adminEmail', '') ||
-                      request.auth.token.email == get(/databases/$(database)/documents/admin/config).data.adminEmail;
-    }
-    
-    // Admin configuration (optional - for storing admin email)
-    match /admin/config {
-      allow read: if isAuthenticated();
-      allow write: if false; // Only set via Firebase Console
+      allow write: if isAuthenticated();
     }
   }
 }

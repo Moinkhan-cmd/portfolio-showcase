@@ -47,7 +47,7 @@ export const getSkill = async (id: string): Promise<Skill | null> => {
   if (docSnap.exists()) {
     return {
       id: docSnap.id,
-      ...doc.data(),
+      ...docSnap.data(),
       createdAt: docSnap.data().createdAt?.toDate(),
       updatedAt: docSnap.data().updatedAt?.toDate(),
     } as Skill;
