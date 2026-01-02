@@ -46,9 +46,10 @@ export const HeroSection = () => {
 
   return (
     <section
+      id="hero"
       ref={containerRef}
       onMouseMove={handleMouseMove}
-      className="relative min-h-screen overflow-hidden bg-background"
+      className="relative min-h-screen overflow-hidden bg-background pt-20"
     >
       {/* Animated gradient mesh background */}
       <div className="absolute inset-0 overflow-hidden">
