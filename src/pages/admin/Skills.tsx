@@ -323,7 +323,7 @@ export const AdminSkills = () => {
             <div className="space-y-2">
               <Label htmlFor="category">Category *</Label>
               <Select
-                value={formData.category}
+                value={formData.category || undefined}
                 onValueChange={(value) => setFormData({ ...formData, category: value })}
               >
                 <SelectTrigger id="category">
