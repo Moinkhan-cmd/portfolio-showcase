@@ -98,12 +98,18 @@ export const Navigation = () => {
 
       <nav
         ref={navRef}
-        className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 will-change-transform ${
+        className={`fixed top-0 left-0 right-0 z-[9999] transition-all duration-300 will-change-transform ${
           isScrolled || isMobileMenuOpen
-            ? "py-2 sm:py-3 backdrop-blur-xl bg-background/90 border-b border-border/50 shadow-sm"
-            : "py-4 sm:py-5 bg-transparent"
+            ? "py-2 sm:py-3 backdrop-blur-xl bg-background/95 border-b border-border/50 shadow-sm"
+            : "py-4 sm:py-5 bg-background/80 backdrop-blur-sm"
         }`}
-        style={{ transform: 'translateZ(0)' }}
+        style={{ 
+          transform: 'translateZ(0)',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+        }}
       >
         {/* Subtle top border */}
         <motion.div
