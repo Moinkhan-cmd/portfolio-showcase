@@ -142,7 +142,7 @@ export const SkillsSection = () => {
               <div className="flex flex-wrap gap-1.5 sm:gap-2">
                 {category.skills.map((skill, skillIndex) => (
                   <motion.span
-                        key={skill.id || skill.name}
+                    key={skill.id}
                     initial={{ opacity: 0, scale: 0 }}
                     animate={isVisible ? { opacity: 1, scale: 1 } : {}}
                     transition={{ 
@@ -151,10 +151,10 @@ export const SkillsSection = () => {
                       type: "spring"
                     }}
                     whileHover={{ scale: 1.15, y: -3, rotate: 2 }}
-                    className="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium bg-primary/10 text-primary rounded-md sm:rounded-lg border border-primary/20 hover:bg-primary/20 hover:border-primary/40 transition-all duration-300 cursor-default magnetic-hover"
+                    className="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium bg-primary/10 text-primary rounded-md sm:rounded-lg border border-primary/20 hover:bg-primary/20 hover:border-primary/40 transition-all duration-300 cursor-default magnetic-hover min-w-0 break-words max-w-full"
                   >
-                        {skill.icon && <span className="mr-1">{skill.icon}</span>}
-                    {skill.name}
+                    {skill.icon && <span className="mr-1">{skill.icon}</span>}
+                    <span className="break-words">{skill.name}</span>
                   </motion.span>
                 ))}
               </div>
