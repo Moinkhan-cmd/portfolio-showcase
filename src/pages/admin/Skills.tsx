@@ -85,7 +85,7 @@ const SkillCard = ({ skill, onEdit, onDelete }: SkillCardProps) => {
   };
 
   return (
-    <div className="group relative flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors min-h-[80px] bg-background">
+    <div className="group relative flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors bg-background">
       <div className="flex items-center gap-3 flex-1 min-w-0">
         {/* Icon - always reserves space */}
         <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
@@ -99,7 +99,7 @@ const SkillCard = ({ skill, onEdit, onDelete }: SkillCardProps) => {
         </div>
         {/* Content - always has base styles */}
         <div className="flex-1 min-w-0 flex flex-col gap-1">
-          <p className="font-medium truncate text-sm sm:text-base">{skillName}</p>
+          <p className="font-medium text-sm sm:text-base break-words min-w-0">{skillName}</p>
           {/* Level badge - always renders */}
           <Badge
             variant="outline"
