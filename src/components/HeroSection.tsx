@@ -80,7 +80,7 @@ export const HeroSection = () => {
 
       {/* Floating cursor light */}
       <motion.div
-        className="pointer-events-none fixed w-96 h-96 rounded-full opacity-10 blur-3xl z-50"
+        className="pointer-events-none fixed w-96 h-96 rounded-full opacity-10 blur-3xl z-40"
         style={{
           background: "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)",
           left: mousePos.x - 192,
@@ -293,7 +293,7 @@ export const HeroSection = () => {
                   src={myPhoto}
                   alt="Moinkhan Bhatti"
                   className="absolute inset-1 w-[calc(100%-8px)] h-[calc(100%-8px)] object-cover rounded-[20px]"
-                  style={{ objectPosition: "center 20%" }}
+                  style={{ objectPosition: "center 10%" }}
                 />
 
                 {/* Overlay gradient */}
