@@ -13,7 +13,9 @@ This guide will walk you through setting up Firebase for the admin panel. The ad
 2. Click **"Add project"** or **"Create a project"**
 3. Enter your project name (e.g., "portfolio-admin")
 4. Click **Continue**
-5. Disable Google Analytics (optional, you can enable it later if needed)
+5. **Enable Google Analytics** (recommended - you can enable it later if you skip this step)
+   - If you enable it now, select or create a Google Analytics account
+   - If you skip it, see [ENABLE_FIREBASE_ANALYTICS.md](./ENABLE_FIREBASE_ANALYTICS.md) to enable it later
 6. Click **Create project**
 7. Wait for the project to be created, then click **Continue**
 

@@ -123,12 +123,17 @@ The `firestore.rules` file has been updated to include analytics collections. Ma
 3. Paste the updated rules
 4. Click "Publish"
 
-### 2. Firebase Analytics (Optional)
+### 2. Firebase Analytics (Optional but Recommended)
 
-Firebase Analytics is initialized in `src/lib/firebase.ts`. If you want to use Firebase Analytics:
+Firebase Analytics is initialized in `src/lib/firebase.ts`. To enable Firebase Analytics:
 
-1. Enable Google Analytics in your Firebase project (optional)
-2. The analytics events are automatically logged alongside Firestore tracking
+1. **Enable Google Analytics in Firebase Console:**
+   - Go to Firebase Console > Project Settings > Integrations
+   - Click "Enable" next to Google Analytics
+   - Select or create a Google Analytics account
+   - See [ENABLE_FIREBASE_ANALYTICS.md](./ENABLE_FIREBASE_ANALYTICS.md) for detailed steps
+
+2. **That's it!** The analytics events are automatically logged alongside Firestore tracking once enabled
 
 ### 3. No Additional Configuration Required
 
