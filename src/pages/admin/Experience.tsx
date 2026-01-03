@@ -138,13 +138,23 @@ export const AdminExperience = () => {
         .map((s) => s.trim())
         .filter((s) => s.length > 0);
 
-      const expData = {
-        ...formData,
+      // Build expData, excluding location and endDate to handle them conditionally
+      const { location: _location, endDate: _endDate, ...restFormData } = formData;
+      const expData: any = {
+        ...restFormData,
         responsibilities,
         skills,
-        endDate: formData.current ? undefined : formData.endDate,
-        location: formData.workType === "remote" ? undefined : formData.location,
       };
+
+      // Only include endDate if it's not a current position and has a value
+      if (!formData.current && formData.endDate) {
+        expData.endDate = formData.endDate;
+      }
+
+      // Only include location if workType is not remote and has a value
+      if (formData.workType !== "remote" && formData.location) {
+        expData.location = formData.location;
+      }
 
       if (selectedExp?.id) {
         await updateExperience(selectedExp.id, expData);
