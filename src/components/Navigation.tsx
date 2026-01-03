@@ -70,7 +70,7 @@ export const Navigation = () => {
     };
   }, [mouseX, mouseY]);
 
-  // Hide/show navbar on scroll with velocity tracking
+  // Track scroll for styling and velocity effects (navbar always visible)
   useMotionValueEvent(scrollY, "change", (latest) => {
     const current = latest;
     const previous = lastScrollY;
@@ -78,16 +78,8 @@ export const Navigation = () => {
     
     setScrollVelocity(velocity);
     
-    if (current < previous && current > 100) {
-      // Scrolling up - show navbar
-      setIsVisible(true);
-    } else if (current > previous && current > 100) {
-      // Scrolling down - hide navbar
-      setIsVisible(false);
-    } else if (current < 50) {
-      // Near top - always show
-      setIsVisible(true);
-    }
+    // Always keep navbar visible
+    setIsVisible(true);
     
     setLastScrollY(current);
     setIsScrolled(current > 50);
