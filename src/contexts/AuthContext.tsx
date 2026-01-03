@@ -14,6 +14,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   isAdmin: boolean;
+  isFirebaseAvailable: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -29,17 +30,31 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isFirebaseAvailable, setIsFirebaseAvailable] = useState(!!auth);
   const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || "";
 
   const login = async (email: string, password: string) => {
+    if (!auth) {
+      throw new Error("Firebase is not initialized. Please check your environment variables.");
+    }
     await signInWithEmailAndPassword(auth, email, password);
   };
 
   const logout = async () => {
+    if (!auth) {
+      return;
+    }
     await signOut(auth);
   };
 
   useEffect(() => {
+    if (!auth) {
+      console.warn("Firebase Auth is not available. Admin features will be disabled.");
+      setLoading(false);
+      setIsFirebaseAvailable(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
       setLoading(false);
@@ -56,6 +71,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     login,
     logout,
     isAdmin,
+    isFirebaseAvailable,
   };
 
   return (
