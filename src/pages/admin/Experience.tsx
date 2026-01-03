@@ -34,7 +34,13 @@ import {
 } from "@/lib/admin/experience";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 export const AdminExperience = () => {
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,6 +56,8 @@ export const AdminExperience = () => {
     startDate: "",
     endDate: "",
     current: false,
+    workType: "remote",
+    location: "",
     responsibilities: [],
     skills: [],
   });
@@ -86,6 +94,8 @@ export const AdminExperience = () => {
         startDate: exp.startDate,
         endDate: exp.endDate || "",
         current: exp.current,
+        workType: exp.workType || "remote",
+        location: exp.location || "",
         responsibilities: exp.responsibilities,
         skills: exp.skills,
       });
@@ -105,6 +115,8 @@ export const AdminExperience = () => {
       startDate: "",
       endDate: "",
       current: false,
+      workType: "remote",
+      location: "",
       responsibilities: [],
       skills: [],
     });
@@ -131,6 +143,7 @@ export const AdminExperience = () => {
         responsibilities,
         skills,
         endDate: formData.current ? undefined : formData.endDate,
+        location: formData.workType === "remote" ? undefined : formData.location,
       };
 
       if (selectedExp?.id) {
@@ -208,10 +221,11 @@ export const AdminExperience = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">
-                    {exp.startDate} - {exp.current ? "Present" : exp.endDate || "N/A"}
-                  </p>
+                <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
+                  <span>{exp.startDate} - {exp.current ? "Present" : exp.endDate || "N/A"}</span>
+                  <span>•</span>
+                  <span className="capitalize">{exp.workType || "remote"}</span>
+                  {exp.location && <span>• {exp.location}</span>}
                 </div>
                 {exp.skills.length > 0 && (
                   <div className="flex flex-wrap gap-1">
@@ -304,20 +318,20 @@ export const AdminExperience = () => {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="startDate">Start Date *</Label>
+                <Label htmlFor="startDate">Start Date (Month/Year) *</Label>
                 <Input
                   id="startDate"
-                  type="date"
+                  type="month"
                   value={formData.startDate}
                   onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="endDate">End Date</Label>
+                <Label htmlFor="endDate">End Date (Month/Year)</Label>
                 <Input
                   id="endDate"
-                  type="date"
+                  type="month"
                   value={formData.endDate}
                   onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
                   disabled={formData.current}
@@ -332,6 +346,37 @@ export const AdminExperience = () => {
                 onCheckedChange={(checked) => setFormData({ ...formData, current: checked })}
               />
               <Label htmlFor="current">Current Position</Label>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="workType">Work Type *</Label>
+                <Select
+                  value={formData.workType}
+                  onValueChange={(value: "remote" | "onsite" | "hybrid") => setFormData({ ...formData, workType: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select work type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="remote">Remote</SelectItem>
+                    <SelectItem value="onsite">On-site</SelectItem>
+                    <SelectItem value="hybrid">Hybrid</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {(formData.workType === "onsite" || formData.workType === "hybrid") && (
+                <div className="space-y-2">
+                  <Label htmlFor="location">Location *</Label>
+                  <Input
+                    id="location"
+                    value={formData.location}
+                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                    placeholder="e.g., New York, NY"
+                    required
+                  />
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">
