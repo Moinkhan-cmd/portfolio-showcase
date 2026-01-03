@@ -34,14 +34,11 @@ export const Navigation = () => {
   const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [7, -7]), { stiffness: 150, damping: 15 });
   const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-7, 7]), { stiffness: 150, damping: 15 });
   
-  // Scroll-based styling transforms (navbar always visible)
-  // Removed navY transform that was hiding navbar on scroll
-  const navScale = useTransform(scrollY, [0, 100], [1, 0.98], { clamp: true });
-  const navOpacity = useTransform(scrollY, [0, 50, 100], [1, 0.98, 0.95], { clamp: true }); // Always visible (min 0.95)
-  const navBlur = useTransform(scrollY, [0, 100], [0, 8], { clamp: true }); // Reduced blur for performance
+  // Scroll-based styling transforms (navbar always visible - no hiding transforms)
   const borderOpacity = useTransform(scrollY, [0, 50], [0, 1], { clamp: true });
-  const shadowIntensity = useTransform(scrollY, [0, 100], [0, 0.3], { clamp: true });
-  const backgroundOpacity = useTransform(scrollY, [0, 50, 100], [0.75, 0.88, 0.95], { clamp: true }); // Smooth background transition
+  const shadowIntensity = useTransform(scrollY, [0, 100], [0, 0.35], { clamp: true });
+  const backgroundOpacity = useTransform(scrollY, [0, 50, 100], [0.85, 0.92, 0.98], { clamp: true });
+  const backdropBlur = useTransform(scrollY, [0, 50], [12, 20], { clamp: true });
 
   // Mouse tracking for 3D tilt effect
   useEffect(() => {
@@ -240,12 +237,7 @@ export const Navigation = () => {
           opacity: 1 
         }}
         style={{ 
-          scale: navScale,
-          opacity: navOpacity,
-          filter: `blur(${navBlur.get()}px)`,
           transform: 'translateZ(0)',
-          rotateX: isScrolled ? rotateX : 0,
-          rotateY: isScrolled ? rotateY : 0,
           perspective: 1000,
         }}
         transition={{
@@ -315,11 +307,14 @@ export const Navigation = () => {
         </AnimatePresence>
         {/* Enhanced glassmorphism background with smooth scroll transition */}
         <motion.div
-          className="absolute inset-0 backdrop-blur-xl"
+          className="absolute inset-0"
           style={{
-            background: `linear-gradient(135deg, hsl(var(--background) / ${backgroundOpacity.get()}) 0%, hsl(var(--background) / ${backgroundOpacity.get() * 0.98}) 50%, hsl(var(--background) / ${backgroundOpacity.get() * 0.95}) 100%)`,
-            boxShadow: `0 8px 32px 0 rgba(0, 0, 0, ${shadowIntensity.get()}), inset 0 1px 0 0 rgba(255, 255, 255, 0.1)`,
-            transition: "background 0.3s ease, box-shadow 0.3s ease",
+            background: `linear-gradient(135deg, hsl(var(--background) / 0.95) 0%, hsl(var(--background) / 0.92) 50%, hsl(var(--background) / 0.9) 100%)`,
+            backdropFilter: `blur(${backdropBlur.get()}px) saturate(180%)`,
+            WebkitBackdropFilter: `blur(${backdropBlur.get()}px) saturate(180%)`,
+            boxShadow: `0 4px 24px 0 rgba(0, 0, 0, ${shadowIntensity.get()}), 0 1px 0 0 rgba(255, 255, 255, 0.05) inset`,
+            borderBottom: `1px solid hsl(var(--primary) / ${borderOpacity.get() * 0.15})`,
+            transition: "backdrop-filter 0.3s ease, box-shadow 0.3s ease",
           }}
         />
 
