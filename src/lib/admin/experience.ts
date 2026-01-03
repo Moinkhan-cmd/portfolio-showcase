@@ -17,9 +17,11 @@ export interface Experience {
   id?: string;
   title: string;
   company: string;
-  startDate: string;
-  endDate?: string;
+  startDate: string; // Format: "YYYY-MM" (month and year only)
+  endDate?: string; // Format: "YYYY-MM" (month and year only)
   current: boolean;
+  workType: "remote" | "onsite" | "hybrid";
+  location?: string; // Required if workType is "onsite" or "hybrid"
   responsibilities: string[];
   skills: string[];
   createdAt?: Date;
