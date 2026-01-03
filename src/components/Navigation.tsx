@@ -34,13 +34,14 @@ export const Navigation = () => {
   const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [7, -7]), { stiffness: 150, damping: 15 });
   const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-7, 7]), { stiffness: 150, damping: 15 });
   
-  // Advanced scroll-based transforms
-  const navY = useTransform(scrollY, [0, 100], [0, -100], { clamp: false });
-  const navScale = useTransform(scrollY, [0, 100], [1, 0.9], { clamp: true });
-  const navOpacity = useTransform(scrollY, [0, 50, 100], [1, 0.95, 0.85], { clamp: true });
-  const navBlur = useTransform(scrollY, [0, 100], [0, 15], { clamp: true });
+  // Scroll-based styling transforms (navbar always visible)
+  // Removed navY transform that was hiding navbar on scroll
+  const navScale = useTransform(scrollY, [0, 100], [1, 0.98], { clamp: true });
+  const navOpacity = useTransform(scrollY, [0, 50, 100], [1, 0.98, 0.95], { clamp: true }); // Always visible (min 0.95)
+  const navBlur = useTransform(scrollY, [0, 100], [0, 8], { clamp: true }); // Reduced blur for performance
   const borderOpacity = useTransform(scrollY, [0, 50], [0, 1], { clamp: true });
   const shadowIntensity = useTransform(scrollY, [0, 100], [0, 0.3], { clamp: true });
+  const backgroundOpacity = useTransform(scrollY, [0, 50, 100], [0.75, 0.88, 0.95], { clamp: true }); // Smooth background transition
 
   // Mouse tracking for 3D tilt effect
   useEffect(() => {
@@ -123,6 +124,21 @@ export const Navigation = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     setIsMobileMenuOpen(false);
   };
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+      document.body.style.paddingRight = "0px"; // Prevent layout shift
+    } else {
+      document.body.style.overflow = "";
+      document.body.style.paddingRight = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.paddingRight = "";
+    };
+  }, [isMobileMenuOpen]);
 
   return (
     <>
@@ -217,26 +233,27 @@ export const Navigation = () => {
 
       <motion.nav
         ref={navRef}
-        className="fixed top-0 left-0 right-0 z-[9999] will-change-transform cursor-none"
+        className="fixed top-0 left-0 right-0 z-[9999] will-change-transform"
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ 
+          y: 0, 
+          opacity: 1 
+        }}
         style={{ 
-          y: isVisible ? 0 : navY,
           scale: navScale,
-          opacity: isVisible ? navOpacity : 0,
+          opacity: navOpacity,
           filter: `blur(${navBlur.get()}px)`,
           transform: 'translateZ(0)',
           rotateX: isScrolled ? rotateX : 0,
           rotateY: isScrolled ? rotateY : 0,
           perspective: 1000,
         }}
-        animate={{
-          y: isVisible ? 0 : -100,
-          opacity: isVisible ? 1 : 0,
-        }}
         transition={{
           type: "spring",
-          stiffness: 300,
-          damping: 30,
-          mass: 0.8,
+          stiffness: 400,
+          damping: 25,
+          mass: 0.5,
+          opacity: { duration: 0.3, ease: "easeOut" },
         }}
       >
         {/* Cursor-following glow effect */}
@@ -296,29 +313,14 @@ export const Navigation = () => {
             </motion.div>
           )}
         </AnimatePresence>
-        {/* Advanced multi-layer glassmorphism background */}
+        {/* Enhanced glassmorphism background with smooth scroll transition */}
         <motion.div
-          className="absolute inset-0 backdrop-blur-2xl"
+          className="absolute inset-0 backdrop-blur-xl"
           style={{
-            background: isScrolled
-              ? "linear-gradient(135deg, hsl(var(--background) / 0.95) 0%, hsl(var(--background) / 0.92) 50%, hsl(var(--background) / 0.88) 100%)"
-              : "linear-gradient(135deg, hsl(var(--background) / 0.75) 0%, hsl(var(--background) / 0.65) 50%, hsl(var(--background) / 0.55) 100%)",
+            background: `linear-gradient(135deg, hsl(var(--background) / ${backgroundOpacity.get()}) 0%, hsl(var(--background) / ${backgroundOpacity.get() * 0.98}) 50%, hsl(var(--background) / ${backgroundOpacity.get() * 0.95}) 100%)`,
             boxShadow: `0 8px 32px 0 rgba(0, 0, 0, ${shadowIntensity.get()}), inset 0 1px 0 0 rgba(255, 255, 255, 0.1)`,
+            transition: "background 0.3s ease, box-shadow 0.3s ease",
           }}
-          animate={{
-            background: isScrolled
-              ? [
-                  "linear-gradient(135deg, hsl(var(--background) / 0.95) 0%, hsl(var(--background) / 0.92) 50%, hsl(var(--background) / 0.88) 100%)",
-                  "linear-gradient(225deg, hsl(var(--background) / 0.95) 0%, hsl(var(--background) / 0.92) 50%, hsl(var(--background) / 0.88) 100%)",
-                  "linear-gradient(135deg, hsl(var(--background) / 0.95) 0%, hsl(var(--background) / 0.92) 50%, hsl(var(--background) / 0.88) 100%)",
-                ]
-              : [
-                  "linear-gradient(135deg, hsl(var(--background) / 0.75) 0%, hsl(var(--background) / 0.65) 50%, hsl(var(--background) / 0.55) 100%)",
-                  "linear-gradient(225deg, hsl(var(--background) / 0.75) 0%, hsl(var(--background) / 0.65) 50%, hsl(var(--background) / 0.55) 100%)",
-                  "linear-gradient(135deg, hsl(var(--background) / 0.75) 0%, hsl(var(--background) / 0.65) 50%, hsl(var(--background) / 0.55) 100%)",
-                ],
-          }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         />
 
         {/* Morphing gradient overlay */}
@@ -956,7 +958,18 @@ export const Navigation = () => {
             {/* Enhanced Mobile Navigation */}
         <AnimatePresence>
           {isMobileMenuOpen && (
-            <motion.div
+            <>
+              {/* Backdrop overlay */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9998] lg:hidden"
+                onClick={() => setIsMobileMenuOpen(false)}
+                aria-hidden="true"
+              />
+              <motion.div
                     initial={{ opacity: 0, height: 0, marginTop: 0, y: -20 }}
                     animate={{ opacity: 1, height: "auto", marginTop: "1rem", y: 0 }}
                     exit={{ opacity: 0, height: 0, marginTop: 0, y: -20 }}
@@ -966,7 +979,7 @@ export const Navigation = () => {
                       damping: 30,
                       duration: 0.4 
                     }}
-              className="lg:hidden overflow-hidden"
+              className="lg:hidden overflow-hidden relative z-[9999]"
               style={{ marginTop: isMobileMenuOpen ? "1rem" : "0" }}
             >
                     <motion.div
@@ -1133,6 +1146,7 @@ export const Navigation = () => {
                 </motion.div>
                     </motion.div>
             </motion.div>
+            </>
           )}
         </AnimatePresence>
       </div>

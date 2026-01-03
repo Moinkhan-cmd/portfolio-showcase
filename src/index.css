@@ -127,6 +127,21 @@ a, button, [role="button"], input[type="submit"], input[type="button"], .cursor-
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-body);
+    /* Add padding-top to prevent content from being hidden behind fixed navbar */
+    padding-top: 80px;
+  }
+
+  /* Responsive navbar height adjustment */
+  @media (max-width: 1024px) {
+    body {
+      padding-top: 70px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    body {
+      padding-top: 65px;
+    }
   }
 
   h1, h2, h3, h4, h5, h6 {
