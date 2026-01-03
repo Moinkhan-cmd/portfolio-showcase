@@ -128,6 +128,33 @@ VITE_EMAILJS_PUBLIC_KEY=your-public-key
 
 5. **Double-check**: Make sure `.env` is in your `.gitignore` file (it should be already - this keeps your secrets safe!)
 
+### Lovable Production Environment Variables
+
+1. Go to your [Lovable project dashboard](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID)
+2. Click on **Project Settings** (gear icon) or go to **Settings**
+3. Navigate to **Environment Variables** or **Env Variables** section
+4. Click **Add Variable** or **Add Environment Variable**
+5. Add each environment variable from your `.env` file:
+
+   - `VITE_FIREBASE_API_KEY` = (your Firebase API key)
+   - `VITE_FIREBASE_AUTH_DOMAIN` = (your Firebase auth domain)
+   - `VITE_FIREBASE_PROJECT_ID` = (your Firebase project ID)
+   - `VITE_FIREBASE_MESSAGING_SENDER_ID` = (your messaging sender ID)
+   - `VITE_FIREBASE_APP_ID` = (your Firebase app ID)
+   - `VITE_ADMIN_EMAIL` = (your admin email)
+   - `VITE_EMAILJS_SERVICE_ID` = (your existing EmailJS service ID)
+   - `VITE_EMAILJS_TEMPLATE_ID` = (your existing EmailJS template ID)
+   - `VITE_EMAILJS_PUBLIC_KEY` = (your existing EmailJS public key)
+
+6. **Save** the environment variables
+7. **Redeploy your site** - Click **Share** → **Publish** or trigger a new deployment
+
+**Note**: If you can't find the Environment Variables section, look for:
+- **Settings** → **Environment Variables**
+- **Project Settings** → **Environment Variables**
+- **Deployment Settings** → **Environment Variables**
+- Or use the search/filter in settings to find "env" or "environment"
+
 ### Netlify Production Environment Variables
 
 1. Go to your Netlify dashboard
@@ -199,10 +226,13 @@ VITE_EMAILJS_PUBLIC_KEY=your-public-key
 - Ensure URLs are complete (include https://)
 - For GitHub raw URLs, use the raw file URL, not the repository page
 
-### Environment variables not working in Netlify
+### Environment variables not working in Netlify/Lovable
 - Make sure all variables start with `VITE_`
 - Redeploy your site after adding/updating variables
-- Check Netlify build logs for errors
+- Check build logs for errors
+- For Lovable: Make sure variables are saved and trigger a new deployment
+- Verify variable names match exactly (case-sensitive)
+- Ensure no extra spaces around the `=` sign in the variable values
 
 ### Can't access `/admin` route
 - Make sure you've deployed the latest code with the admin routes
