@@ -152,3 +152,5 @@ Once enabled:
 
 **That's it!** Once you enable Google Analytics in the Firebase Console, everything else is automatic. Your website will start tracking visitors, and you'll see data in both Firebase Console Analytics and your custom Admin Panel Analytics page.
 
+
+

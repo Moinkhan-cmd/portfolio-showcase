@@ -276,3 +276,5 @@ The code has been updated with:
 
 **Important:** The SSL error is a hosting/DNS configuration issue, not a code issue. The code has been secured with proper headers, but you must configure SSL in Netlify for HTTPS to work.
 
+
+

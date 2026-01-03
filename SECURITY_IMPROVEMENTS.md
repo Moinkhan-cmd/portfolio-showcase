@@ -175,3 +175,5 @@ The SSL error (`ERR_SSL_PROTOCOL_ERROR`) is a **hosting/DNS configuration issue*
 
 **Important**: The code is now secure. You need to configure SSL in Netlify to enable HTTPS. Follow `SSL_SETUP_GUIDE.md` for step-by-step instructions.
 
+
+
