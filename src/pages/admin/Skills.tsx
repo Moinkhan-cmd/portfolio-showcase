@@ -122,7 +122,7 @@ export const AdminSkills = () => {
       const skillData = {
         name: formData.name.trim(),
         category: formData.category.trim(),
-        level: formData.level,
+        level: formData.level as "beginner" | "intermediate" | "advanced" | "expert",
         icon: formData.icon.trim(),
       };
 
