@@ -51,6 +51,7 @@ const Certification3DCard = ({ cert, index }: CertificationCardProps) => {
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
+      onClick={() => setIsHovered(!isHovered)}
       style={{
         rotateX,
         rotateY,
