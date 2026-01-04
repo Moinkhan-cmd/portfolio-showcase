@@ -25,6 +25,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2, Loader2, ExternalLink } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import {
   getCertifications,
   createCertification,
@@ -49,8 +50,11 @@ export const AdminCertifications = () => {
     issueDate: "",
     credentialUrl: "",
     imageUrl: "",
+    skills: [],
     description: "",
   });
+
+  const [skillsInput, setSkillsInput] = useState("");
 
 
   useEffect(() => {
@@ -82,8 +86,10 @@ export const AdminCertifications = () => {
         issueDate: cert.issueDate,
         credentialUrl: cert.credentialUrl,
         imageUrl: cert.imageUrl,
+        skills: cert.skills ?? [],
         description: cert.description || "",
       });
+      setSkillsInput((cert.skills ?? []).join(", "));
     } else {
       resetForm();
     }
@@ -98,8 +104,10 @@ export const AdminCertifications = () => {
       issueDate: "",
       credentialUrl: "",
       imageUrl: "",
+      skills: [],
       description: "",
     });
+    setSkillsInput("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -107,7 +115,12 @@ export const AdminCertifications = () => {
     setIsSubmitting(true);
 
     try {
-      const certData = { ...formData };
+      const skills = skillsInput
+        .split(",")
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
+
+      const certData = { ...formData, skills };
 
       // Validate with Zod schema
       const validationResult = certificationSchema.safeParse(certData);
@@ -302,6 +315,28 @@ export const AdminCertifications = () => {
                   }
                   placeholder="https://..."
                 />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="skills">Skills</Label>
+              <Input
+                id="skills"
+                value={skillsInput}
+                onChange={(e) => setSkillsInput(e.target.value)}
+                placeholder="e.g. React, TypeScript, UI/UX"
+              />
+              <p className="text-xs text-muted-foreground">Comma-separated. Optional.</p>
+              <div className="flex flex-wrap gap-2 pt-1">
+                {skillsInput
+                  .split(",")
+                  .map((s) => s.trim())
+                  .filter(Boolean)
+                  .map((s, i) => (
+                    <Badge key={`${s}-${i}`} variant="secondary" className="text-xs">
+                      {s}
+                    </Badge>
+                  ))}
               </div>
             </div>
 

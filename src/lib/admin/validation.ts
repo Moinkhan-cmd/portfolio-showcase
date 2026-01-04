@@ -68,6 +68,11 @@ export const certificationSchema = z.object({
     .or(z.literal("")),
   credentialUrl: optionalSafeUrl,
   imageUrl: optionalSafeUrl,
+  skills: z.array(
+    z.string().trim().max(50, { message: "Skill must be less than 50 characters" })
+  ).max(30, { message: "Maximum 30 skills allowed" })
+    .optional()
+    .default([]),
   description: z.string()
     .trim()
     .max(1000, { message: "Description must be less than 1000 characters" })

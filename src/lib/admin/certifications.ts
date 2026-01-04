@@ -20,6 +20,7 @@ export interface Certification {
   issueDate: string;
   credentialUrl: string;
   imageUrl: string;
+  skills?: string[];
   description?: string;
   createdAt?: Date;
   updatedAt?: Date;
@@ -55,6 +56,8 @@ export const createCertification = async (
 ): Promise<string> => {
   const docRef = await addDoc(collection(db, "certifications"), {
     ...cert,
+    issueDate: cert.issueDate ?? "",
+    skills: cert.skills ?? [],
     createdAt: Timestamp.now(),
     updatedAt: Timestamp.now(),
   });
@@ -68,6 +71,8 @@ export const updateCertification = async (
   const docRef = doc(db, "certifications", id);
   await updateDoc(docRef, {
     ...cert,
+    ...(cert.issueDate === undefined ? {} : { issueDate: cert.issueDate ?? "" }),
+    ...(cert.skills === undefined ? {} : { skills: cert.skills ?? [] }),
     updatedAt: Timestamp.now(),
   });
 };
@@ -75,6 +80,7 @@ export const updateCertification = async (
 export const deleteCertification = async (id: string): Promise<void> => {
   await deleteDoc(doc(db, "certifications", id));
 };
+
 
 
 

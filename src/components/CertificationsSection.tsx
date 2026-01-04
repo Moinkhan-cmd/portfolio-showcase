@@ -4,6 +4,7 @@ import { Award, ExternalLink, Calendar, Sparkles, Loader2 } from "lucide-react";
 import { CertificationsBackground3D } from "./CertificationsBackground3D";
 import { useCertifications } from "@/hooks/useCertifications";
 import type { Certification } from "@/lib/admin/certifications";
+import { Badge } from "@/components/ui/badge";
 
 export const CertificationsSection = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -124,6 +125,22 @@ export const CertificationsSection = () => {
                   <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4 flex-1 line-clamp-3">
                     {cert.description}
                   </p>
+                )}
+
+                {/* Skills */}
+                {Array.isArray(cert.skills) && cert.skills.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-3 sm:mb-4">
+                    {cert.skills.slice(0, 8).map((skill) => (
+                      <Badge key={skill} variant="secondary" className="text-[11px] sm:text-xs">
+                        {skill}
+                      </Badge>
+                    ))}
+                    {cert.skills.length > 8 && (
+                      <Badge variant="secondary" className="text-[11px] sm:text-xs">
+                        +{cert.skills.length - 8}
+                      </Badge>
+                    )}
+                  </div>
                 )}
 
                 {/* Footer */}
