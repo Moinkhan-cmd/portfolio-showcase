@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Briefcase, Calendar, Loader2, MapPin, Laptop, Building2, Sparkles } from "lucide-react";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { Briefcase, Calendar, Loader2, MapPin, Laptop, Building2 } from "lucide-react";
+import { motion } from "framer-motion";
 import { ExperienceBackground3D } from "./ExperienceBackground3D";
 import { useExperience } from "@/hooks/useExperience";
 import type { Experience } from "@/lib/admin/experience";
@@ -34,15 +34,6 @@ export const ExperienceSection = () => {
         return "Remote";
     }
   };
-
-  // Scroll Parallax for Timeline
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"]
-  });
-
-  const ySpring = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
-  const timelineHeight = useTransform(ySpring, [0, 1], ["0%", "100%"]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -96,24 +87,13 @@ export const ExperienceSection = () => {
           </p>
         </div>
 
-        {/* 3D Timeline Container */}
-        <div className="max-w-5xl mx-auto relative perspective-1000">
-
-          {/* Animated Central Timeline Beam */}
-          <div className="absolute left-4 sm:left-0 md:left-1/2 top-0 bottom-0 w-[3px] md:-translate-x-1/2 bg-border/30 rounded-full overflow-hidden">
-            <motion.div className="w-full origin-top" style={{ height: timelineHeight }}>
-              <div className="h-full w-full bg-gradient-to-b from-primary via-[hsl(200,90%,60%)] to-primary opacity-80" />
-              <div className="absolute inset-0 blur-md bg-primary/30" />
-            </motion.div>
+        {isLoading ? (
+          <div className="flex items-center justify-center min-h-[400px]">
+            <Loader2 className="w-10 h-10 animate-spin text-primary" />
           </div>
-
-          {isLoading ? (
-            <div className="flex items-center justify-center min-h-[400px]">
-              <Loader2 className="w-12 h-12 animate-spin text-primary" />
-            </div>
-          ) : experiences.length > 0 ? (
-            experiences.map((exp, index) => {
-              const isEven = index % 2 === 0;
+        ) : experiences.length > 0 ? (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 max-w-6xl mx-auto">
+            {experiences.map((exp, index) => {
               const duration = exp.current
                 ? `${formatMonthYear(exp.startDate)} – Present`
                 : exp.endDate
@@ -121,126 +101,100 @@ export const ExperienceSection = () => {
                   : formatMonthYear(exp.startDate);
 
               return (
-                <div key={exp.id || index} className="relative mb-16 sm:mb-24 last:mb-0">
-                  <div className={`flex flex-col md:flex-row items-center ${!isEven ? 'md:flex-row-reverse' : ''}`}>
+                <motion.div
+                  key={exp.id || index}
+                  initial={{ opacity: 0, y: 25 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-80px" }}
+                  transition={{ duration: 0.55, delay: index * 0.06 }}
+                  whileHover={{ y: -6 }}
+                  className="glass-enhanced rounded-2xl border border-primary/10 overflow-hidden card-hover"
+                >
+                  <div className="p-5 sm:p-6 relative">
+                    {/* Top accent */}
+                    <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-primary/60 to-transparent opacity-70 pointer-events-none" />
 
-                    {/* Glowing Timeline Node */}
-                    <div className="absolute left-4 sm:left-0 md:left-1/2 -translate-x-1/2 md:-translate-x-1/2 flex items-center justify-center z-10 w-8 h-8">
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        whileInView={{ scale: 1 }}
-                        viewport={{ once: true, margin: "-100px" }}
-                        className={`w-3.5 h-3.5 rounded-full ${exp.current ? 'bg-primary' : 'bg-foreground/70'} shadow-[0_0_20px_rgba(45,212,191,0.5)]`}
-                      >
-                        {exp.current && (
-                          <div className="absolute inset-0 rounded-full bg-primary animate-ping opacity-75" />
-                        )}
-                      </motion.div>
+                    {/* Header */}
+                    <div className="flex items-start gap-3">
+                      <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/15 shrink-0">
+                        <Briefcase className="w-5 h-5 text-primary" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-display text-lg sm:text-xl font-semibold leading-snug">
+                          {exp.title}
+                        </h3>
+                        <div className="flex items-center gap-2 mt-1 text-primary/90 font-medium">
+                          <Building2 className="w-4 h-4" />
+                          <span className="truncate">{exp.company}</span>
+                        </div>
+                      </div>
+                      {exp.current && (
+                        <Badge variant="default" className="shrink-0">
+                          Current
+                        </Badge>
+                      )}
                     </div>
 
-                    {/* Spacer for desktop layout */}
-                    <div className="hidden md:block w-1/2" />
+                    {/* Meta */}
+                    <div className="flex flex-wrap gap-2 mt-4 text-muted-foreground">
+                      <Badge variant="secondary" className="gap-1.5">
+                        <Calendar className="w-3.5 h-3.5" />
+                        {duration}
+                      </Badge>
+                      <Badge variant="outline" className="gap-1.5 border-primary/30">
+                        <Laptop className="w-3.5 h-3.5" />
+                        {workTypeLabel(exp.workType)}
+                      </Badge>
+                      {exp.location && (
+                        <Badge variant="outline" className="gap-1.5 border-primary/20">
+                          <MapPin className="w-3.5 h-3.5" />
+                          {exp.location}
+                        </Badge>
+                      )}
+                    </div>
 
-                    {/* 3D Card */}
-                    <motion.div
-                      className={`w-full md:w-[calc(50%-3rem)] pl-12 md:pl-0 ${isEven ? 'md:pr-12 text-left' : 'md:pl-12 text-left'}`}
-                      initial={{ opacity: 0, x: isEven ? -100 : 100, rotateY: isEven ? 25 : -25 }}
-                      whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
-                      viewport={{ once: true, margin: "-100px" }}
-                      transition={{ duration: 0.8, type: "spring", bounce: 0.4 }}
-                    >
-                      <motion.div
-                        whileHover={{
-                          scale: 1.03,
-                          rotateX: 4,
-                          z: 50,
-                        }}
-                        className="group relative glass-enhanced rounded-2xl p-6 sm:p-8 shadow-2xl border border-primary/10 overflow-hidden"
-                        style={{ transformStyle: "preserve-3d" }}
-                      >
-                        {/* Decorative shimmer + gradient border */}
-                        <div className="absolute inset-0 pointer-events-none">
-                          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 opacity-60" />
-                          <motion.div
-                            className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent"
-                            animate={{ x: isVisible ? ["-120%", "220%"] : "-120%" }}
-                            transition={{ duration: 2.2, repeat: Infinity, repeatDelay: 2.5, ease: "linear" }}
-                          />
-                        </div>
+                    {/* Skills */}
+                    {exp.skills?.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-4">
+                        {exp.skills.slice(0, 10).map((skill) => (
+                          <Badge key={skill} variant="secondary" className="text-xs">
+                            {skill}
+                          </Badge>
+                        ))}
+                        {exp.skills.length > 10 && (
+                          <Badge variant="secondary" className="text-xs">
+                            +{exp.skills.length - 10}
+                          </Badge>
+                        )}
+                      </div>
+                    )}
 
-                        {/* 3D Float Header */}
-                        <div style={{ transform: "translateZ(20px)" }} className="flex flex-col gap-2 mb-4 relative">
-                          <h3 className="font-display text-2xl font-bold text-white group-hover:text-primary transition-colors">
-                            {exp.title}
-                          </h3>
-                          <div className="flex items-center gap-2 text-primary/90 font-medium text-lg">
-                            <Building2 className="w-4 h-4" />
-                            {exp.company}
-                          </div>
-                        </div>
-
-                        {/* 3D Depth Content */}
-                        <div style={{ transform: "translateZ(10px)" }}>
-                          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground mb-4">
-                            <Badge variant="secondary" className="gap-1.5">
-                              <Calendar className="w-3.5 h-3.5" />
-                              {duration}
-                            </Badge>
-                            <Badge variant="outline" className="gap-1.5 border-primary/30">
-                              <Laptop className="w-3.5 h-3.5" />
-                              {workTypeLabel(exp.workType)}
-                            </Badge>
-                            {exp.location && (
-                              <Badge variant="outline" className="gap-1.5 border-primary/20">
-                                <MapPin className="w-3.5 h-3.5" />
-                                {exp.location}
-                              </Badge>
-                            )}
-                            {exp.current && (
-                              <Badge variant="default" className="gap-1.5">
-                                <Sparkles className="w-3.5 h-3.5" />
-                                Current
-                              </Badge>
-                            )}
-                          </div>
-
-                          {exp.skills?.length > 0 && (
-                            <div className="flex flex-wrap gap-2 mb-5">
-                              {exp.skills.slice(0, 8).map((skill) => (
-                                <Badge key={skill} variant="secondary" className="text-xs">
-                                  {skill}
-                                </Badge>
-                              ))}
-                              {exp.skills.length > 8 && (
-                                <Badge variant="secondary" className="text-xs">
-                                  +{exp.skills.length - 8}
-                                </Badge>
-                              )}
-                            </div>
-                          )}
-
-                          <ul className="space-y-3">
-                            {exp.responsibilities.map((resp, i) => (
-                              <li key={i} className="flex items-start gap-3 text-muted-foreground group-hover:text-white/90 transition-colors">
-                                <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0 shadow-[0_0_10px_rgba(45,212,191,0.5)]" />
-                                <span className="text-sm leading-relaxed">{resp}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-
-                        {/* Glow Border Effect */}
-                        <div className="absolute inset-0 rounded-2xl border border-primary/0 group-hover:border-primary/40 transition-colors pointer-events-none" />
-                      </motion.div>
-                    </motion.div>
+                    {/* Responsibilities */}
+                    {exp.responsibilities?.length > 0 && (
+                      <ul className="mt-4 space-y-2.5">
+                        {exp.responsibilities.slice(0, 4).map((resp, i) => (
+                          <li key={i} className="flex items-start gap-3 text-sm text-muted-foreground leading-relaxed">
+                            <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
+                            <span>{resp}</span>
+                          </li>
+                        ))}
+                        {exp.responsibilities.length > 4 && (
+                          <li className="text-xs text-muted-foreground pl-4">
+                            +{exp.responsibilities.length - 4} more…
+                          </li>
+                        )}
+                      </ul>
+                    )}
                   </div>
-                </div>
+                </motion.div>
               );
-            })
-          ) : (
-            <div className="text-center py-20 text-muted-foreground">No experience entries yet.</div>
-          )}
-        </div>
+            })}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">No experience entries yet.</p>
+          </div>
+        )}
       </div>
     </section>
   );
