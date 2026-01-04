@@ -71,6 +71,11 @@ export const certificationSchema = z.object({
     .max(50, { message: "Issue date must be valid" })
     .optional()
     .or(z.literal("")),
+  credentialId: z.string()
+    .trim()
+    .max(120, { message: "Credential ID must be less than 120 characters" })
+    .optional()
+    .or(z.literal("")),
   credentialUrl: optionalSafeUrl,
   imageUrl: optionalSafeUrl,
   skills: z.array(

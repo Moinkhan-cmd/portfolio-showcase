@@ -18,6 +18,7 @@ export interface Certification {
   title: string;
   issuer: string;
   issueDate: string;
+  credentialId?: string;
   credentialUrl: string;
   imageUrl: string;
   skills?: string[];
@@ -57,6 +58,7 @@ export const createCertification = async (
   const docRef = await addDoc(collection(db, "certifications"), {
     ...cert,
     issueDate: cert.issueDate ?? "",
+    credentialId: cert.credentialId ?? "",
     skills: cert.skills ?? [],
     createdAt: Timestamp.now(),
     updatedAt: Timestamp.now(),
@@ -72,6 +74,7 @@ export const updateCertification = async (
   await updateDoc(docRef, {
     ...cert,
     ...(cert.issueDate === undefined ? {} : { issueDate: cert.issueDate ?? "" }),
+    ...(cert.credentialId === undefined ? {} : { credentialId: cert.credentialId ?? "" }),
     ...(cert.skills === undefined ? {} : { skills: cert.skills ?? [] }),
     updatedAt: Timestamp.now(),
   });

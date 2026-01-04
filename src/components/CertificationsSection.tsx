@@ -140,8 +140,12 @@ const Certification3DCard = ({ cert, index }: CertificationCardProps) => {
           {/* Fixed Footer */}
           <div className="mt-auto pt-3 border-t border-white/5 flex items-center justify-between text-xs text-muted-foreground shrink-0">
             <div className="flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5" />
-              <span>{cert.issueDate || "N/A"}</span>
+              {cert.issueDate && (
+                <>
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span>{cert.issueDate}</span>
+                </>
+              )}
             </div>
             {cert.credentialUrl && (
               <a
