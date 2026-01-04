@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Briefcase, Calendar, Loader2 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { ExperienceBackground3D } from "./ExperienceBackground3D";
 import { useExperience } from "@/hooks/useExperience";
 import type { Experience } from "@/lib/admin/experience";
@@ -10,20 +10,21 @@ export const ExperienceSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const { data: experiences = [], isLoading } = useExperience();
 
+  // Scroll Parallax for Timeline
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"]
+  });
+
+  const ySpring = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
+  const timelineHeight = useTransform(ySpring, [0, 1], ["0%", "100%"]);
+
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
+      ([entry]) => { if (entry.isIntersecting) setIsVisible(true); },
       { threshold: 0.1 }
     );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
+    if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
   }, []);
 
@@ -31,152 +32,134 @@ export const ExperienceSection = () => {
     <section
       id="experience"
       ref={sectionRef}
-      className="section-padding relative bg-secondary/30 overflow-hidden"
+      className="section-padding relative overflow-hidden bg-black/40 perspective-1000"
     >
       <ExperienceBackground3D />
-      
-      {/* Overlay for text contrast */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/65 to-background/50 pointer-events-none z-10" />
-      <div className="absolute inset-0 pointer-events-none z-10" 
-           style={{
-             background: 'radial-gradient(ellipse at center, transparent 0%, hsl(222 47% 6% / 0.2) 50%, hsl(222 47% 6% / 0.5) 100%)'
-           }} 
-      />
-      
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden opacity-30 z-10">
-        <div className="absolute top-1/2 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -translate-x-1/2" />
-        <div className="absolute bottom-0 right-0 w-80 h-80 bg-primary/5 rounded-full blur-3xl translate-x-1/2" />
-      </div>
+
+      {/* Cinematic Lighting Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent pointer-events-none mix-blend-screen" />
 
       <div className="container mx-auto container-padding relative z-20">
-        {/* Section Header */}
-        <div className={`text-center mb-10 sm:mb-16 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}>
-          <span className="text-primary text-sm font-medium uppercase tracking-wider">Experience</span>
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold mt-3 sm:mt-4">
-            Work <span className="gradient-text">Journey</span>
+
+        {/* Floating Header */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={isVisible ? { opacity: 1, scale: 1 } : {}}
+          transition={{ duration: 0.8, type: "spring" }}
+          className="text-center mb-16 sm:mb-24"
+        >
+          <span className="inline-block px-3 py-1 rounded-full bg-white/5 border border-white/10 text-primary text-xs font-bold tracking-[0.2em] uppercase mb-4 backdrop-blur-md">
+            Career Trajectory
+          </span>
+          <h2 className="font-display text-4xl sm:text-6xl md:text-7xl font-bold">
+            Work <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-purple-400 to-primary animate-gradient-x bg-300%">Journal</span>
           </h2>
-          <p className="text-muted-foreground mt-3 sm:mt-4 max-w-2xl mx-auto text-sm sm:text-base px-4">
-            My professional experience and learning journey in web development
-          </p>
-        </div>
+        </motion.div>
 
-        {/* Timeline - Simplified for mobile */}
-        <div className="max-w-3xl mx-auto">
-          <div className="relative">
-            {/* Timeline Line - Left aligned on mobile */}
-            <div className="absolute left-2 sm:left-0 md:left-1/2 top-0 bottom-0 w-px bg-border md:-translate-x-1/2" />
+        {/* 3D Timeline Container */}
+        <div className="max-w-4xl mx-auto relative perspective-1000">
 
-            {isLoading ? (
-              <div className="flex items-center justify-center min-h-[400px]">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
-              </div>
-            ) : experiences.length > 0 ? (
-              experiences.map((exp, index) => {
-                const duration = exp.current
-                  ? `${exp.startDate} – Present`
-                  : exp.endDate
+          {/* Animated Central Timeline Beam */}
+          <div className="absolute left-4 sm:left-0 md:left-1/2 top-0 bottom-0 w-1 md:-translate-x-1/2 bg-white/5 rounded-full overflow-hidden">
+            <motion.div
+              className="w-full bg-gradient-to-b from-primary via-purple-500 to-primary origin-top"
+              style={{ height: timelineHeight }}
+            />
+          </div>
+
+          {isLoading ? (
+            <div className="flex items-center justify-center min-h-[400px]">
+              <Loader2 className="w-12 h-12 animate-spin text-primary" />
+            </div>
+          ) : experiences.length > 0 ? (
+            experiences.map((exp, index) => {
+              const isEven = index % 2 === 0;
+              const duration = exp.current
+                ? `${exp.startDate} – Present`
+                : exp.endDate
                   ? `${exp.startDate} – ${exp.endDate}`
                   : exp.startDate;
-                return (
-              <motion.div
-                    key={exp.id || exp.title}
-                initial={{ opacity: 0, y: 30 }}
-                animate={isVisible ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.6, delay: 0.1 + index * 0.1 }}
-                className="relative mb-8 sm:mb-12 last:mb-0"
-              >
-                <div className={`flex flex-col md:flex-row items-start gap-4 sm:gap-6 ${index % 2 === 1 ? 'md:flex-row-reverse' : ''}`}>
-                  {/* Timeline Node */}
-                  <motion.div 
-                    className="absolute left-2 sm:left-0 md:left-1/2 w-3 h-3 sm:w-4 sm:h-4 -translate-x-1/2 md:-translate-x-1/2 top-6 sm:top-8 z-10"
-                    initial={{ scale: 0 }}
-                    animate={isVisible ? { scale: 1 } : {}}
-                    transition={{ duration: 0.4, delay: 0.2 + index * 0.1, type: "spring" }}
-                    whileHover={{ scale: 1.5 }}
-                  >
-                    <motion.div 
-                      className={`w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 border-primary ${exp.current ? 'bg-primary' : 'bg-background'}`}
-                      animate={exp.current ? {
-                        boxShadow: [
-                          "0 0 0px hsl(175 80% 50% / 0)",
-                          "0 0 20px hsl(175 80% 50% / 0.6)",
-                          "0 0 0px hsl(175 80% 50% / 0)"
-                        ]
-                      } : {}}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    />
-                  </motion.div>
 
-                  {/* Content Card */}
-                  <motion.div 
-                    className={`md:w-[calc(50%-2rem)] ml-8 sm:ml-8 md:ml-0 ${index % 2 === 0 ? 'md:mr-auto md:pr-8' : 'md:ml-auto md:pl-8'}`}
-                    initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
-                    animate={isVisible ? { opacity: 1, x: 0 } : {}}
-                    transition={{ duration: 0.6, delay: 0.2 + index * 0.1 }}
-                    whileHover={{ y: -5, scale: 1.02 }}
-                  >
-                    <div className="glass-enhanced rounded-xl sm:rounded-2xl p-4 sm:p-6 card-hover">
-                      {/* Header */}
-                      <motion.div 
-                        className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4"
-                        whileHover={{ x: 5 }}
+              return (
+                <div key={exp.id || index} className="relative mb-16 sm:mb-24 last:mb-0">
+                  <div className={`flex flex-col md:flex-row items-center ${!isEven ? 'md:flex-row-reverse' : ''}`}>
+
+                    {/* Glowing Timeline Node */}
+                    <div className="absolute left-4 sm:left-0 md:left-1/2 -translate-x-1/2 md:-translate-x-1/2 flex items-center justify-center z-10 w-8 h-8">
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        whileInView={{ scale: 1 }}
+                        viewport={{ once: true, margin: "-100px" }}
+                        className={`w-4 h-4 rounded-full ${exp.current ? 'bg-primary' : 'bg-white'} shadow-[0_0_20px_rgba(45,212,191,0.5)]`}
                       >
-                        <motion.div 
-                          className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-primary/10 shrink-0"
-                          whileHover={{ rotate: 360, scale: 1.1 }}
-                          transition={{ duration: 0.5 }}
-                        >
-                          <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-                        </motion.div>
-                        <div>
-                          <h3 className="font-display text-base sm:text-lg font-semibold">{exp.title}</h3>
-                          <p className="text-primary font-medium text-sm sm:text-base">{exp.company}</p>
-                        </div>
-                      </motion.div>
-
-                      {/* Duration */}
-                      <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
-                        <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                            <span>{duration}</span>
                         {exp.current && (
-                          <span className="px-2 py-0.5 bg-primary/20 text-primary text-xs rounded-full">
-                            Current
-                          </span>
+                          <div className="absolute inset-0 rounded-full bg-primary animate-ping opacity-75" />
                         )}
-                      </div>
-
-                      {/* Responsibilities */}
-                      <ul className="space-y-1.5 sm:space-y-2">
-                        {exp.responsibilities.map((resp, i) => (
-                          <motion.li 
-                            key={i} 
-                            className="flex items-start gap-2 text-xs sm:text-sm text-muted-foreground"
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={isVisible ? { opacity: 1, x: 0 } : {}}
-                            transition={{ duration: 0.4, delay: 0.3 + index * 0.1 + i * 0.05 }}
-                            whileHover={{ x: 5, color: "hsl(var(--foreground))" }}
-                          >
-                            <motion.span 
-                              className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-primary mt-1.5 sm:mt-2 shrink-0"
-                              whileHover={{ scale: 1.5 }}
-                            />
-                            <span>{resp}</span>
-                          </motion.li>
-                        ))}
-                      </ul>
+                      </motion.div>
                     </div>
-                  </motion.div>
+
+                    {/* Spacer for desktop layout */}
+                    <div className="hidden md:block w-1/2" />
+
+                    {/* 3D Card */}
+                    <motion.div
+                      className={`w-full md:w-[calc(50%-3rem)] pl-12 md:pl-0 ${isEven ? 'md:pr-12 text-left' : 'md:pl-12 text-left'}`}
+                      initial={{ opacity: 0, x: isEven ? -100 : 100, rotateY: isEven ? 25 : -25 }}
+                      whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
+                      viewport={{ once: true, margin: "-100px" }}
+                      transition={{ duration: 0.8, type: "spring", bounce: 0.4 }}
+                    >
+                      <motion.div
+                        whileHover={{
+                          scale: 1.05,
+                          rotateX: 5,
+                          z: 50,
+                          backgroundColor: "rgba(255,255,255,0.08)"
+                        }}
+                        className="group relative backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl transition-colors duration-300"
+                        style={{ transformStyle: "preserve-3d" }}
+                      >
+                        {/* 3D Float Header */}
+                        <div style={{ transform: "translateZ(20px)" }} className="flex flex-col gap-2 mb-4">
+                          <h3 className="font-display text-2xl font-bold text-white group-hover:text-primary transition-colors">
+                            {exp.title}
+                          </h3>
+                          <div className="flex items-center gap-2 text-primary/80 font-medium text-lg">
+                            <Briefcase className="w-4 h-4" />
+                            {exp.company}
+                          </div>
+                        </div>
+
+                        {/* 3D Depth Content */}
+                        <div style={{ transform: "translateZ(10px)" }}>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+                            <Calendar className="w-4 h-4" />
+                            <span className={`px-2 py-0.5 rounded-full ${exp.current ? 'bg-primary/20 text-primary' : 'bg-white/10'}`}>
+                              {duration}
+                            </span>
+                          </div>
+
+                          <ul className="space-y-3">
+                            {exp.responsibilities.map((resp, i) => (
+                              <li key={i} className="flex items-start gap-3 text-muted-foreground group-hover:text-white/90 transition-colors">
+                                <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0 shadow-[0_0_10px_rgba(45,212,191,0.5)]" />
+                                <span className="text-sm leading-relaxed">{resp}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        {/* Glow Border Effect */}
+                        <div className="absolute inset-0 rounded-2xl border border-primary/0 group-hover:border-primary/50 transition-colors pointer-events-none" />
+                      </motion.div>
+                    </motion.div>
+                  </div>
                 </div>
-              </motion.div>
-                );
-              })
-            ) : (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">No experience entries available yet.</p>
-              </div>
-            )}
-          </div>
+              );
+            })
+          ) : (
+            <div className="text-center py-20 text-muted-foreground">Journey loading...</div>
+          )}
         </div>
       </div>
     </section>
