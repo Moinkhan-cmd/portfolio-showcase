@@ -400,7 +400,7 @@ html {
 
 /* Enhanced smooth scrolling with performance optimizations */
 html {
-  scroll-behavior: smooth;
+  /* scroll-behavior: smooth; -- Handled by Lenis */
   overflow-x: hidden;
   /* Enable hardware acceleration - Removed to fix fixed positioning interactions */
   /* transform: translateZ(0); */
@@ -410,7 +410,7 @@ html {
 
 body {
   /* Optimize scrolling performance */
-  overscroll-behavior-y: none;
+  /* overscroll-behavior-y: none; -- Disabled to test 'stuck' feeling fix */
   -webkit-overflow-scrolling: touch;
   /* GPU acceleration - Removed to fix fixed positioning interactions */
   /* transform: translateZ(0); */
