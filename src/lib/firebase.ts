@@ -37,13 +37,13 @@ try {
     db = getFirestore(app);
 
     // Initialize Analytics (only in browser environment)
-    if (typeof window !== "undefined") {
-      try {
-        analytics = getAnalytics(app);
-      } catch (error) {
-        console.warn("Analytics initialization failed:", error);
-      }
-    }
+if (typeof window !== "undefined") {
+  try {
+    analytics = getAnalytics(app);
+  } catch (error) {
+    console.warn("Analytics initialization failed:", error);
+  }
+}
   } else {
     console.error("Firebase configuration is missing. Please check your environment variables.");
     console.error("Required variables: VITE_FIREBASE_API_KEY, VITE_FIREBASE_AUTH_DOMAIN, VITE_FIREBASE_PROJECT_ID, VITE_FIREBASE_MESSAGING_SENDER_ID, VITE_FIREBASE_APP_ID");

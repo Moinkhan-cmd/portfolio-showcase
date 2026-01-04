@@ -24,40 +24,40 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <ErrorBoundary>
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-        <TooltipProvider>
-          <AuthProvider>
-            <ScrollProgress />
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <AnalyticsTracker />
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/admin/login" element={<AdminLogin />} />
-                <Route
-                  path="/admin"
-                  element={
-                    <ProtectedRoute>
-                      <AdminLayout />
-                    </ProtectedRoute>
-                  }
-                >
-                  <Route index element={<AdminDashboard />} />
-                  <Route path="analytics" element={<AdminAnalytics />} />
-                  <Route path="projects" element={<AdminProjects />} />
-                  <Route path="certifications" element={<AdminCertifications />} />
-                  <Route path="experience" element={<AdminExperience />} />
-                  <Route path="skills" element={<AdminSkills />} />
-                </Route>
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </AuthProvider>
-        </TooltipProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+  <QueryClientProvider client={queryClient}>
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+      <TooltipProvider>
+        <AuthProvider>
+          <ScrollProgress />
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AnalyticsTracker />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute>
+                    <AdminLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<AdminDashboard />} />
+                <Route path="analytics" element={<AdminAnalytics />} />
+                <Route path="projects" element={<AdminProjects />} />
+                <Route path="certifications" element={<AdminCertifications />} />
+                <Route path="experience" element={<AdminExperience />} />
+                <Route path="skills" element={<AdminSkills />} />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </AuthProvider>
+      </TooltipProvider>
+    </ThemeProvider>
+  </QueryClientProvider>
   </ErrorBoundary>
 );
 
