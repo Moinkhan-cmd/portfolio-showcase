@@ -342,12 +342,22 @@ export const AdminProjects = () => {
         </Card>
       )}
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <Dialog
+        open={dialogOpen}
+        onOpenChange={(open) => {
+          // Prevent accidental data loss by disallowing outside-click close.
+          // Users should close via Cancel or the X button.
+          if (!open) return;
+          setDialogOpen(open);
+        }}
+      >
         {/* Updated DialogContent with better max-height and fixed padding handles */}
         <DialogContent 
           ref={dialogContentRef}
           className="max-w-4xl h-[85vh] p-0 flex flex-col gap-0 overflow-hidden"
           style={{ overflowY: 'hidden', maxHeight: '85vh', height: '85vh' }}
+          onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
         >
           <DialogHeader className="px-6 py-4 border-b shrink-0 bg-background/95 backdrop-blur z-10">
             <DialogTitle className="flex items-center gap-2 text-xl">

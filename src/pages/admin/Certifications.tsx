@@ -286,6 +286,8 @@ export const AdminCertifications = () => {
           ref={dialogContentRef}
           className="max-w-2xl max-h-[90vh] overflow-y-auto"
           data-lenis-prevent="true"
+          onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
         >
           <DialogHeader>
             <DialogTitle>

@@ -268,7 +268,11 @@ export const AdminSkills = () => {
       )}
 
       <Dialog open={dialogOpen} onOpenChange={(open) => !open && handleCloseDialog()}>
-        <DialogContent className="max-w-[600px] w-full max-h-[85vh] overflow-y-auto">
+        <DialogContent
+          className="max-w-[600px] w-full max-h-[85vh] overflow-y-auto"
+          onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
+        >
           <DialogHeader>
             <DialogTitle>{selectedSkill ? "Edit Skill" : "Add New Skill"}</DialogTitle>
             <DialogDescription>
