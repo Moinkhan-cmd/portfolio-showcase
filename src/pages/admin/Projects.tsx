@@ -24,12 +24,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Edit, Trash2, Loader2, ExternalLink, Github } from "lucide-react";
+import {
+  Plus, Edit, Trash2, Loader2, ExternalLink, Github,
+  Layout, Code, Image as ImageIcon, Link as LinkIcon,
+  CheckCircle2, Info, Layers
+} from "lucide-react";
 import { getProjects, createProject, updateProject, deleteProject, Project } from "@/lib/admin/projects";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { projectSchema, formatZodError } from "@/lib/admin/validation";
+import { Separator } from "@/components/ui/separator";
 
 export const AdminProjects = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -299,214 +305,257 @@ export const AdminProjects = () => {
       )}
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
+        {/* Updated DialogContent with better max-height and fixed padding handles */}
+        <DialogContent className="max-w-4xl max-h-[85vh] p-0 flex flex-col gap-0 overflow-hidden">
+          <DialogHeader className="px-6 py-4 border-b shrink-0 bg-background/95 backdrop-blur z-10">
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              {selectedProject ? <Edit className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
               {selectedProject ? "Edit Project" : "Add New Project"}
             </DialogTitle>
             <DialogDescription>
               {selectedProject
-                ? "Update the project details below"
-                : "Fill in the details to add a new project"}
+                ? "Update the details below. All changes are auto-saved to state until you submit."
+                : "Fill in the details to add a new project to your portfolio."}
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="title">Title *</Label>
-                <Input
-                  id="title"
-                  value={formData.title}
-                  onChange={(e) =>
-                    setFormData({ ...formData, title: e.target.value })
-                  }
-                  required
-                />
+
+          {/* ScrollArea for form content */}
+          <ScrollArea className="flex-1 px-6 py-4">
+            <form id="project-form" onSubmit={handleSubmit} className="space-y-8 pb-6">
+
+              {/* SECTION: CORE DETAILS */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-primary font-semibold border-b pb-2">
+                  <Layout className="w-4 h-4" />
+                  <h3>Core Details</h3>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-5">
+                  <div className="space-y-2">
+                    <Label htmlFor="title">Project Title *</Label>
+                    <Input
+                      id="title"
+                      value={formData.title}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      maxLength={100}
+                      placeholder="e.g. Portfolio v2"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="category">Category *</Label>
+                    <Input
+                      id="category"
+                      value={formData.category}
+                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                      placeholder="e.g. Web App, Mobile, Design System"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="shortDescription">Short Description (Summary) *</Label>
+                  <Input
+                    id="shortDescription"
+                    value={formData.shortDescription}
+                    onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
+                    placeholder="Brief one-line summary for cards..."
+                    maxLength={150}
+                    required
+                  />
+                  <p className="text-[11px] text-muted-foreground">Appears in project cards. Max 150 chars.</p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="fullDescription">Full Description *</Label>
+                  <Textarea
+                    id="fullDescription"
+                    value={formData.fullDescription}
+                    onChange={(e) => setFormData({ ...formData, fullDescription: e.target.value })}
+                    rows={5}
+                    placeholder="# Project Details \n\nDescribe the challenges, features, and outcome..."
+                    className="font-mono text-sm leading-relaxed"
+                    required
+                  />
+                  <p className="text-[11px] text-muted-foreground">Markdown supported. This content appears on the details page.</p>
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="category">Category *</Label>
-                <Input
-                  id="category"
-                  value={formData.category}
-                  onChange={(e) =>
-                    setFormData({ ...formData, category: e.target.value })
-                  }
-                  required
-                />
+
+              {/* SECTION: TECH STACK */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-primary font-semibold border-b pb-2">
+                  <Code className="w-4 h-4" />
+                  <h3>Technical Info</h3>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="techStack">Technologies Used *</Label>
+                  <Input
+                    id="techStack"
+                    value={techStackInput}
+                    onChange={(e) => setTechStackInput(e.target.value)}
+                    placeholder="React, TypeScript, Tailwind CSS, Node.js"
+                    required
+                  />
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {techStackInput.split(",").filter(t => t.trim()).map((t, i) => (
+                      <Badge key={i} variant="secondary" className="text-xs">{t.trim()}</Badge>
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="shortDescription">Short Description *</Label>
-              <Textarea
-                id="shortDescription"
-                value={formData.shortDescription}
-                onChange={(e) =>
-                  setFormData({ ...formData, shortDescription: e.target.value })
-                }
-                rows={2}
-                required
-              />
-            </div>
+              {/* SECTION: MEDIA */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-primary font-semibold border-b pb-2">
+                  <ImageIcon className="w-4 h-4" />
+                  <h3>Media & Visuals</h3>
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="fullDescription">Full Description *</Label>
-              <Textarea
-                id="fullDescription"
-                value={formData.fullDescription}
-                onChange={(e) =>
-                  setFormData({ ...formData, fullDescription: e.target.value })
-                }
-                rows={4}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="techStack">Tech Stack (comma-separated) *</Label>
-              <Input
-                id="techStack"
-                value={techStackInput}
-                onChange={(e) => setTechStackInput(e.target.value)}
-                placeholder="React, TypeScript, Tailwind CSS"
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="liveUrl">Live URL</Label>
-                <Input
-                  id="liveUrl"
-                  type="url"
-                  value={formData.liveUrl}
-                  onChange={(e) =>
-                    setFormData({ ...formData, liveUrl: e.target.value })
-                  }
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="githubUrl">GitHub URL</Label>
-                <Input
-                  id="githubUrl"
-                  type="url"
-                  value={formData.githubUrl}
-                  onChange={(e) =>
-                    setFormData({ ...formData, githubUrl: e.target.value })
-                  }
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
-                <select
-                  id="status"
-                  value={formData.status}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      status: e.target.value as "completed" | "in-progress",
-                    })
-                  }
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <option value="completed">Completed</option>
-                  <option value="in-progress">In Progress</option>
-                </select>
-              </div>
-              <div className="flex items-center space-x-2 pt-8">
-                <Switch
-                  id="featured"
-                  checked={formData.featured}
-                  onCheckedChange={(checked) =>
-                    setFormData({ ...formData, featured: checked })
-                  }
-                />
-                <Label htmlFor="featured">Featured Project</Label>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="thumbnail">Thumbnail Image URL</Label>
-              <Input
-                id="thumbnail"
-                type="url"
-                value={formData.thumbnail}
-                onChange={(e) =>
-                  setFormData({ ...formData, thumbnail: e.target.value })
-                }
-                placeholder="https://example.com/image.jpg"
-              />
-              <p className="text-xs text-muted-foreground">
-                Use ImgBB, Cloudinary, GitHub raw URLs, or any image hosting service
-              </p>
-              {formData.thumbnail && (
-                <img
-                  src={formData.thumbnail}
-                  alt="Thumbnail preview"
-                  className="w-full h-40 object-cover rounded-lg mt-2"
-                  onError={(e) => {
-                    e.currentTarget.style.display = "none";
-                  }}
-                />
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="images">Additional Image URLs (one per line)</Label>
-              <Textarea
-                id="images"
-                value={additionalImagesInput}
-                onChange={(e) => setAdditionalImagesInput(e.target.value)}
-                placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg"
-                rows={4}
-              />
-              <p className="text-xs text-muted-foreground">
-                Enter image URLs, one per line
-              </p>
-              {additionalImagesInput && (
-                <div className="grid grid-cols-4 gap-2 mt-2">
-                  {additionalImagesInput
-                    .split("\n")
-                    .filter((url) => url.trim().length > 0)
-                    .map((url, index) => (
-                      <div key={index} className="relative">
+                <div className="space-y-3">
+                  <Label htmlFor="thumbnail">Thumbnail Image URL</Label>
+                  <div className="flex gap-4 items-start">
+                    <div className="flex-1 space-y-2">
+                      <Input
+                        id="thumbnail"
+                        type="url"
+                        value={formData.thumbnail}
+                        onChange={(e) => setFormData({ ...formData, thumbnail: e.target.value })}
+                        placeholder="https://images.unsplash.com/..."
+                      />
+                      <p className="text-[11px] text-muted-foreground">Main cover image for the project card.</p>
+                    </div>
+                    {formData.thumbnail && (
+                      <div className="w-24 h-16 shrink-0 rounded-md overflow-hidden border bg-muted">
                         <img
-                          src={url.trim()}
-                          alt={`Preview ${index + 1}`}
-                          className="w-full h-24 object-cover rounded-lg"
-                          onError={(e) => {
-                            e.currentTarget.style.display = "none";
-                          }}
+                          src={formData.thumbnail}
+                          alt="Preview"
+                          className="w-full h-full object-cover"
+                          onError={(e) => e.currentTarget.style.display = 'none'}
                         />
                       </div>
-                    ))}
+                    )}
+                  </div>
                 </div>
-              )}
-            </div>
 
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setDialogOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  selectedProject ? "Update" : "Create"
-                )}
-              </Button>
-            </DialogFooter>
-          </form>
+                <div className="space-y-2">
+                  <Label htmlFor="images">Additional Screenshots (One per line)</Label>
+                  <Textarea
+                    id="images"
+                    value={additionalImagesInput}
+                    onChange={(e) => setAdditionalImagesInput(e.target.value)}
+                    placeholder="https://.../screen1.jpg&#10;https://.../screen2.jpg"
+                    rows={3}
+                    className="font-mono text-xs"
+                  />
+                </div>
+              </div>
+
+              {/* SECTION: LINKS & STATUS */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-primary font-semibold border-b pb-2">
+                  <LinkIcon className="w-4 h-4" />
+                  <h3>Links & Status</h3>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-5">
+                  <div className="space-y-2">
+                    <Label htmlFor="liveUrl">Live Demo URL</Label>
+                    <div className="relative">
+                      <ExternalLink className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
+                      <Input
+                        id="liveUrl"
+                        type="url"
+                        value={formData.liveUrl}
+                        onChange={(e) => setFormData({ ...formData, liveUrl: e.target.value })}
+                        className="pl-9"
+                        placeholder="https://myproject.com"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="githubUrl">Source Code URL</Label>
+                    <div className="relative">
+                      <Github className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
+                      <Input
+                        id="githubUrl"
+                        type="url"
+                        value={formData.githubUrl}
+                        onChange={(e) => setFormData({ ...formData, githubUrl: e.target.value })}
+                        className="pl-9"
+                        placeholder="https://github.com/..."
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-5 pt-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="status">Project Status</Label>
+                    <div className="relative">
+                      <select
+                        id="status"
+                        value={formData.status}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            status: e.target.value as "completed" | "in-progress",
+                          })
+                        }
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                      >
+                        <option value="completed">Completed</option>
+                        <option value="in-progress">In Progress</option>
+                      </select>
+                      <Info className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between border rounded-lg p-3 bg-muted/20">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="featured" className="text-base">Featured</Label>
+                      <p className="text-[11px] text-muted-foreground">Show on Home page.</p>
+                    </div>
+                    <Switch
+                      id="featured"
+                      checked={formData.featured}
+                      onCheckedChange={(checked) => setFormData({ ...formData, featured: checked })}
+                    />
+                  </div>
+                </div>
+              </div>
+
+            </form>
+          </ScrollArea>
+
+          <DialogFooter className="px-6 py-4 border-t shrink-0 bg-background/95 backdrop-blur z-10 gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              form="project-form"
+              disabled={isSubmitting}
+              className="min-w-[100px]"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 className="mr-2 h-4 w-4" />
+                  {selectedProject ? "Update Project" : "Create Project"}
+                </>
+              )}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
@@ -529,5 +578,3 @@ export const AdminProjects = () => {
     </div>
   );
 };
-
-
