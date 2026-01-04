@@ -128,10 +128,12 @@ export const CertificationsSection = () => {
 
                 {/* Footer */}
                 <div className="flex items-center justify-between mt-auto pt-3 sm:pt-4 border-t border-border/50">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                    <span>{cert.issueDate}</span>
-                  </div>
+                  {cert.issueDate && (
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                      <span>{cert.issueDate}</span>
+                    </div>
+                  )}
                   {cert.credentialUrl && cert.credentialUrl !== "#" && (
                     <motion.a
                       href={cert.credentialUrl}
