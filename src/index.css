@@ -402,8 +402,8 @@ html {
 html {
   scroll-behavior: smooth;
   overflow-x: hidden;
-  /* Enable hardware acceleration */
-  transform: translateZ(0);
+  /* Enable hardware acceleration - Removed to fix fixed positioning interactions */
+  /* transform: translateZ(0); */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -412,9 +412,10 @@ body {
   /* Optimize scrolling performance */
   overscroll-behavior-y: none;
   -webkit-overflow-scrolling: touch;
-  /* GPU acceleration */
-  transform: translateZ(0);
-  will-change: scroll-position;
+  /* GPU acceleration - Removed to fix fixed positioning interactions */
+  /* transform: translateZ(0); */
+  /* will-change: scroll-position; */
+
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -481,8 +482,8 @@ body {
 nav,
 header,
 footer {
-  will-change: transform, opacity;
-  transform: translateZ(0);
+  /* will-change: transform, opacity; */
+  /* transform: translateZ(0); */
   backface-visibility: hidden;
 }
 
