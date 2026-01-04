@@ -322,7 +322,11 @@ export const AdminProjects = () => {
           </DialogHeader>
 
           {/* Scrollable form content */}
-          <div className="flex-1 min-h-0 overflow-y-auto px-6 py-4" style={{ scrollbarWidth: 'thin', scrollbarColor: 'hsl(175 80% 50%) hsl(222 47% 8%)' }}>
+          <div 
+            className="flex-1 min-h-0 overflow-y-auto px-6 py-4" 
+            style={{ scrollbarWidth: 'thin', scrollbarColor: 'hsl(175 80% 50%) hsl(222 47% 8%)' }}
+            data-lenis-prevent="true"
+          >
             <form id="project-form" onSubmit={handleSubmit} className="space-y-8 pb-6">
 
               {/* SECTION: CORE DETAILS */}
