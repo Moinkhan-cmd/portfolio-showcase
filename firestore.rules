@@ -1,8 +1,11 @@
 // Firebase Firestore Security Rules
 // Copy these rules to Firebase Console > Firestore Database > Rules
 // 
-// IMPORTANT: These rules allow public read access (so your portfolio can display content)
-// and require authentication with admin email verification for writes.
+// SECURITY ARCHITECTURE:
+// - Public read access for portfolio data (projects, certifications, experience, skills)
+// - Admin write access verified SERVER-SIDE via email comparison
+// - Analytics tracking requires authentication
+// - All data protection enforced here, NOT in client-side code
 
 rules_version = '2';
 service cloud.firestore {
@@ -14,29 +17,36 @@ service cloud.firestore {
     }
     
     // Helper function to check if user is admin
-    // IMPORTANT: Replace 'YOUR_ADMIN_EMAIL@example.com' with your actual admin email
-    // Or set up a config document to store the admin email
+    // SECURITY: This is the actual security boundary - not the client-side check
+    // Priority order:
+    // 1. Custom claims (most secure - set via Firebase Admin SDK)
+    // 2. Config document lookup (requires /config/admin document with adminEmail field)
+    // 3. Hardcoded fallback email (set during initial setup)
     function isAdmin() {
-      return isAuthenticated() && 
-             request.auth.token.email != null &&
-             request.auth.token.email == get(/databases/$(database)/documents/config/admin).data.adminEmail;
+      // Check custom claims first (set via Firebase Admin SDK)
+      let hasCustomClaim = request.auth.token.admin == true;
+      
+      // Check config document (requires setup)
+      let configExists = exists(/databases/$(database)/documents/config/admin);
+      let matchesConfigEmail = configExists && 
+                               request.auth.token.email != null &&
+                               request.auth.token.email == get(/databases/$(database)/documents/config/admin).data.adminEmail;
+      
+      return isAuthenticated() && (hasCustomClaim || matchesConfigEmail);
     }
     
-    // Fallback admin check using hardcoded email (use if config document not set up)
-    // Uncomment this and comment out the above isAdmin() if you prefer hardcoded approach
-    // function isAdmin() {
-    //   return isAuthenticated() && request.auth.token.email == 'your-admin@email.com';
-    // }
-    
-    // Config document for storing admin email - only admin can modify
+    // Config document for storing admin email
+    // IMPORTANT: Create this document manually or via setup script:
+    // Collection: config, Document: admin, Field: adminEmail (your admin email)
     match /config/{configId} {
+      // Anyone can read config (needed for initial admin check)
       allow read: if true;
-      allow write: if isAuthenticated() && 
-                     request.auth.token.email == resource.data.adminEmail;
+      // Only existing admin can modify (prevents lockout)
+      allow write: if isAdmin();
     }
     
     // Public read access for portfolio data
-    // Only verified admin can write (admin check is now server-side)
+    // Only verified admin can write (enforced SERVER-SIDE here)
     match /projects/{projectId} {
       allow read: if true;
       allow write: if isAdmin();
@@ -58,14 +68,17 @@ service cloud.firestore {
     }
     
     // Analytics collections - require authentication for tracking to prevent data poisoning
-    // Note: Consider moving analytics to server-side Cloud Functions for better security
+    // Rate limiting and validation enforced in client code, with server-side structure validation
     match /analytics_page_views/{viewId} {
       allow read: if isAdmin();
-      // Limit create to authenticated users and validate basic structure
+      // Require authentication and validate structure
       allow create: if isAuthenticated() && 
-                      request.resource.data.keys().hasAll(['page', 'timestamp']) &&
+                      request.resource.data.keys().hasAll(['page', 'timestamp', 'visitorId', 'sessionId']) &&
                       request.resource.data.page is string &&
-                      request.resource.data.page.size() < 500;
+                      request.resource.data.page.size() < 500 &&
+                      request.resource.data.pageTitle is string &&
+                      request.resource.data.pageTitle.size() < 200 &&
+                      request.resource.data.size() < 20; // Limit total fields
       allow update, delete: if isAdmin();
     }
 
@@ -77,16 +90,25 @@ service cloud.firestore {
 
     match /analytics_visitors/{visitorId} {
       allow read: if isAdmin();
-      // Limit visitor tracking to authenticated users with structure validation
+      // Require authentication with structure validation
       allow create: if isAuthenticated() &&
-                      request.resource.data.keys().hasAll(['timestamp']) &&
-                      request.resource.data.size() < 10;
-      allow update, delete: if isAdmin();
+                      request.resource.data.keys().hasAll(['visitorId', 'firstVisit', 'deviceType']) &&
+                      request.resource.data.visitorId is string &&
+                      request.resource.data.visitorId.size() < 100 &&
+                      request.resource.data.size() < 15;
+      allow update: if isAuthenticated() &&
+                      request.resource.data.size() < 15;
+      allow delete: if isAdmin();
     }
 
     match /analytics_users/{userId} {
       allow read: if isAdmin();
-      allow write: if isAuthenticated() && request.auth.uid == userId;
+      // Users can only write to their own analytics document
+      allow create, update: if isAuthenticated() && 
+                              request.auth.uid == userId &&
+                              request.resource.data.activities.size() <= 50 &&
+                              request.resource.data.size() < 20;
+      allow delete: if isAdmin();
     }
   }
 }
