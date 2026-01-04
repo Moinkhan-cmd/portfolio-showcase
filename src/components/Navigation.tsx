@@ -233,9 +233,8 @@ export const Navigation = () => {
         className="fixed top-0 left-0 right-0 z-[9999] will-change-transform"
         initial={{ y: -100, opacity: 0 }}
         animate={{ 
-          y: isVisible ? 0 : -100, 
-          opacity: isVisible ? 1 : 0,
-          visibility: isVisible ? "visible" : "visible"
+          y: 0, 
+          opacity: 1
         }}
         style={{ 
           transform: 'translateZ(0)',
