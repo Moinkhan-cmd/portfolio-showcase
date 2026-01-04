@@ -1,5 +1,5 @@
 // Projects CRUD page
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -62,10 +62,29 @@ export const AdminProjects = () => {
 
   const [techStackInput, setTechStackInput] = useState("");
   const [additionalImagesInput, setAdditionalImagesInput] = useState("");
+  const scrollableRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchProjects();
   }, []);
+
+  // Handle wheel events to prevent Lenis from intercepting
+  useEffect(() => {
+    const scrollableElement = scrollableRef.current;
+    if (!scrollableElement || !dialogOpen) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      // Always stop propagation to prevent Lenis from handling it
+      // This allows the native scroll to work within the modal
+      e.stopPropagation();
+    };
+
+    scrollableElement.addEventListener('wheel', handleWheel, { passive: false, capture: true });
+    
+    return () => {
+      scrollableElement.removeEventListener('wheel', handleWheel, { capture: true } as any);
+    };
+  }, [dialogOpen]);
 
   const fetchProjects = async () => {
     try {
@@ -323,6 +342,7 @@ export const AdminProjects = () => {
 
           {/* Scrollable form content */}
           <div 
+            ref={scrollableRef}
             className="flex-1 min-h-0 overflow-y-auto px-6 py-4" 
             style={{ scrollbarWidth: 'thin', scrollbarColor: 'hsl(175 80% 50%) hsl(222 47% 8%)' }}
             data-lenis-prevent="true"
