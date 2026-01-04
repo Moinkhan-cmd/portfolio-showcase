@@ -1,165 +1,116 @@
 import { useEffect, useRef, useState } from "react";
-import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from "framer-motion";
-import { Award, ExternalLink, Calendar, Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
+import { Award, ExternalLink, Calendar, Loader2, Image as ImageIcon, Hash } from "lucide-react";
 import { CertificationsBackground3D } from "./CertificationsBackground3D";
 import { useCertifications } from "@/hooks/useCertifications";
 import type { Certification } from "@/lib/admin/certifications";
 import { Badge } from "@/components/ui/badge";
 
-// --- 3D FIXED CARD WITH INTERNAL EXPANSION ---
 interface CertificationCardProps {
   cert: Certification;
   index: number;
 }
 
-const Certification3DCard = ({ cert, index }: CertificationCardProps) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+const CertificationCard = ({ cert, index }: CertificationCardProps) => {
+  const [imageError, setImageError] = useState(false);
 
-  // Subtle 3D Tilt
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const mouseXSpring = useSpring(x, { stiffness: 500, damping: 100 });
-  const mouseYSpring = useSpring(y, { stiffness: 500, damping: 100 });
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["3deg", "-3deg"]);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-3deg", "3deg"]);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    x.set(mouseX / width - 0.5);
-    y.set(mouseY / height - 0.5);
-  };
-
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-    setIsHovered(false);
-  };
+  const showVerify = Boolean(cert.credentialUrl && cert.credentialUrl !== "#");
+  const skills = Array.isArray(cert.skills) ? cert.skills : [];
 
   return (
     <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={handleMouseLeave}
-      onClick={() => setIsHovered(!isHovered)}
-      style={{
-        rotateX,
-        rotateY,
-        transformStyle: "preserve-3d",
-      }}
-      className="relative group perspective-1000 h-[420px] w-full"
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.55, delay: index * 0.06 }}
+      whileHover={{ y: -8 }}
+      className="glass-enhanced rounded-2xl overflow-hidden border border-primary/10 card-hover"
     >
-      <div
-        className="relative h-full flex flex-col bg-card/40 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-xl transition-all duration-300 group-hover:shadow-2xl group-hover:border-primary/30"
-        style={{ transform: "translateZ(0px)" }}
-      >
-        {/* === IMAGE SECTION (Dynamic Height) === */}
-        <motion.div
-          className="relative w-full overflow-hidden bg-muted/20"
-          animate={{ height: isHovered ? "80px" : "180px" }} // Shrinks on hover
-          transition={{ duration: 0.4, ease: "easeInOut" }}
-        >
-          {cert.imageUrl ? (
+      {/* Image */}
+      <div className="relative aspect-[16/9] bg-gradient-to-br from-primary/10 via-primary/5 to-transparent">
+        {cert.imageUrl && !imageError ? (
+          <>
             <img
               src={cert.imageUrl}
-              alt={cert.title}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              onError={(e) => (e.currentTarget.style.display = 'none')}
+              alt={`${cert.title} certificate`}
+              className="absolute inset-0 w-full h-full object-cover"
+              loading="lazy"
+              onError={() => setImageError(true)}
             />
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-secondary/50">
-              <Award className="w-12 h-12 text-primary/20" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/10 to-transparent" />
+          </>
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="p-4 rounded-2xl bg-background/40 border border-border/40 backdrop-blur">
+              <ImageIcon className="w-8 h-8 text-primary/70" />
             </div>
-          )}
-          {/* Gradient Overlay */}
-          <div className={`absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent ${isHovered ? 'opacity-100' : 'opacity-60'}`} />
+          </div>
+        )}
+      </div>
 
-          {/* Title Overlay (Visible on Hover when image shrinks) */}
-          <motion.div
-            className="absolute bottom-2 left-4 right-4 z-10"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: isHovered ? 1 : 0 }}
-          >
-            <h3 className="font-display text-base font-bold text-white truncate shadow-black drop-shadow-md">
+      {/* Content */}
+      <div className="p-5 sm:p-6">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h3 className="font-display text-lg sm:text-xl font-semibold leading-snug truncate">
               {cert.title}
             </h3>
-          </motion.div>
-        </motion.div>
-
-        {/* === CONTENT SECTION === */}
-        <div className="flex flex-col flex-1 p-5 min-h-0 relative z-10 bg-background/5">
-          {/* Header (Hidden on Hover to save space, swapped with image overlay title) */}
-          <AnimatePresence>
-            {!isHovered && (
-              <motion.div
-                initial={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-                className="mb-2 shrink-0"
-              >
-                <h3 className="font-display text-lg font-bold leading-tight text-white group-hover:text-primary transition-colors line-clamp-1">
-                  {cert.title}
-                </h3>
-                <p className="text-sm text-primary/80 mt-1 font-medium truncate">{cert.issuer}</p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Description (Expands to fill available space) */}
-          <motion.div className="flex-1 relative overflow-hidden group/text">
-            <div className={`h-full overflow-y-auto pr-2 custom-scrollbar ${isHovered ? '' : 'overflow-hidden'}`}>
-              <p className={`text-sm text-muted-foreground leading-relaxed ${isHovered ? '' : 'line-clamp-3'}`}>
-                {cert.description || "No description provided for this certification."}
-              </p>
-
-              {/* Metadata (Date/Tags) inside scroll area if needed, or stick to bottom */}
-              <div className="mt-4 flex flex-wrap gap-2">
-                {cert.skills?.map((skill, i) => (
-                  <Badge key={i} variant="outline" className="text-[10px] border-white/10 text-muted-foreground">
-                    {skill}
-                  </Badge>
-                ))}
-              </div>
+            <div className="flex items-center gap-2 mt-1 text-primary/90 font-medium">
+              <Award className="w-4 h-4 shrink-0" />
+              <span className="truncate">{cert.issuer}</span>
             </div>
+          </div>
+          {showVerify && (
+            <a
+              href={cert.credentialUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold border border-primary/25 bg-primary/10 hover:bg-primary/15 hover:border-primary/40 transition-colors"
+            >
+              Verify
+              <ExternalLink className="w-4 h-4" />
+            </a>
+          )}
+        </div>
 
-            {/* Bottom Fade for collapsed state */}
-            {!isHovered && (
-              <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-[#0b0f19] to-transparent pointer-events-none" />
-            )}
-          </motion.div>
+        {/* Meta */}
+        <div className="flex flex-wrap gap-2 mt-4 text-muted-foreground">
+          {cert.issueDate && (
+            <Badge variant="secondary" className="gap-1.5">
+              <Calendar className="w-3.5 h-3.5" />
+              {cert.issueDate}
+            </Badge>
+          )}
+          {cert.credentialId && (
+            <Badge variant="outline" className="gap-1.5 border-primary/20">
+              <Hash className="w-3.5 h-3.5" />
+              {cert.credentialId}
+            </Badge>
+          )}
+        </div>
 
-          {/* Fixed Footer */}
-          <div className="mt-auto pt-3 border-t border-white/5 flex items-center justify-between text-xs text-muted-foreground shrink-0">
-            <div className="flex items-center gap-1.5">
-              {cert.issueDate && (
-                <>
-                  <Calendar className="w-3.5 h-3.5" />
-                  <span>{cert.issueDate}</span>
-                </>
-              )}
-            </div>
-            {cert.credentialUrl && (
-              <a
-                href={cert.credentialUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1 text-primary hover:text-white transition-colors font-medium border border-primary/20 px-3 py-1.5 rounded-md hover:bg-primary/20"
-              >
-                Verify <ExternalLink className="w-3 h-3 ml-1" />
-              </a>
+        {/* Description */}
+        {cert.description && (
+          <p className="text-sm text-muted-foreground leading-relaxed mt-4 line-clamp-3">
+            {cert.description}
+          </p>
+        )}
+
+        {/* Skills */}
+        {skills.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-4">
+            {skills.slice(0, 8).map((skill) => (
+              <Badge key={skill} variant="secondary" className="text-xs">
+                {skill}
+              </Badge>
+            ))}
+            {skills.length > 8 && (
+              <Badge variant="secondary" className="text-xs">
+                +{skills.length - 8}
+              </Badge>
             )}
           </div>
-        </div>
+        )}
       </div>
     </motion.div>
   );
@@ -183,28 +134,42 @@ export const CertificationsSection = () => {
     <section
       id="certifications"
       ref={sectionRef}
-      className="section-padding relative overflow-hidden bg-background/50"
+      className="section-padding relative bg-secondary/30 overflow-hidden"
     >
       <CertificationsBackground3D />
 
-      {/* Background Ambience */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background pointer-events-none -z-10" />
+      {/* Overlays for contrast + depth */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/65 to-background/50 pointer-events-none z-10" />
+      <div
+        className="absolute inset-0 pointer-events-none z-10"
+        style={{
+          background:
+            "radial-gradient(ellipse at center, transparent 0%, hsl(222 47% 6% / 0.2) 50%, hsl(222 47% 6% / 0.55) 100%)",
+        }}
+      />
+      <div className="absolute inset-0 overflow-hidden opacity-30 pointer-events-none z-10">
+        <div className="absolute top-1/2 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -translate-x-1/2" />
+        <div className="absolute bottom-0 right-0 w-80 h-80 bg-primary/5 rounded-full blur-3xl translate-x-1/2" />
+      </div>
 
       <div className="container mx-auto container-padding relative z-20">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isVisible ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12 sm:mb-16"
-        >
-          <Badge variant="outline" className="mb-4 border-primary/20 text-primary">
-            <Award className="w-3 h-3 mr-2" />
-            Certifications
-          </Badge>
-          <h2 className="font-display text-4xl sm:text-5xl font-bold">
-            Verifiable <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-500">Credentials</span>
+        <div className={`text-center mb-10 sm:mb-16 ${isVisible ? "animate-slide-up" : "opacity-0"}`}>
+          <motion.span
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={isVisible ? { opacity: 1, scale: 1 } : {}}
+            transition={{ duration: 0.5 }}
+            className="text-primary text-sm font-medium uppercase tracking-wider inline-flex items-center gap-2 mb-2"
+          >
+            <Award className="w-4 h-4" />
+            Credentials
+          </motion.span>
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold mt-3 sm:mt-4">
+            My <span className="gradient-text">Certifications</span>
           </h2>
-        </motion.div>
+          <p className="text-muted-foreground mt-3 sm:mt-4 max-w-2xl mx-auto text-sm sm:text-base px-4">
+            Professional certifications that validate skills and continuous learning.
+          </p>
+        </div>
 
         {isLoading ? (
           <div className="flex items-center justify-center min-h-[400px]">
@@ -213,7 +178,7 @@ export const CertificationsSection = () => {
         ) : certifications.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
             {certifications.map((cert, index) => (
-              <Certification3DCard key={cert.id || index} cert={cert} index={index} />
+              <CertificationCard key={cert.id || index} cert={cert} index={index} />
             ))}
           </div>
         ) : (
