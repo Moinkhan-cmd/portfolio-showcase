@@ -415,16 +415,18 @@ export const HeroSection = () => {
                           size="lg"
                           className="btn-lift border-2 border-primary/50 bg-transparent hover:bg-primary/10 min-w-[200px] h-14 text-lg backdrop-blur-sm"
                           style={{ transform: "translateZ(10px)", transformStyle: "preserve-3d" }}
+                          type="button"
                         >
                           <Download className="w-5 h-5 mr-2" />
                           Resume
                           <ChevronDown className="w-4 h-4 ml-2" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuContent align="end" className="w-48 z-[200]">
                         <DropdownMenuItem
-                          onClick={() => {
-                            window.open("https://drive.google.com/file/d/1p42p9NpczSWy_-iLeVaO38ciHAMHXp9r/view?usp=sharing", "_blank");
+                          onSelect={(e) => {
+                            e.preventDefault();
+                            window.open("https://drive.google.com/file/d/1p42p9NpczSWy_-iLeVaO38ciHAMHXp9r/view?usp=sharing", "_blank", "noopener,noreferrer");
                           }}
                           className="cursor-pointer"
                         >
@@ -432,20 +434,15 @@ export const HeroSection = () => {
                           See Resume
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={async () => {
-                            try {
-                              // Try to download directly
-                              const link = document.createElement("a");
-                              link.href = "https://drive.google.com/uc?export=download&id=1p42p9NpczSWy_-iLeVaO38ciHAMHXp9r";
-                              link.download = "Moin_Bhatti_Resume.pdf";
-                              link.target = "_blank";
-                              document.body.appendChild(link);
-                              link.click();
-                              document.body.removeChild(link);
-                            } catch (error) {
-                              // Fallback: open in new tab if download fails
-                              window.open("https://drive.google.com/uc?export=download&id=1p42p9NpczSWy_-iLeVaO38ciHAMHXp9r", "_blank");
-                            }
+                          onSelect={(e) => {
+                            e.preventDefault();
+                            // Google Drive download - opens download page or triggers download
+                            const fileId = "1p42p9NpczSWy_-iLeVaO38ciHAMHXp9r";
+                            const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+                            
+                            // Open download URL - Google Drive will handle the download
+                            // For large files, it may show a warning page first
+                            window.open(downloadUrl, "_blank", "noopener,noreferrer");
                           }}
                           className="cursor-pointer"
                         >
