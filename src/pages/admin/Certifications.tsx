@@ -382,8 +382,16 @@ export const AdminCertifications = () => {
                 placeholder="https://example.com/certificate.jpg"
               />
               <p className="text-xs text-muted-foreground">
-                Use ImgBB, Cloudinary, GitHub raw URLs, or any image hosting service
+                Use a direct image URL (must end up loading an image). For ImgBB, use the “Direct link” like{" "}
+                <span className="font-mono">https://i.ibb.co/.../image.jpg</span> (NOT{" "}
+                <span className="font-mono">https://ibb.co/...</span>).
               </p>
+              {formData.imageUrl?.includes("ibb.co/") && !formData.imageUrl?.includes("i.ibb.co/") && (
+                <p className="text-xs text-destructive">
+                  This looks like an ImgBB page link. Please paste the <b>Direct link</b> (it should start with{" "}
+                  <span className="font-mono">https://i.ibb.co/</span>).
+                </p>
+              )}
               {formData.imageUrl && (
                 <img
                   src={formData.imageUrl}
