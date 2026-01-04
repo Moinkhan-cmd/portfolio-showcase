@@ -320,7 +320,7 @@ export const AdminProjects = () => {
           </DialogHeader>
 
           {/* ScrollArea for form content */}
-          <ScrollArea className="flex-1 px-6 py-4">
+          <ScrollArea className="flex-1 min-h-0 px-6 py-4">
             <form id="project-form" onSubmit={handleSubmit} className="space-y-8 pb-6">
 
               {/* SECTION: CORE DETAILS */}
