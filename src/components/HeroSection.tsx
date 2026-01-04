@@ -403,12 +403,12 @@ export const HeroSection = () => {
                     </Button>
                   </motion.div>
                   
-                  <motion.div 
-                    whileHover={{ scale: 1.08, y: -5, rotateY: -5, rotateX: -5, z: 20 }} 
-                    whileTap={{ scale: 0.95 }}
-                    style={{ transformStyle: "preserve-3d" }}
-                  >
-                    <DropdownMenu>
+                  <DropdownMenu>
+                    <motion.div 
+                      whileHover={{ scale: 1.08, y: -5, rotateY: -5, rotateX: -5, z: 20 }} 
+                      whileTap={{ scale: 0.95 }}
+                      style={{ transformStyle: "preserve-3d" }}
+                    >
                       <DropdownMenuTrigger asChild>
                         <Button
                           variant="hero-outline"
@@ -422,36 +422,44 @@ export const HeroSection = () => {
                           <ChevronDown className="w-4 h-4 ml-2" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-48 z-[200]">
-                        <DropdownMenuItem
-                          onSelect={(e) => {
-                            e.preventDefault();
-                            window.open("https://drive.google.com/file/d/1p42p9NpczSWy_-iLeVaO38ciHAMHXp9r/view?usp=sharing", "_blank", "noopener,noreferrer");
-                          }}
-                          className="cursor-pointer"
-                        >
-                          <Eye className="w-4 h-4 mr-2" />
-                          See Resume
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onSelect={(e) => {
-                            e.preventDefault();
-                            // Google Drive download - opens download page or triggers download
-                            const fileId = "1p42p9NpczSWy_-iLeVaO38ciHAMHXp9r";
-                            const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
-                            
-                            // Open download URL - Google Drive will handle the download
-                            // For large files, it may show a warning page first
-                            window.open(downloadUrl, "_blank", "noopener,noreferrer");
-                          }}
-                          className="cursor-pointer"
-                        >
-                          <Download className="w-4 h-4 mr-2" />
-                          Download
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </motion.div>
+                    </motion.div>
+                    <DropdownMenuContent align="end" className="w-48 z-[9999]" sideOffset={5}>
+                      <DropdownMenuItem
+                        onSelect={(e) => {
+                          const url = "https://drive.google.com/file/d/1p42p9NpczSWy_-iLeVaO38ciHAMHXp9r/view?usp=sharing";
+                          window.open(url, "_blank", "noopener,noreferrer");
+                        }}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          const url = "https://drive.google.com/file/d/1p42p9NpczSWy_-iLeVaO38ciHAMHXp9r/view?usp=sharing";
+                          window.open(url, "_blank", "noopener,noreferrer");
+                        }}
+                        className="cursor-pointer focus:bg-accent"
+                      >
+                        <Eye className="w-4 h-4 mr-2" />
+                        See Resume
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onSelect={(e) => {
+                          const fileId = "1p42p9NpczSWy_-iLeVaO38ciHAMHXp9r";
+                          const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+                          window.open(downloadUrl, "_blank", "noopener,noreferrer");
+                        }}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          const fileId = "1p42p9NpczSWy_-iLeVaO38ciHAMHXp9r";
+                          const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+                          window.open(downloadUrl, "_blank", "noopener,noreferrer");
+                        }}
+                        className="cursor-pointer focus:bg-accent"
+                      >
+                        <Download className="w-4 h-4 mr-2" />
+                        Download
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </motion.div>
               {/* Sparkle decorations */}
               {[
