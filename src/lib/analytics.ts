@@ -1,4 +1,5 @@
 // Analytics tracking service
+// SECURITY: All inputs are sanitized and validated before Firestore writes
 import { db, auth } from "./firebase";
 import {
   collection,
@@ -17,6 +18,70 @@ import {
 } from "firebase/firestore";
 import { analytics } from "./firebase";
 import { logEvent } from "firebase/analytics";
+import { 
+  isRateLimited, 
+  pageViewSchema, 
+  userActivitySchema,
+  activityItemSchema,
+} from "./admin/analyticsValidation";
+
+// ============================================
+// INPUT SANITIZATION UTILITIES
+// ============================================
+
+// Sanitize and limit string length
+const sanitizeString = (value: string, maxLength: number): string => {
+  if (typeof value !== "string") return "";
+  return value.trim().slice(0, maxLength);
+};
+
+// Sanitize page path - only allow safe characters
+const sanitizePath = (path: string): string => {
+  if (typeof path !== "string") return "/";
+  // Remove potentially dangerous characters, keep alphanumeric, /, -, _, .
+  const sanitized = path.trim().replace(/[^a-zA-Z0-9\-_./]/g, "").slice(0, 500);
+  return sanitized || "/";
+};
+
+// Sanitize page title
+const sanitizeTitle = (title: string): string => {
+  if (typeof title !== "string") return "";
+  // Remove HTML tags and limit length
+  return title.replace(/<[^>]*>/g, "").trim().slice(0, 200);
+};
+
+// Sanitize email
+const sanitizeEmail = (email: string): string => {
+  if (typeof email !== "string") return "unknown";
+  // Basic email sanitization - only allow typical email characters
+  const sanitized = email.trim().toLowerCase().slice(0, 254);
+  const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
+  return emailRegex.test(sanitized) ? sanitized : "unknown";
+};
+
+// Validate device type
+const validateDeviceType = (type: string): "desktop" | "tablet" | "mobile" => {
+  const validTypes = ["desktop", "tablet", "mobile"];
+  return validTypes.includes(type) ? (type as "desktop" | "tablet" | "mobile") : "desktop";
+};
+
+// Sanitize country/region identifiers
+const sanitizeLocationId = (value: string): string => {
+  if (typeof value !== "string") return "Unknown";
+  // Only allow alphanumeric and underscores for location keys
+  return value.replace(/[^a-zA-Z0-9_]/g, "_").slice(0, 100) || "Unknown";
+};
+
+// Sanitize traffic source
+const sanitizeTrafficSource = (source: string): string => {
+  if (typeof source !== "string") return "direct";
+  // Only allow alphanumeric, dots, and hyphens for traffic source
+  return source.replace(/[^a-zA-Z0-9.-]/g, "").slice(0, 100) || "direct";
+};
+
+// ============================================
+// SESSION & VISITOR IDENTIFICATION
+// ============================================
 
 // Visitor session ID (stored in localStorage)
 const getSessionId = (): string => {
@@ -45,16 +110,19 @@ const getDeviceType = (): "desktop" | "tablet" | "mobile" => {
   return "desktop";
 };
 
-// Get country/region from browser
+// Get country/region from browser with validation
 const getCountryRegion = (): { country: string; region: string } => {
   try {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (typeof timezone !== "string" || !timezone.includes("/")) {
+      return { country: "Unknown", region: "Unknown" };
+    }
     // Extract region from timezone (e.g., "America/New_York" -> "US", "America")
     const parts = timezone.split("/");
     if (parts.length >= 2) {
       return {
-        country: parts[parts.length - 1] || "Unknown",
-        region: parts[0] || "Unknown",
+        country: sanitizeLocationId(parts[parts.length - 1] || "Unknown"),
+        region: sanitizeLocationId(parts[0] || "Unknown"),
       };
     }
     return { country: "Unknown", region: "Unknown" };
@@ -63,14 +131,16 @@ const getCountryRegion = (): { country: string; region: string } => {
   }
 };
 
-// Get referrer/traffic source
+// Get referrer/traffic source with validation
 const getTrafficSource = (): string => {
   const referrer = document.referrer;
-  if (!referrer) return "direct";
+  if (!referrer || typeof referrer !== "string") return "direct";
   
   try {
     const url = new URL(referrer);
     const hostname = url.hostname;
+    
+    if (!hostname || hostname.length > 253) return "direct";
     
     if (hostname.includes("google")) return "google";
     if (hostname.includes("bing")) return "bing";
@@ -81,18 +151,27 @@ const getTrafficSource = (): string => {
     if (hostname.includes("github")) return "github";
     if (hostname.includes("reddit")) return "reddit";
     
-    return hostname;
+    return sanitizeTrafficSource(hostname);
   } catch {
     return "direct";
   }
 };
 
-// Track page view
+// Track page view with input sanitization and rate limiting
 export const trackPageView = async (pagePath: string, pageTitle?: string) => {
   try {
+    // Check rate limit first
+    if (isRateLimited()) {
+      return; // Silently skip if rate limited
+    }
+    
+    // Sanitize all inputs
+    const sanitizedPath = sanitizePath(pagePath);
+    const sanitizedTitle = sanitizeTitle(pageTitle || pagePath);
+    
     const visitorId = getVisitorId();
     const sessionId = getSessionId();
-    const deviceType = getDeviceType();
+    const deviceType = validateDeviceType(getDeviceType());
     const { country, region } = getCountryRegion();
     const trafficSource = getTrafficSource();
     const isNewVisitor = !localStorage.getItem("visitor_has_visited");
@@ -110,20 +189,33 @@ export const trackPageView = async (pagePath: string, pageTitle?: string) => {
       localStorage.setItem("visitor_last_visit_date", today);
     }
 
-    // Firestore: Store page view
-    const pageViewRef = doc(collection(db, "analytics_page_views"));
-    await setDoc(pageViewRef, {
+    // Build and validate page view data
+    const pageViewData = {
       visitorId,
       sessionId,
-      pagePath,
-      pageTitle: pageTitle || pagePath,
+      page: sanitizedPath,
+      pagePath: sanitizedPath,
+      pageTitle: sanitizedTitle,
       deviceType,
       country,
       region,
       trafficSource,
       isNewVisitor: isNewVisitor && isNewSession,
-      timestamp: serverTimestamp(),
       date: today,
+    };
+    
+    // Validate with Zod schema before Firestore write
+    const validationResult = pageViewSchema.safeParse(pageViewData);
+    if (!validationResult.success) {
+      // Invalid data - skip write silently
+      return;
+    }
+
+    // Firestore: Store page view with validated data
+    const pageViewRef = doc(collection(db, "analytics_page_views"));
+    await setDoc(pageViewRef, {
+      ...validationResult.data,
+      timestamp: serverTimestamp(),
     });
 
     // Firestore: Update daily stats
@@ -192,63 +284,106 @@ export const trackPageView = async (pagePath: string, pageTitle?: string) => {
       }
     }
 
-    // Firebase Analytics (if available)
+    // Firebase Analytics (if available) - with sanitized data
     if (analytics) {
       logEvent(analytics, "page_view", {
-        page_path: pagePath,
-        page_title: pageTitle || pagePath,
+        page_path: sanitizedPath,
+        page_title: sanitizedTitle,
         device_type: deviceType,
         country,
         traffic_source: trafficSource,
       });
     }
   } catch (error) {
-    console.error("Error tracking page view:", error);
+    // Silent fail for analytics - don't expose internal errors
+    console.error("Analytics error");
   }
 };
 
-// Track authenticated user activity
+// Track authenticated user activity with input sanitization and validation
 export const trackUserActivity = async (userId: string, pagePath: string, pageTitle?: string) => {
   try {
-    const userRef = doc(db, "analytics_users", userId);
+    // Rate limit check
+    if (isRateLimited()) {
+      return;
+    }
+    
+    // Sanitize inputs
+    const sanitizedPath = sanitizePath(pagePath);
+    const sanitizedTitle = sanitizeTitle(pageTitle || pagePath);
+    
+    // Validate with Zod schema
+    const validationResult = userActivitySchema.safeParse({
+      userId,
+      pagePath: sanitizedPath,
+      pageTitle: sanitizedTitle,
+    });
+    
+    if (!validationResult.success) {
+      return; // Invalid data - skip silently
+    }
+    
+    const userRef = doc(db, "analytics_users", validationResult.data.userId);
     const userSnap = await getDoc(userRef);
     
+    // Validate activity item
     const activityData = {
-      pagePath,
-      pageTitle: pageTitle || pagePath,
-      timestamp: serverTimestamp(),
+      pagePath: validationResult.data.pagePath,
+      pageTitle: validationResult.data.pageTitle,
     };
+    
+    const activityValidation = activityItemSchema.safeParse(activityData);
+    if (!activityValidation.success) {
+      return;
+    }
 
     if (userSnap.exists()) {
       await updateDoc(userRef, {
         lastActive: serverTimestamp(),
-        lastPage: pagePath,
+        lastPage: validationResult.data.pagePath,
         activityCount: increment(1),
       });
       
-      // Add to activity log (keep last 50 activities)
+      // Add to activity log (keep last 50 activities) - with size validation
       const activities = userSnap.data().activities || [];
-      activities.push(activityData);
-      if (activities.length > 50) {
+      if (Array.isArray(activities) && activities.length < 50) {
+        activities.push({
+          ...activityValidation.data,
+          timestamp: serverTimestamp(),
+        });
+        await updateDoc(userRef, {
+          activities,
+        });
+      } else if (Array.isArray(activities)) {
+        // Replace oldest activity
         activities.shift();
+        activities.push({
+          ...activityValidation.data,
+          timestamp: serverTimestamp(),
+        });
+        await updateDoc(userRef, {
+          activities,
+        });
       }
-      await updateDoc(userRef, {
-        activities,
-      });
     } else {
       const user = auth.currentUser;
+      const sanitizedEmail = sanitizeEmail(user?.email || "");
       await setDoc(userRef, {
-        userId,
-        email: user?.email || "unknown",
+        userId: validationResult.data.userId,
+        email: sanitizedEmail,
         firstActive: serverTimestamp(),
         lastActive: serverTimestamp(),
-        lastPage: pagePath,
+        lastPage: validationResult.data.pagePath,
         activityCount: 1,
-        activities: [activityData],
+        activities: [{
+          ...activityValidation.data,
+          timestamp: serverTimestamp(),
+        }],
       });
     }
   } catch (error) {
-    console.error("Error tracking user activity:", error);
+    // Silent fail for analytics - don't expose internal errors
+    console.error("Analytics error");
   }
 };
 

@@ -33,6 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { skillSchema, formatZodError } from "@/lib/admin/validation";
 
 export const AdminSkills = () => {
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -106,16 +107,6 @@ export const AdminSkills = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!formData.name.trim() || !formData.category.trim()) {
-      toast({
-        title: "Error",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsSubmitting(true);
 
     try {
@@ -125,6 +116,18 @@ export const AdminSkills = () => {
         level: formData.level as "beginner" | "intermediate" | "advanced" | "expert",
         icon: formData.icon.trim(),
       };
+
+      // Validate with Zod schema
+      const validationResult = skillSchema.safeParse(skillData);
+      if (!validationResult.success) {
+        toast({
+          title: "Validation Error",
+          description: formatZodError(validationResult.error),
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
 
       if (selectedSkill?.id) {
         await updateSkill(selectedSkill.id, skillData);

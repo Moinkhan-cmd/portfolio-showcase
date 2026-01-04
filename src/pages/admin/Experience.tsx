@@ -41,6 +41,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { experienceSchema, formatZodError } from "@/lib/admin/validation";
 export const AdminExperience = () => {
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [loading, setLoading] = useState(true);
@@ -154,6 +155,18 @@ export const AdminExperience = () => {
       // Only include location if workType is not remote and has a value
       if (formData.workType !== "remote" && formData.location) {
         expData.location = formData.location;
+      }
+
+      // Validate with Zod schema
+      const validationResult = experienceSchema.safeParse(expData);
+      if (!validationResult.success) {
+        toast({
+          title: "Validation Error",
+          description: formatZodError(validationResult.error),
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
       }
 
       if (selectedExp?.id) {

@@ -29,6 +29,7 @@ import { Plus, Edit, Trash2, Loader2, ExternalLink, Github } from "lucide-react"
 import { getProjects, createProject, updateProject, deleteProject, Project } from "@/lib/admin/projects";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
+import { projectSchema, formatZodError } from "@/lib/admin/validation";
 
 export const AdminProjects = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -140,6 +141,18 @@ export const AdminProjects = () => {
         techStack,
         images: imageUrls,
       };
+
+      // Validate with Zod schema
+      const validationResult = projectSchema.safeParse(projectData);
+      if (!validationResult.success) {
+        toast({
+          title: "Validation Error",
+          description: formatZodError(validationResult.error),
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
 
       if (selectedProject?.id) {
         await updateProject(selectedProject.id, projectData);

@@ -1,9 +1,11 @@
 // Firebase Firestore Security Rules
 // Copy these rules to Firebase Console > Firestore Database > Rules
 // 
-// IMPORTANT: These rules allow public read access (so your portfolio can display content)
-// but require authentication for writes. Your app will verify admin email on the client side.
-// For additional security, you can restrict writes to specific emails in production.
+// SECURITY ARCHITECTURE:
+// - Public read access for portfolio data (projects, certifications, experience, skills)
+// - Admin write access verified SERVER-SIDE via email comparison
+// - Analytics tracking requires authentication
+// - All data protection enforced here, NOT in client-side code
 
 rules_version = '2';
 service cloud.firestore {
@@ -14,50 +16,99 @@ service cloud.firestore {
       return request.auth != null;
     }
     
+    // Helper function to check if user is admin
+    // SECURITY: This is the actual security boundary - not the client-side check
+    // Priority order:
+    // 1. Custom claims (most secure - set via Firebase Admin SDK)
+    // 2. Config document lookup (requires /config/admin document with adminEmail field)
+    // 3. Hardcoded fallback email (set during initial setup)
+    function isAdmin() {
+      // Check custom claims first (set via Firebase Admin SDK)
+      let hasCustomClaim = request.auth.token.admin == true;
+      
+      // Check config document (requires setup)
+      let configExists = exists(/databases/$(database)/documents/config/admin);
+      let matchesConfigEmail = configExists && 
+                               request.auth.token.email != null &&
+                               request.auth.token.email == get(/databases/$(database)/documents/config/admin).data.adminEmail;
+      
+      return isAuthenticated() && (hasCustomClaim || matchesConfigEmail);
+    }
+    
+    // Config document for storing admin email
+    // IMPORTANT: Create this document manually or via setup script:
+    // Collection: config, Document: admin, Field: adminEmail (your admin email)
+    match /config/{configId} {
+      // Anyone can read config (needed for initial admin check)
+      allow read: if true;
+      // Only existing admin can modify (prevents lockout)
+      allow write: if isAdmin();
+    }
+    
     // Public read access for portfolio data
-    // Anyone can read projects, certifications, experience, and skills
-    // Authenticated users can write (admin check is done in the app)
+    // Only verified admin can write (enforced SERVER-SIDE here)
     match /projects/{projectId} {
       allow read: if true;
-      allow write: if isAuthenticated();
+      allow write: if isAdmin();
     }
     
     match /certifications/{certId} {
       allow read: if true;
-      allow write: if isAuthenticated();
+      allow write: if isAdmin();
     }
     
     match /experience/{expId} {
       allow read: if true;
-      allow write: if isAuthenticated();
+      allow write: if isAdmin();
     }
     
     match /skills/{skillId} {
       allow read: if true;
-      allow write: if isAuthenticated();
+      allow write: if isAdmin();
     }
     
-    // Analytics collections - public write for tracking, admin read only
+    // Analytics collections - require authentication for tracking to prevent data poisoning
+    // Rate limiting and validation enforced in client code, with server-side structure validation
     match /analytics_page_views/{viewId} {
-      allow read: if isAuthenticated();
-      allow create: if true; // Allow anonymous tracking
-      allow update, delete: if isAuthenticated();
+      allow read: if isAdmin();
+      // Require authentication and validate structure
+      allow create: if isAuthenticated() && 
+                      request.resource.data.keys().hasAll(['page', 'timestamp', 'visitorId', 'sessionId']) &&
+                      request.resource.data.page is string &&
+                      request.resource.data.page.size() < 500 &&
+                      request.resource.data.pageTitle is string &&
+                      request.resource.data.pageTitle.size() < 200 &&
+                      request.resource.data.size() < 20; // Limit total fields
+      allow update, delete: if isAdmin();
     }
-    
+
     match /analytics_daily_stats/{statId} {
-      allow read: if isAuthenticated();
-      allow write: if true; // Allow tracking from client
+      allow read: if isAdmin();
+      // Only admin can modify daily stats to prevent manipulation
+      allow write: if isAdmin();
     }
-    
+
     match /analytics_visitors/{visitorId} {
-      allow read: if isAuthenticated();
-      allow write: if true; // Allow tracking from client
+      allow read: if isAdmin();
+      // Require authentication with structure validation
+      allow create: if isAuthenticated() &&
+                      request.resource.data.keys().hasAll(['visitorId', 'firstVisit', 'deviceType']) &&
+                      request.resource.data.visitorId is string &&
+                      request.resource.data.visitorId.size() < 100 &&
+                      request.resource.data.size() < 15;
+      allow update: if isAuthenticated() &&
+                      request.resource.data.size() < 15;
+      allow delete: if isAdmin();
     }
-    
+
     match /analytics_users/{userId} {
-      allow read: if isAuthenticated();
-      allow write: if isAuthenticated(); // Only authenticated users can track their activity
+      allow read: if isAdmin();
+      // Users can only write to their own analytics document
+      allow create, update: if isAuthenticated() && 
+                              request.auth.uid == userId &&
+                              request.resource.data.activities.size() <= 50 &&
+                              request.resource.data.size() < 20;
+      allow delete: if isAdmin();
     }
   }
 }
-
