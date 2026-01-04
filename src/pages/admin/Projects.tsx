@@ -306,7 +306,10 @@ export const AdminProjects = () => {
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         {/* Updated DialogContent with better max-height and fixed padding handles */}
-        <DialogContent className="max-w-4xl max-h-[85vh] p-0 flex flex-col gap-0 overflow-hidden">
+        <DialogContent 
+          className="max-w-4xl max-h-[85vh] p-0 flex flex-col gap-0 overflow-hidden"
+          style={{ overflowY: 'hidden' }}
+        >
           <DialogHeader className="px-6 py-4 border-b shrink-0 bg-background/95 backdrop-blur z-10">
             <DialogTitle className="flex items-center gap-2 text-xl">
               {selectedProject ? <Edit className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
