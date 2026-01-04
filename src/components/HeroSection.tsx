@@ -1,5 +1,11 @@
-import { ArrowDown, Download, Github, Linkedin, Mail, Sparkles, ExternalLink, Rocket } from "lucide-react";
+import { ArrowDown, Download, Github, Linkedin, Mail, Sparkles, ExternalLink, Rocket, Eye, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { motion, useMotionValue, useSpring, useTransform, useInView } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import myPhoto from "@/images/my photo.jpg";
@@ -402,18 +408,52 @@ export const HeroSection = () => {
                     whileTap={{ scale: 0.95 }}
                     style={{ transformStyle: "preserve-3d" }}
                   >
-                    <Button
-                      variant="hero-outline"
-                      size="lg"
-                      className="btn-lift border-2 border-primary/50 bg-transparent hover:bg-primary/10 min-w-[200px] h-14 text-lg backdrop-blur-sm"
-                      style={{ transform: "translateZ(10px)", transformStyle: "preserve-3d" }}
-                      asChild
-                    >
-                      <a href="https://drive.google.com/uc?export=download&id=1p42p9NpczSWy_-iLeVaO38ciHAMHXp9r" download="Moin_Bhatti_Resume.pdf">
-                        <Download className="w-5 h-5 mr-2" />
-                        Download Resume
-                      </a>
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="hero-outline"
+                          size="lg"
+                          className="btn-lift border-2 border-primary/50 bg-transparent hover:bg-primary/10 min-w-[200px] h-14 text-lg backdrop-blur-sm"
+                          style={{ transform: "translateZ(10px)", transformStyle: "preserve-3d" }}
+                        >
+                          <Download className="w-5 h-5 mr-2" />
+                          Resume
+                          <ChevronDown className="w-4 h-4 ml-2" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuItem
+                          onClick={() => {
+                            window.open("https://drive.google.com/file/d/1p42p9NpczSWy_-iLeVaO38ciHAMHXp9r/view?usp=sharing", "_blank");
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <Eye className="w-4 h-4 mr-2" />
+                          See Resume
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={async () => {
+                            try {
+                              // Try to download directly
+                              const link = document.createElement("a");
+                              link.href = "https://drive.google.com/uc?export=download&id=1p42p9NpczSWy_-iLeVaO38ciHAMHXp9r";
+                              link.download = "Moin_Bhatti_Resume.pdf";
+                              link.target = "_blank";
+                              document.body.appendChild(link);
+                              link.click();
+                              document.body.removeChild(link);
+                            } catch (error) {
+                              // Fallback: open in new tab if download fails
+                              window.open("https://drive.google.com/uc?export=download&id=1p42p9NpczSWy_-iLeVaO38ciHAMHXp9r", "_blank");
+                            }
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <Download className="w-4 h-4 mr-2" />
+                          Download
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </motion.div>
                 </motion.div>
               {/* Sparkle decorations */}
