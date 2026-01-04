@@ -86,6 +86,22 @@ export const CertificationsSection = () => {
                 whileHover={{ y: -8, scale: 1.02 }}
                 className="glass-enhanced rounded-xl sm:rounded-2xl p-4 sm:p-6 card-hover group"
               >
+                {/* Certificate Image (optional) */}
+                {cert.imageUrl && (
+                  <div className="mb-4 overflow-hidden rounded-lg border border-border/40 bg-muted/10">
+                    <img
+                      src={cert.imageUrl}
+                      alt={`${cert.title} certificate`}
+                      className="w-full h-40 object-cover"
+                      loading="lazy"
+                      onError={(e) => {
+                        // Hide broken images (common when using ImgBB "page" links instead of direct image links)
+                        (e.currentTarget as HTMLImageElement).style.display = "none";
+                      }}
+                    />
+                  </div>
+                )}
+
                 {/* Header */}
                 <motion.div 
                   className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4"
