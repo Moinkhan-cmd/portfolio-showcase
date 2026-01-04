@@ -1,4 +1,5 @@
 // Analytics tracking service
+// SECURITY: All inputs are sanitized and validated before Firestore writes
 import { db, auth } from "./firebase";
 import {
   collection,
@@ -17,6 +18,12 @@ import {
 } from "firebase/firestore";
 import { analytics } from "./firebase";
 import { logEvent } from "firebase/analytics";
+import { 
+  isRateLimited, 
+  pageViewSchema, 
+  userActivitySchema,
+  activityItemSchema,
+} from "./admin/analyticsValidation";
 
 // ============================================
 // INPUT SANITIZATION UTILITIES
@@ -150,9 +157,14 @@ const getTrafficSource = (): string => {
   }
 };
 
-// Track page view with input sanitization
+// Track page view with input sanitization and rate limiting
 export const trackPageView = async (pagePath: string, pageTitle?: string) => {
   try {
+    // Check rate limit first
+    if (isRateLimited()) {
+      return; // Silently skip if rate limited
+    }
+    
     // Sanitize all inputs
     const sanitizedPath = sanitizePath(pagePath);
     const sanitizedTitle = sanitizeTitle(pageTitle || pagePath);
@@ -177,12 +189,11 @@ export const trackPageView = async (pagePath: string, pageTitle?: string) => {
       localStorage.setItem("visitor_last_visit_date", today);
     }
 
-    // Firestore: Store page view with sanitized data
-    const pageViewRef = doc(collection(db, "analytics_page_views"));
-    await setDoc(pageViewRef, {
+    // Build and validate page view data
+    const pageViewData = {
       visitorId,
       sessionId,
-      page: sanitizedPath, // Use 'page' to match Firestore rules validation
+      page: sanitizedPath,
       pagePath: sanitizedPath,
       pageTitle: sanitizedTitle,
       deviceType,
@@ -190,8 +201,21 @@ export const trackPageView = async (pagePath: string, pageTitle?: string) => {
       region,
       trafficSource,
       isNewVisitor: isNewVisitor && isNewSession,
-      timestamp: serverTimestamp(),
       date: today,
+    };
+    
+    // Validate with Zod schema before Firestore write
+    const validationResult = pageViewSchema.safeParse(pageViewData);
+    if (!validationResult.success) {
+      // Invalid data - skip write silently
+      return;
+    }
+
+    // Firestore: Store page view with validated data
+    const pageViewRef = doc(collection(db, "analytics_page_views"));
+    await setDoc(pageViewRef, {
+      ...validationResult.data,
+      timestamp: serverTimestamp(),
     });
 
     // Firestore: Update daily stats
@@ -276,11 +300,11 @@ export const trackPageView = async (pagePath: string, pageTitle?: string) => {
   }
 };
 
-// Track authenticated user activity with input sanitization
+// Track authenticated user activity with input sanitization and validation
 export const trackUserActivity = async (userId: string, pagePath: string, pageTitle?: string) => {
   try {
-    // Validate userId format
-    if (!userId || typeof userId !== "string" || userId.length > 128) {
+    // Rate limit check
+    if (isRateLimited()) {
       return;
     }
     
@@ -288,33 +312,55 @@ export const trackUserActivity = async (userId: string, pagePath: string, pageTi
     const sanitizedPath = sanitizePath(pagePath);
     const sanitizedTitle = sanitizeTitle(pageTitle || pagePath);
     
-    const userRef = doc(db, "analytics_users", userId);
-    const userSnap = await getDoc(userRef);
-    
-    const activityData = {
+    // Validate with Zod schema
+    const validationResult = userActivitySchema.safeParse({
+      userId,
       pagePath: sanitizedPath,
       pageTitle: sanitizedTitle,
-      timestamp: serverTimestamp(),
+    });
+    
+    if (!validationResult.success) {
+      return; // Invalid data - skip silently
+    }
+    
+    const userRef = doc(db, "analytics_users", validationResult.data.userId);
+    const userSnap = await getDoc(userRef);
+    
+    // Validate activity item
+    const activityData = {
+      pagePath: validationResult.data.pagePath,
+      pageTitle: validationResult.data.pageTitle,
     };
+    
+    const activityValidation = activityItemSchema.safeParse(activityData);
+    if (!activityValidation.success) {
+      return;
+    }
 
     if (userSnap.exists()) {
       await updateDoc(userRef, {
         lastActive: serverTimestamp(),
-        lastPage: sanitizedPath,
+        lastPage: validationResult.data.pagePath,
         activityCount: increment(1),
       });
       
       // Add to activity log (keep last 50 activities) - with size validation
       const activities = userSnap.data().activities || [];
       if (Array.isArray(activities) && activities.length < 50) {
-        activities.push(activityData);
+        activities.push({
+          ...activityValidation.data,
+          timestamp: serverTimestamp(),
+        });
         await updateDoc(userRef, {
           activities,
         });
       } else if (Array.isArray(activities)) {
         // Replace oldest activity
         activities.shift();
-        activities.push(activityData);
+        activities.push({
+          ...activityValidation.data,
+          timestamp: serverTimestamp(),
+        });
         await updateDoc(userRef, {
           activities,
         });
@@ -323,13 +369,16 @@ export const trackUserActivity = async (userId: string, pagePath: string, pageTi
       const user = auth.currentUser;
       const sanitizedEmail = sanitizeEmail(user?.email || "");
       await setDoc(userRef, {
-        userId,
+        userId: validationResult.data.userId,
         email: sanitizedEmail,
         firstActive: serverTimestamp(),
         lastActive: serverTimestamp(),
-        lastPage: sanitizedPath,
+        lastPage: validationResult.data.pagePath,
         activityCount: 1,
-        activities: [activityData],
+        activities: [{
+          ...activityValidation.data,
+          timestamp: serverTimestamp(),
+        }],
       });
     }
   } catch (error) {
