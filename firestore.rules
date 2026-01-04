@@ -57,28 +57,36 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     
-    // Analytics collections - public write for tracking, admin read only
+    // Analytics collections - require authentication for tracking to prevent data poisoning
+    // Note: Consider moving analytics to server-side Cloud Functions for better security
     match /analytics_page_views/{viewId} {
-      allow read: if isAuthenticated();
-      allow create: if true; // Allow anonymous tracking
+      allow read: if isAdmin();
+      // Limit create to authenticated users and validate basic structure
+      allow create: if isAuthenticated() && 
+                      request.resource.data.keys().hasAll(['page', 'timestamp']) &&
+                      request.resource.data.page is string &&
+                      request.resource.data.page.size() < 500;
       allow update, delete: if isAdmin();
     }
-    
+
     match /analytics_daily_stats/{statId} {
-      allow read: if isAuthenticated();
-      allow create, update: if true; // Allow tracking from client
-      allow delete: if isAdmin();
+      allow read: if isAdmin();
+      // Only admin can modify daily stats to prevent manipulation
+      allow write: if isAdmin();
     }
-    
+
     match /analytics_visitors/{visitorId} {
-      allow read: if isAuthenticated();
-      allow create, update: if true; // Allow tracking from client
-      allow delete: if isAdmin();
+      allow read: if isAdmin();
+      // Limit visitor tracking to authenticated users with structure validation
+      allow create: if isAuthenticated() &&
+                      request.resource.data.keys().hasAll(['timestamp']) &&
+                      request.resource.data.size() < 10;
+      allow update, delete: if isAdmin();
     }
-    
+
     match /analytics_users/{userId} {
-      allow read: if isAuthenticated();
-      allow write: if isAuthenticated(); // Only authenticated users can track their activity
+      allow read: if isAdmin();
+      allow write: if isAuthenticated() && request.auth.uid == userId;
     }
   }
 }

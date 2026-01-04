@@ -32,6 +32,7 @@ import {
   deleteCertification,
   Certification,
 } from "@/lib/admin/certifications";
+import { certificationSchema, formatZodError } from "@/lib/admin/validation";
 
 export const AdminCertifications = () => {
   const [certs, setCerts] = useState<Certification[]>([]);
@@ -107,6 +108,18 @@ export const AdminCertifications = () => {
 
     try {
       const certData = { ...formData };
+
+      // Validate with Zod schema
+      const validationResult = certificationSchema.safeParse(certData);
+      if (!validationResult.success) {
+        toast({
+          title: "Validation Error",
+          description: formatZodError(validationResult.error),
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
 
       if (selectedCert?.id) {
         await updateCertification(selectedCert.id, certData);
