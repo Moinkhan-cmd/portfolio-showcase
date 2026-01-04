@@ -63,6 +63,7 @@ export const AdminProjects = () => {
   const [techStackInput, setTechStackInput] = useState("");
   const [additionalImagesInput, setAdditionalImagesInput] = useState("");
   const scrollableRef = useRef<HTMLDivElement>(null);
+  const dialogContentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchProjects();
@@ -70,19 +71,26 @@ export const AdminProjects = () => {
 
   // Handle wheel events to prevent Lenis from intercepting
   useEffect(() => {
+    if (!dialogOpen) return;
+
     const scrollableElement = scrollableRef.current;
-    if (!scrollableElement || !dialogOpen) return;
+    const dialogElement = dialogContentRef.current;
 
     const handleWheel = (e: WheelEvent) => {
-      // Always stop propagation to prevent Lenis from handling it
-      // This allows the native scroll to work within the modal
-      e.stopPropagation();
+      // Check if the event target is within the dialog
+      const target = e.target as Node;
+      if (dialogElement && dialogElement.contains(target)) {
+        // Stop propagation to prevent Lenis from handling it
+        // This allows native scrolling within the modal
+        e.stopPropagation();
+      }
     };
 
-    scrollableElement.addEventListener('wheel', handleWheel, { passive: false, capture: true });
+    // Attach to document with capture phase to catch events before Lenis
+    document.addEventListener('wheel', handleWheel, { passive: false, capture: true });
     
     return () => {
-      scrollableElement.removeEventListener('wheel', handleWheel, { capture: true } as any);
+      document.removeEventListener('wheel', handleWheel, { capture: true } as any);
     };
   }, [dialogOpen]);
 
@@ -325,6 +333,7 @@ export const AdminProjects = () => {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         {/* Updated DialogContent with better max-height and fixed padding handles */}
         <DialogContent 
+          ref={dialogContentRef}
           className="max-w-4xl h-[85vh] p-0 flex flex-col gap-0 overflow-hidden"
           style={{ overflowY: 'hidden', maxHeight: '85vh', height: '85vh' }}
         >
@@ -343,9 +352,14 @@ export const AdminProjects = () => {
           {/* Scrollable form content */}
           <div 
             ref={scrollableRef}
-            className="flex-1 min-h-0 overflow-y-auto px-6 py-4" 
+            className="flex-1 min-h-0 overflow-y-auto px-6 py-4 focus:outline-none" 
             style={{ scrollbarWidth: 'thin', scrollbarColor: 'hsl(175 80% 50%) hsl(222 47% 8%)' }}
             data-lenis-prevent="true"
+            tabIndex={-1}
+            onMouseEnter={(e) => {
+              // Focus the scrollable area when mouse enters to ensure it can receive scroll events
+              e.currentTarget.focus();
+            }}
           >
             <form id="project-form" onSubmit={handleSubmit} className="space-y-8 pb-6">
 
