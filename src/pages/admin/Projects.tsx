@@ -307,8 +307,8 @@ export const AdminProjects = () => {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         {/* Updated DialogContent with better max-height and fixed padding handles */}
         <DialogContent 
-          className="max-w-4xl max-h-[85vh] p-0 flex flex-col gap-0 overflow-hidden"
-          style={{ overflowY: 'hidden' }}
+          className="max-w-4xl h-[85vh] p-0 flex flex-col gap-0 overflow-hidden"
+          style={{ overflowY: 'hidden', maxHeight: '85vh', height: '85vh' }}
         >
           <DialogHeader className="px-6 py-4 border-b shrink-0 bg-background/95 backdrop-blur z-10">
             <DialogTitle className="flex items-center gap-2 text-xl">
@@ -322,8 +322,8 @@ export const AdminProjects = () => {
             </DialogDescription>
           </DialogHeader>
 
-          {/* ScrollArea for form content */}
-          <ScrollArea className="flex-1 min-h-0 px-6 py-4">
+          {/* Scrollable form content */}
+          <div className="flex-1 min-h-0 overflow-y-auto px-6 py-4" style={{ scrollbarWidth: 'thin', scrollbarColor: 'hsl(175 80% 50%) hsl(222 47% 8%)' }}>
             <form id="project-form" onSubmit={handleSubmit} className="space-y-8 pb-6">
 
               {/* SECTION: CORE DETAILS */}
@@ -530,7 +530,7 @@ export const AdminProjects = () => {
               </div>
 
             </form>
-          </ScrollArea>
+          </div>
 
           <DialogFooter className="px-6 py-4 border-t shrink-0 bg-background/95 backdrop-blur z-10 gap-2">
             <Button
