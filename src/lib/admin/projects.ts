@@ -19,6 +19,7 @@ export interface Project {
   shortDescription: string;
   fullDescription: string;
   techStack: string[];
+  skills?: string[];
   category: string;
   thumbnail: string;
   images: string[];
@@ -58,6 +59,7 @@ export const getProject = async (id: string): Promise<Project | null> => {
 export const createProject = async (project: Omit<Project, "id" | "createdAt" | "updatedAt">): Promise<string> => {
   const docRef = await addDoc(collection(db, "projects"), {
     ...project,
+    skills: project.skills ?? [],
     createdAt: Timestamp.now(),
     updatedAt: Timestamp.now(),
   });
@@ -68,6 +70,7 @@ export const updateProject = async (id: string, project: Partial<Project>): Prom
   const docRef = doc(db, "projects", id);
   await updateDoc(docRef, {
     ...project,
+    ...(project.skills === undefined ? {} : { skills: project.skills ?? [] }),
     updatedAt: Timestamp.now(),
   });
 };

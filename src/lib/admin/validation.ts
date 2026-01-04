@@ -40,6 +40,11 @@ export const projectSchema = z.object({
   techStack: z.array(
     z.string().trim().max(50, { message: "Tech stack item must be less than 50 characters" })
   ).max(20, { message: "Maximum 20 tech stack items allowed" }),
+  skills: z.array(
+    z.string().trim().max(50, { message: "Skill must be less than 50 characters" })
+  ).max(30, { message: "Maximum 30 skills allowed" })
+    .optional()
+    .default([]),
   thumbnail: optionalSafeUrl,
   images: z.array(
     z.string().refine((url) => !url || safeUrlRegex.test(url), {

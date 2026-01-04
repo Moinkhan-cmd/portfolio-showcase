@@ -1,5 +1,5 @@
 // Certifications CRUD page
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -43,6 +43,7 @@ export const AdminCertifications = () => {
   const [selectedCert, setSelectedCert] = useState<Certification | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const dialogContentRef = useRef<HTMLDivElement>(null);
 
   const [formData, setFormData] = useState<Omit<Certification, "id" | "createdAt" | "updatedAt">>({
     title: "",
@@ -56,6 +57,23 @@ export const AdminCertifications = () => {
 
   const [skillsInput, setSkillsInput] = useState("");
 
+  // Fix mouse-wheel scrolling inside dialog when Lenis is enabled
+  useEffect(() => {
+    if (!dialogOpen) return;
+
+    const dialogElement = dialogContentRef.current;
+    const handleWheel = (e: WheelEvent) => {
+      const target = e.target as Node;
+      if (dialogElement && dialogElement.contains(target)) {
+        e.stopPropagation();
+      }
+    };
+
+    document.addEventListener("wheel", handleWheel, { passive: false, capture: true });
+    return () => {
+      document.removeEventListener("wheel", handleWheel, { capture: true } as any);
+    };
+  }, [dialogOpen]);
 
   useEffect(() => {
     fetchCerts();
@@ -261,7 +279,11 @@ export const AdminCertifications = () => {
       )}
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent
+          ref={dialogContentRef}
+          className="max-w-2xl max-h-[90vh] overflow-y-auto"
+          data-lenis-prevent="true"
+        >
           <DialogHeader>
             <DialogTitle>
               {selectedCert ? "Edit Certification" : "Add New Certification"}

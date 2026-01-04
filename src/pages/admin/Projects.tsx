@@ -51,6 +51,7 @@ export const AdminProjects = () => {
     shortDescription: "",
     fullDescription: "",
     techStack: [],
+    skills: [],
     category: "",
     thumbnail: "",
     images: [],
@@ -61,6 +62,7 @@ export const AdminProjects = () => {
   });
 
   const [techStackInput, setTechStackInput] = useState("");
+  const [skillsInput, setSkillsInput] = useState("");
   const [additionalImagesInput, setAdditionalImagesInput] = useState("");
   const scrollableRef = useRef<HTMLDivElement>(null);
   const dialogContentRef = useRef<HTMLDivElement>(null);
@@ -118,6 +120,7 @@ export const AdminProjects = () => {
         shortDescription: project.shortDescription,
         fullDescription: project.fullDescription,
         techStack: project.techStack,
+        skills: project.skills ?? [],
         category: project.category,
         thumbnail: project.thumbnail,
         images: project.images,
@@ -127,6 +130,7 @@ export const AdminProjects = () => {
         featured: project.featured,
       });
       setTechStackInput(project.techStack.join(", "));
+      setSkillsInput((project.skills ?? []).join(", "));
       setAdditionalImagesInput(project.images.join("\n"));
     } else {
       resetForm();
@@ -141,6 +145,7 @@ export const AdminProjects = () => {
       shortDescription: "",
       fullDescription: "",
       techStack: [],
+      skills: [],
       category: "",
       thumbnail: "",
       images: [],
@@ -150,6 +155,7 @@ export const AdminProjects = () => {
       featured: false,
     });
     setTechStackInput("");
+    setSkillsInput("");
     setAdditionalImagesInput("");
   };
 
@@ -163,6 +169,11 @@ export const AdminProjects = () => {
         .map((tech) => tech.trim())
         .filter((tech) => tech.length > 0);
 
+      const skills = skillsInput
+        .split(",")
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
+
       const imageUrls = additionalImagesInput
         .split("\n")
         .map((url) => url.trim())
@@ -171,6 +182,7 @@ export const AdminProjects = () => {
       const projectData = {
         ...formData,
         techStack,
+        skills,
         images: imageUrls,
       };
 
@@ -441,6 +453,21 @@ export const AdminProjects = () => {
                   <div className="flex flex-wrap gap-2 mt-2">
                     {techStackInput.split(",").filter(t => t.trim()).map((t, i) => (
                       <Badge key={i} variant="secondary" className="text-xs">{t.trim()}</Badge>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="skills">Skills (Optional)</Label>
+                  <Input
+                    id="skills"
+                    value={skillsInput}
+                    onChange={(e) => setSkillsInput(e.target.value)}
+                    placeholder="UI/UX, Performance, Animations"
+                  />
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {skillsInput.split(",").filter(t => t.trim()).map((t, i) => (
+                      <Badge key={`skill-${i}`} variant="outline" className="text-xs">{t.trim()}</Badge>
                     ))}
                   </div>
                 </div>

@@ -5,6 +5,7 @@ import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { ProjectsBackground3D } from "./ProjectsBackground3D";
 import { useProjects } from "@/hooks/useProjects";
 import type { Project } from "@/lib/admin/projects";
+import { Badge } from "@/components/ui/badge";
 
 interface ProjectCardProps {
   project: Project;
@@ -310,6 +311,22 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
               </motion.span>
             ))}
           </div>
+
+          {/* Skills (optional) */}
+          {Array.isArray(project.skills) && project.skills.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-4 sm:mb-5">
+              {project.skills.slice(0, 8).map((skill) => (
+                <Badge key={skill} variant="secondary" className="text-[11px] sm:text-xs">
+                  {skill}
+                </Badge>
+              ))}
+              {project.skills.length > 8 && (
+                <Badge variant="secondary" className="text-[11px] sm:text-xs">
+                  +{project.skills.length - 8}
+                </Badge>
+              )}
+            </div>
+          )}
 
           {/* Action Buttons */}
           <div className="flex gap-2 sm:gap-3">
