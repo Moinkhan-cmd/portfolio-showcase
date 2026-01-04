@@ -49,6 +49,7 @@ export const AdminCertifications = () => {
     title: "",
     issuer: "",
     issueDate: "",
+    credentialId: "",
     credentialUrl: "",
     imageUrl: "",
     skills: [],
@@ -102,6 +103,7 @@ export const AdminCertifications = () => {
         title: cert.title,
         issuer: cert.issuer,
         issueDate: cert.issueDate,
+        credentialId: cert.credentialId || "",
         credentialUrl: cert.credentialUrl,
         imageUrl: cert.imageUrl,
         skills: cert.skills ?? [],
@@ -120,6 +122,7 @@ export const AdminCertifications = () => {
       title: "",
       issuer: "",
       issueDate: "",
+      credentialId: "",
       credentialUrl: "",
       imageUrl: "",
       skills: [],
@@ -338,6 +341,16 @@ export const AdminCertifications = () => {
                   placeholder="https://..."
                 />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="credentialId">Credential ID</Label>
+              <Input
+                id="credentialId"
+                value={formData.credentialId}
+                onChange={(e) => setFormData({ ...formData, credentialId: e.target.value })}
+                placeholder="e.g. ABCD-1234 (Optional)"
+              />
             </div>
 
             <div className="space-y-2">
