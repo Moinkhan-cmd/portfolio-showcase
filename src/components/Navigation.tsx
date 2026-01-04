@@ -21,8 +21,8 @@ export const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
-  const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  // isVisible state removed - navbar always visible
+  const lastScrollYRef = useRef(0);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [scrollVelocity, setScrollVelocity] = useState(0);
   const navRef = useRef<HTMLElement>(null);
@@ -70,17 +70,10 @@ export const Navigation = () => {
 
   // Track scroll for styling and velocity effects (navbar always visible)
   useMotionValueEvent(scrollY, "change", (latest) => {
-    const current = latest;
-    const previous = lastScrollY;
-    const velocity = Math.abs(current - previous);
-    
+    const velocity = Math.abs(latest - lastScrollYRef.current);
     setScrollVelocity(velocity);
-    
-    // Always keep navbar visible
-    setIsVisible(true);
-    
-    setLastScrollY(current);
-    setIsScrolled(current > 50);
+    lastScrollYRef.current = latest;
+    setIsScrolled(latest > 50);
   });
 
   useEffect(() => {
@@ -230,27 +223,11 @@ export const Navigation = () => {
 
       <motion.nav
         ref={navRef}
-        className="fixed top-0 left-0 right-0 z-[9999] will-change-transform"
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ 
-          y: 0, 
-          opacity: 1
-        }}
-        style={{ 
-          transform: 'translateZ(0)',
-          perspective: 1000,
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-        }}
-        transition={{
-          type: "spring",
-          stiffness: 400,
-          damping: 25,
-          mass: 0.5,
-          opacity: { duration: 0.3, ease: "easeOut" },
-        }}
+        className="fixed top-0 left-0 right-0 z-[9999]"
+        initial={{ opacity: 1 }}
+        animate={{ opacity: 1 }}
+        style={{ position: "fixed", top: 0, left: 0, right: 0, width: "100%" }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
       >
         {/* Cursor-following glow effect */}
         <motion.div
@@ -1010,7 +987,7 @@ export const Navigation = () => {
 
                 <motion.ul
                         initial={{ y: -10, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
+                        animate={{ opacity: 1 }}
                         exit={{ y: -10, opacity: 0 }}
                         transition={{ duration: 0.3, delay: 0.1 }}
                         className="flex flex-col gap-2 relative z-10"
