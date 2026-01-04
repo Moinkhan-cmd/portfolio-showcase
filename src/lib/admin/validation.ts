@@ -63,8 +63,9 @@ export const certificationSchema = z.object({
     .min(1, { message: "Issuer is required" })
     .max(200, { message: "Issuer must be less than 200 characters" }),
   issueDate: z.string()
-    .min(1, { message: "Issue date is required" })
-    .max(50, { message: "Issue date must be valid" }),
+    .max(50, { message: "Issue date must be valid" })
+    .optional()
+    .or(z.literal("")),
   credentialUrl: optionalSafeUrl,
   imageUrl: optionalSafeUrl,
   description: z.string()

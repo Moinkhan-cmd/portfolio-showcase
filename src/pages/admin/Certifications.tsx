@@ -283,13 +283,12 @@ export const AdminCertifications = () => {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="issueDate">Issue Date *</Label>
+                <Label htmlFor="issueDate">Issue Date</Label>
                 <Input
                   id="issueDate"
                   type="date"
                   value={formData.issueDate}
                   onChange={(e) => setFormData({ ...formData, issueDate: e.target.value })}
-                  required
                 />
               </div>
               <div className="space-y-2">
@@ -301,6 +300,7 @@ export const AdminCertifications = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, credentialUrl: e.target.value })
                   }
+                  placeholder="https://..."
                 />
               </div>
             </div>
