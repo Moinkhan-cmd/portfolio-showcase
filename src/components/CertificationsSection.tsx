@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from "framer-motion";
-import { Award, ExternalLink, Calendar, Sparkles, Loader2 } from "lucide-react";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { Award, ExternalLink, Calendar, Loader2 } from "lucide-react";
 import { CertificationsBackground3D } from "./CertificationsBackground3D";
 import { useCertifications } from "@/hooks/useCertifications";
 import type { Certification } from "@/lib/admin/certifications";
 import { Badge } from "@/components/ui/badge";
 
-// --- 3D POP-OUT CARD ---
+// --- 3D INTERACTIVE CARD (Relative Layout) ---
 interface CertificationCardProps {
   cert: Certification;
   index: number;
@@ -21,8 +21,8 @@ const Certification3DCard = ({ cert, index }: CertificationCardProps) => {
   const y = useMotionValue(0);
   const mouseXSpring = useSpring(x, { stiffness: 500, damping: 100 });
   const mouseYSpring = useSpring(y, { stiffness: 500, damping: 100 });
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["5deg", "-5deg"]); // Reduced tilt for stability
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-5deg", "5deg"]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!ref.current) return;
@@ -42,111 +42,112 @@ const Certification3DCard = ({ cert, index }: CertificationCardProps) => {
   };
 
   return (
-    <div className="relative h-full" onMouseEnter={() => setIsHovered(true)} onMouseLeave={handleMouseLeave}>
-      {/* Placeholder to maintain grid space */}
-      <div className="invisible p-6">
-        <div className="h-64" /> {/* Approximate height */}
-      </div>
-
-      <motion.div
-        ref={ref}
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-50px" }}
-        transition={{ duration: 0.5, delay: index * 0.1 }}
-        onMouseMove={handleMouseMove}
-        style={{
-          rotateX: isHovered ? 0 : rotateX, // Reset tilt on hover to read text easier
-          rotateY: isHovered ? 0 : rotateY,
-          zIndex: isHovered ? 50 : 1,
-          scale: isHovered ? 1.05 : 1,
-        }}
-        className={`absolute inset-0 w-full transition-all duration-300 ease-out perspective-1000 ${isHovered ? 'h-auto min-h-full' : 'h-full'}`}
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        rotateX: isHovered ? 0 : rotateX,
+        rotateY: isHovered ? 0 : rotateY,
+        transformStyle: "preserve-3d",
+        zIndex: isHovered ? 20 : 1,
+      }}
+      className="relative group perspective-1000 h-full"
+    >
+      <div
+        className={`relative flex flex-col h-full bg-secondary/60 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-xl transition-all duration-300 ${isHovered ? 'shadow-2xl border-primary/30 -translate-y-2' : ''}`}
+        style={{ transform: "translateZ(0px)" }}
       >
-        <div
-          className={`relative flex flex-col bg-secondary/80 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 ${isHovered ? 'ring-2 ring-primary/50 bg-secondary/95 z-50' : ''}`}
-        >
-          {/* Shine Effect */}
-          <div className="absolute inset-0 bg-gradient-to-tr from-white/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 pointer-events-none" />
+        {/* Hover Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 pointer-events-none" />
 
-          {/* Image Banner */}
-          <div className="relative h-32 shrink-0 overflow-hidden bg-muted/20">
-            {cert.imageUrl ? (
-              <img
-                src={cert.imageUrl}
-                alt={cert.title}
-                className="w-full h-full object-cover transition-transform duration-700 hover:scale-110" // Simple scale on hover
-                onError={(e) => (e.currentTarget.style.display = 'none')}
-              />
-            ) : (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Award className="w-12 h-12 text-primary/20" />
-              </div>
-            )}
-            {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-secondary via-transparent to-transparent" />
+        {/* Image Section */}
+        <div className="relative h-40 shrink-0 overflow-hidden bg-muted/20">
+          {cert.imageUrl ? (
+            <img
+              src={cert.imageUrl}
+              alt={cert.title}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              onError={(e) => (e.currentTarget.style.display = 'none')}
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center bg-secondary/50">
+              <Award className="w-12 h-12 text-primary/20" />
+            </div>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-secondary via-transparent to-transparent opacity-60" />
+        </div>
+
+        <div className="p-6 flex flex-col flex-1 relative z-10">
+          {/* Header */}
+          <div className="mb-4">
+            <h3 className="font-display text-lg font-bold leading-tight text-white group-hover:text-primary transition-colors">
+              {cert.title}
+            </h3>
+            <p className="text-sm text-muted-foreground mt-1 font-medium">{cert.issuer}</p>
           </div>
 
-          <div className="p-5 flex flex-col flex-1">
-            {/* Header */}
-            <div className="mb-3">
-              <div className="flex items-start justify-between gap-2">
-                <h3 className="font-display text-lg font-bold leading-tight text-white group-hover:text-primary transition-colors">
-                  {cert.title}
-                </h3>
-                <div className="p-1.5 rounded-lg bg-primary/10">
-                  <Award className="w-4 h-4 text-primary" />
-                </div>
-              </div>
-              <p className="text-sm text-primary/80 font-medium mt-1">{cert.issuer}</p>
-            </div>
-
-            {/* Description - The Reveal Magic */}
-            <div className="relative mb-4 group/desc">
-              <motion.div
-                animate={{ height: isHovered ? "auto" : 60 }} // Expands height
-                className="overflow-hidden text-sm text-muted-foreground leading-relaxed"
-              >
+          {/* Description with Smooth Expand */}
+          <div className="relative mb-4">
+            <motion.div
+              animate={{
+                height: isHovered ? "auto" : "3rem", // ~3 lines closed vs auto open
+              }}
+              className="overflow-hidden text-sm text-muted-foreground/80 leading-relaxed"
+            >
+              <p className="pb-2">
                 {cert.description || "No description provided."}
-              </motion.div>
-              {!isHovered && cert.description && cert.description.length > 80 && (
-                <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-secondary to-transparent" />
-              )}
-            </div>
+              </p>
+            </motion.div>
+            {/* Fade out gradient for collapsed state */}
+            <motion.div
+              animate={{ opacity: isHovered ? 0 : 1 }}
+              className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-secondary to-transparent"
+            />
+          </div>
 
-            {/* Tags */}
-            <div className="flex flex-wrap gap-1.5 mb-4">
-              {(cert.skills || []).slice(0, isHovered ? 20 : 4).map((skill, i) => (
-                <span key={i} className="px-2 py-0.5 rounded-md bg-white/5 border border-white/5 text-[10px] text-muted-foreground">
+          {/* Skills Tags */}
+          {cert.skills && cert.skills.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-6">
+              {cert.skills.slice(0, isHovered ? 12 : 3).map((skill, i) => (
+                <Badge key={i} variant="secondary" className="px-2 py-0.5 text-[10px] font-normal sm:text-xs">
                   {skill}
-                </span>
+                </Badge>
               ))}
-              {!isHovered && (cert.skills || []).length > 4 && (
-                <span className="px-2 py-0.5 rounded-md bg-white/5 text-[10px] text-muted-foreground">+{(cert.skills?.length || 0) - 4}</span>
+              {cert.skills.length > (isHovered ? 12 : 3) && (
+                <span className="text-xs text-muted-foreground self-center">
+                  +{cert.skills.length - (isHovered ? 12 : 3)}
+                </span>
               )}
+            </div>
+          )}
+
+          {/* Footer - Pushed to bottom */}
+          <div className="mt-auto pt-4 border-t border-white/5 flex items-center justify-between text-xs text-muted-foreground">
+            <div className="flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5" />
+              <span>{cert.issueDate || "No date"}</span>
             </div>
 
-            {/* Footer */}
-            <div className="mt-auto pt-3 border-t border-white/5 flex items-center justify-between text-xs text-muted-foreground">
-              <div className="flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5" />
-                <span>{cert.issueDate || "No date"}</span>
-              </div>
-              {cert.credentialUrl && (
-                <a
-                  href={cert.credentialUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1 text-primary hover:text-white transition-colors font-medium "
-                >
-                  Verify <ExternalLink className="w-3 h-3" />
-                </a>
-              )}
-            </div>
+            {cert.credentialUrl && (
+              <a
+                href={cert.credentialUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 text-primary hover:text-white transition-colors font-medium border border-primary/20 hover:border-primary/50 px-3 py-1.5 rounded-full bg-primary/5 hover:bg-primary/10"
+              >
+                Verify <ExternalLink className="w-3 h-3" />
+              </a>
+            )}
           </div>
         </div>
-      </motion.div>
-    </div>
+      </div>
+    </motion.div>
   );
 };
 
@@ -168,39 +169,41 @@ export const CertificationsSection = () => {
     <section
       id="certifications"
       ref={sectionRef}
-      className="section-padding relative overflow-hidden perspective-2000"
+      className="section-padding relative overflow-hidden bg-background"
     >
       <CertificationsBackground3D />
 
-      {/* Cinematic Overlays */}
-      <div className="absolute inset-0 bg-background/80 pointer-events-none -z-10" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent opacity-50 pointer-events-none" />
+      {/* Background Ambience */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-background to-background pointer-events-none" />
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
 
       <div className="container mx-auto container-padding relative z-20">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={isVisible ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <span className="text-primary font-mono text-sm tracking-widest uppercase">Verified Skills</span>
-          <h2 className="font-display text-4xl sm:text-5xl font-bold mt-2">
-            Professional <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-500">Credentials</span>
+          <span className="text-primary/80 font-mono text-xs tracking-[0.2em] uppercase mb-3 block">Validated Expertise</span>
+          <h2 className="font-display text-4xl sm:text-5xl font-bold">
+            Certifications <span className="text-primary">&</span> Awards
           </h2>
         </motion.div>
 
         {isLoading ? (
-          <div className="flex items-center justify-center min-h-[400px]">
-            <Loader2 className="w-10 h-10 animate-spin text-primary" />
+          <div className="flex items-center justify-center min-h-[300px]">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
         ) : certifications.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-7xl mx-auto">
             {certifications.map((cert, index) => (
               <Certification3DCard key={cert.id || index} cert={cert} index={index} />
             ))}
           </div>
         ) : (
-          <div className="text-center py-20 text-muted-foreground">No credentials found.</div>
+          <div className="text-center py-20 text-muted-foreground border border-dashed border-white/10 rounded-2xl">
+            No certifications added yet.
+          </div>
         )}
       </div>
     </section>
