@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from "framer-motion";
 import { Award, ExternalLink, Calendar, Loader2 } from "lucide-react";
 import { CertificationsBackground3D } from "./CertificationsBackground3D";
 import { useCertifications } from "@/hooks/useCertifications";
 import type { Certification } from "@/lib/admin/certifications";
 import { Badge } from "@/components/ui/badge";
 
-// --- 3D INTERACTIVE CARD (Relative Layout) ---
+// --- 3D FIXED CARD WITH INTERNAL EXPANSION ---
 interface CertificationCardProps {
   cert: Certification;
   index: number;
@@ -16,13 +16,13 @@ const Certification3DCard = ({ cert, index }: CertificationCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  // 3D Tilt Logic
+  // Subtle 3D Tilt
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const mouseXSpring = useSpring(x, { stiffness: 500, damping: 100 });
   const mouseYSpring = useSpring(y, { stiffness: 500, damping: 100 });
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["5deg", "-5deg"]); // Reduced tilt for stability
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-5deg", "5deg"]);
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["3deg", "-3deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-3deg", "3deg"]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!ref.current) return;
@@ -52,22 +52,22 @@ const Certification3DCard = ({ cert, index }: CertificationCardProps) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
       style={{
-        rotateX: isHovered ? 0 : rotateX,
-        rotateY: isHovered ? 0 : rotateY,
+        rotateX,
+        rotateY,
         transformStyle: "preserve-3d",
-        zIndex: isHovered ? 20 : 1,
       }}
-      className="relative group perspective-1000 h-full"
+      className="relative group perspective-1000 h-[420px] w-full"
     >
       <div
-        className={`relative flex flex-col h-full bg-secondary/60 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-xl transition-all duration-300 ${isHovered ? 'shadow-2xl border-primary/30 -translate-y-2' : ''}`}
+        className="relative h-full flex flex-col bg-card/40 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-xl transition-all duration-300 group-hover:shadow-2xl group-hover:border-primary/30"
         style={{ transform: "translateZ(0px)" }}
       >
-        {/* Hover Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 pointer-events-none" />
-
-        {/* Image Section */}
-        <div className="relative h-40 shrink-0 overflow-hidden bg-muted/20">
+        {/* === IMAGE SECTION (Dynamic Height) === */}
+        <motion.div
+          className="relative w-full overflow-hidden bg-muted/20"
+          animate={{ height: isHovered ? "80px" : "180px" }} // Shrinks on hover
+          transition={{ duration: 0.4, ease: "easeInOut" }}
+        >
           {cert.imageUrl ? (
             <img
               src={cert.imageUrl}
@@ -80,68 +80,77 @@ const Certification3DCard = ({ cert, index }: CertificationCardProps) => {
               <Award className="w-12 h-12 text-primary/20" />
             </div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-secondary via-transparent to-transparent opacity-60" />
-        </div>
+          {/* Gradient Overlay */}
+          <div className={`absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent ${isHovered ? 'opacity-100' : 'opacity-60'}`} />
 
-        <div className="p-6 flex flex-col flex-1 relative z-10">
-          {/* Header */}
-          <div className="mb-4">
-            <h3 className="font-display text-lg font-bold leading-tight text-white group-hover:text-primary transition-colors">
+          {/* Title Overlay (Visible on Hover when image shrinks) */}
+          <motion.div
+            className="absolute bottom-2 left-4 right-4 z-10"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: isHovered ? 1 : 0 }}
+          >
+            <h3 className="font-display text-base font-bold text-white truncate shadow-black drop-shadow-md">
               {cert.title}
             </h3>
-            <p className="text-sm text-muted-foreground mt-1 font-medium">{cert.issuer}</p>
-          </div>
+          </motion.div>
+        </motion.div>
 
-          {/* Description with Smooth Expand */}
-          <div className="relative mb-4">
-            <motion.div
-              animate={{
-                height: isHovered ? "auto" : "3rem", // ~3 lines closed vs auto open
-              }}
-              className="overflow-hidden text-sm text-muted-foreground/80 leading-relaxed"
-            >
-              <p className="pb-2">
-                {cert.description || "No description provided."}
+        {/* === CONTENT SECTION === */}
+        <div className="flex flex-col flex-1 p-5 min-h-0 relative z-10 bg-background/5">
+          {/* Header (Hidden on Hover to save space, swapped with image overlay title) */}
+          <AnimatePresence>
+            {!isHovered && (
+              <motion.div
+                initial={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="mb-2 shrink-0"
+              >
+                <h3 className="font-display text-lg font-bold leading-tight text-white group-hover:text-primary transition-colors line-clamp-1">
+                  {cert.title}
+                </h3>
+                <p className="text-sm text-primary/80 mt-1 font-medium truncate">{cert.issuer}</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Description (Expands to fill available space) */}
+          <motion.div className="flex-1 relative overflow-hidden group/text">
+            <div className={`h-full overflow-y-auto pr-2 custom-scrollbar ${isHovered ? '' : 'overflow-hidden'}`}>
+              <p className={`text-sm text-muted-foreground leading-relaxed ${isHovered ? '' : 'line-clamp-3'}`}>
+                {cert.description || "No description provided for this certification."}
               </p>
-            </motion.div>
-            {/* Fade out gradient for collapsed state */}
-            <motion.div
-              animate={{ opacity: isHovered ? 0 : 1 }}
-              className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-secondary to-transparent"
-            />
-          </div>
 
-          {/* Skills Tags */}
-          {cert.skills && cert.skills.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-6">
-              {cert.skills.slice(0, isHovered ? 12 : 3).map((skill, i) => (
-                <Badge key={i} variant="secondary" className="px-2 py-0.5 text-[10px] font-normal sm:text-xs">
-                  {skill}
-                </Badge>
-              ))}
-              {cert.skills.length > (isHovered ? 12 : 3) && (
-                <span className="text-xs text-muted-foreground self-center">
-                  +{cert.skills.length - (isHovered ? 12 : 3)}
-                </span>
-              )}
+              {/* Metadata (Date/Tags) inside scroll area if needed, or stick to bottom */}
+              <div className="mt-4 flex flex-wrap gap-2">
+                {cert.skills?.map((skill, i) => (
+                  <Badge key={i} variant="outline" className="text-[10px] border-white/10 text-muted-foreground">
+                    {skill}
+                  </Badge>
+                ))}
+              </div>
             </div>
-          )}
 
-          {/* Footer - Pushed to bottom */}
-          <div className="mt-auto pt-4 border-t border-white/5 flex items-center justify-between text-xs text-muted-foreground">
+            {/* Bottom Fade for collapsed state */}
+            {!isHovered && (
+              <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-[#0b0f19] to-transparent pointer-events-none" />
+            )}
+          </motion.div>
+
+          {/* Fixed Footer */}
+          <div className="mt-auto pt-3 border-t border-white/5 flex items-center justify-between text-xs text-muted-foreground shrink-0">
             <div className="flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5" />
-              <span>{cert.issueDate || "No date"}</span>
+              <span>{cert.issueDate || "N/A"}</span>
             </div>
-
             {cert.credentialUrl && (
               <a
                 href={cert.credentialUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-primary hover:text-white transition-colors font-medium border border-primary/20 hover:border-primary/50 px-3 py-1.5 rounded-full bg-primary/5 hover:bg-primary/10"
+                className="flex items-center gap-1 text-primary hover:text-white transition-colors font-medium border border-primary/20 px-3 py-1.5 rounded-md hover:bg-primary/20"
               >
-                Verify <ExternalLink className="w-3 h-3" />
+                Verify <ExternalLink className="w-3 h-3 ml-1" />
               </a>
             )}
           </div>
@@ -169,33 +178,35 @@ export const CertificationsSection = () => {
     <section
       id="certifications"
       ref={sectionRef}
-      className="section-padding relative overflow-hidden bg-background"
+      className="section-padding relative overflow-hidden bg-background/50"
     >
       <CertificationsBackground3D />
 
       {/* Background Ambience */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-background to-background pointer-events-none" />
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background pointer-events-none -z-10" />
 
       <div className="container mx-auto container-padding relative z-20">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={isVisible ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-12 sm:mb-16"
         >
-          <span className="text-primary/80 font-mono text-xs tracking-[0.2em] uppercase mb-3 block">Validated Expertise</span>
+          <Badge variant="outline" className="mb-4 border-primary/20 text-primary">
+            <Award className="w-3 h-3 mr-2" />
+            Certifications
+          </Badge>
           <h2 className="font-display text-4xl sm:text-5xl font-bold">
-            Certifications <span className="text-primary">&</span> Awards
+            Verifiable <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-500">Credentials</span>
           </h2>
         </motion.div>
 
         {isLoading ? (
-          <div className="flex items-center justify-center min-h-[300px]">
+          <div className="flex items-center justify-center min-h-[400px]">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
         ) : certifications.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
             {certifications.map((cert, index) => (
               <Certification3DCard key={cert.id || index} cert={cert} index={index} />
             ))}
