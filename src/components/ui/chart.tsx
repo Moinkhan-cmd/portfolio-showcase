@@ -29,6 +29,77 @@ function useChart() {
   return context;
 }
 
+// ============================================
+// SECURITY: Input sanitization for CSS injection prevention
+// ============================================
+
+/**
+ * Sanitize chart ID to prevent CSS injection
+ * Only allows alphanumeric characters, hyphens, and underscores
+ */
+const sanitizeChartId = (id: string): string => {
+  if (typeof id !== "string") return "chart";
+  // Remove any characters that aren't safe for CSS selectors
+  return id.replace(/[^a-zA-Z0-9\-_]/g, "");
+};
+
+/**
+ * Sanitize CSS color value to prevent CSS injection
+ * Accepts: hex colors (#fff, #ffffff, #ffffffff), 
+ *          rgb/rgba (rgb(0,0,0), rgba(0,0,0,0.5)),
+ *          hsl/hsla (hsl(0,0%,0%), hsla(0,0%,0%,0.5)),
+ *          CSS color keywords, CSS variables
+ */
+const sanitizeCssColor = (color: string): string => {
+  if (typeof color !== "string") return "transparent";
+  
+  const trimmed = color.trim();
+  
+  // Allow hex colors: #fff, #ffffff, #ffffffff (with alpha)
+  if (/^#[0-9a-fA-F]{3,8}$/.test(trimmed)) {
+    return trimmed;
+  }
+  
+  // Allow rgb/rgba with numbers and percentages
+  if (/^rgba?\(\s*\d+%?\s*,\s*\d+%?\s*,\s*\d+%?\s*(,\s*[\d.]+%?)?\s*\)$/i.test(trimmed)) {
+    return trimmed;
+  }
+  
+  // Allow hsl/hsla
+  if (/^hsla?\(\s*[\d.]+\s*,\s*[\d.]+%\s*,\s*[\d.]+%\s*(,\s*[\d.]+%?)?\s*\)$/i.test(trimmed)) {
+    return trimmed;
+  }
+  
+  // Allow CSS variables: var(--name) or var(--name, fallback)
+  if (/^var\(\s*--[a-zA-Z0-9\-_]+\s*(,\s*[^)]+)?\s*\)$/i.test(trimmed)) {
+    return trimmed;
+  }
+  
+  // Allow common CSS color keywords (whitelist approach)
+  const colorKeywords = [
+    "transparent", "currentColor", "inherit", "initial", "unset",
+    "black", "white", "red", "green", "blue", "yellow", "orange", "purple", 
+    "pink", "gray", "grey", "cyan", "magenta", "lime", "olive", "navy",
+    "teal", "aqua", "maroon", "silver", "fuchsia"
+  ];
+  
+  if (colorKeywords.includes(trimmed.toLowerCase())) {
+    return trimmed;
+  }
+  
+  // Default to transparent for unrecognized values
+  return "transparent";
+};
+
+/**
+ * Sanitize CSS variable name (the key part)
+ * Only allows alphanumeric, hyphens, and underscores
+ */
+const sanitizeCssVarName = (name: string): string => {
+  if (typeof name !== "string") return "unknown";
+  return name.replace(/[^a-zA-Z0-9\-_]/g, "");
+};
+
 const ChartContainer = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> & {
@@ -37,7 +108,8 @@ const ChartContainer = React.forwardRef<
   }
 >(({ id, className, children, config, ...props }, ref) => {
   const uniqueId = React.useId();
-  const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`;
+  // Sanitize the chart ID to prevent CSS injection
+  const chartId = `chart-${sanitizeChartId(id || uniqueId.replace(/:/g, ""))}`;
 
   return (
     <ChartContext.Provider value={{ config }}>
@@ -58,6 +130,10 @@ const ChartContainer = React.forwardRef<
 });
 ChartContainer.displayName = "Chart";
 
+/**
+ * ChartStyle component - generates CSS custom properties for chart theming
+ * SECURITY: All inputs are sanitized to prevent CSS injection attacks
+ */
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(([_, config]) => config.theme || config.color);
 
@@ -65,23 +141,34 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     return null;
   }
 
+  // Sanitize the chart ID
+  const safeId = sanitizeChartId(id);
+
+  // Build CSS with sanitized values
+  const cssContent = Object.entries(THEMES)
+    .map(([theme, prefix]) => {
+      const cssVars = colorConfig
+        .map(([key, itemConfig]) => {
+          const color = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
+          if (!color) return null;
+          
+          // Sanitize both the variable name and color value
+          const safeKey = sanitizeCssVarName(key);
+          const safeColor = sanitizeCssColor(color);
+          
+          return `  --color-${safeKey}: ${safeColor};`;
+        })
+        .filter(Boolean)
+        .join("\n");
+      
+      return `${prefix} [data-chart=${safeId}] {\n${cssVars}\n}`;
+    })
+    .join("\n");
+
   return (
     <style
       dangerouslySetInnerHTML={{
-        __html: Object.entries(THEMES)
-          .map(
-            ([theme, prefix]) => `
-${prefix} [data-chart=${id}] {
-${colorConfig
-  .map(([key, itemConfig]) => {
-    const color = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
-    return color ? `  --color-${key}: ${color};` : null;
-  })
-  .join("\n")}
-}
-`,
-          )
-          .join("\n"),
+        __html: cssContent,
       }}
     />
   );
