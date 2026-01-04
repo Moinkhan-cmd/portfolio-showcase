@@ -28,13 +28,14 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Plus, Edit, Trash2, Loader2, ExternalLink, Github,
   Layout, Code, Image as ImageIcon, Link as LinkIcon,
-  CheckCircle2, Info, Layers
+  CheckCircle2, Info, Star, Sparkles, Folder
 } from "lucide-react";
 import { getProjects, createProject, updateProject, deleteProject, Project } from "@/lib/admin/projects";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { projectSchema, formatZodError } from "@/lib/admin/validation";
 import { Separator } from "@/components/ui/separator";
+import { motion, AnimatePresence } from "framer-motion";
 
 export const AdminProjects = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -79,16 +80,12 @@ export const AdminProjects = () => {
     const dialogElement = dialogContentRef.current;
 
     const handleWheel = (e: WheelEvent) => {
-      // Check if the event target is within the dialog
       const target = e.target as Node;
       if (dialogElement && dialogElement.contains(target)) {
-        // Stop propagation to prevent Lenis from handling it
-        // This allows native scrolling within the modal
         e.stopPropagation();
       }
     };
 
-    // Attach to document with capture phase to catch events before Lenis
     document.addEventListener('wheel', handleWheel, { passive: false, capture: true });
     
     return () => {
@@ -186,7 +183,6 @@ export const AdminProjects = () => {
         images: imageUrls,
       };
 
-      // Validate with Zod schema
       const validationResult = projectSchema.safeParse(projectData);
       if (!validationResult.success) {
         toast({
@@ -249,122 +245,181 @@ export const AdminProjects = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+        >
+          <Loader2 className="w-10 h-10 text-primary" />
+        </motion.div>
+        <p className="text-muted-foreground">Loading projects...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold gradient-text">Projects</h1>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+            Projects
+          </h1>
           <p className="text-muted-foreground mt-2">Manage your portfolio projects</p>
         </div>
-        <Button onClick={() => handleOpenDialog()}>
+        <Button 
+          onClick={() => handleOpenDialog()}
+          className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg shadow-primary/20"
+        >
           <Plus className="mr-2 h-4 w-4" />
           Add Project
         </Button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {projects.map((project) => (
-          <Card key={project.id} className="card-hover">
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <CardTitle className="text-lg">{project.title}</CardTitle>
-                {project.featured && <Badge variant="default">Featured</Badge>}
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {project.thumbnail && (
-                  <img
-                    src={project.thumbnail}
-                    alt={project.title}
-                    className="w-full h-40 object-cover rounded-lg"
-                  />
+      {/* Projects Grid */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <AnimatePresence mode="popLayout">
+          {projects.map((project, index) => (
+            <motion.div
+              key={project.id}
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              transition={{ duration: 0.3, delay: index * 0.05 }}
+            >
+              <Card className="group relative overflow-hidden border-primary/10 hover:border-primary/30 transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 bg-gradient-to-br from-card to-card/80">
+                {/* Featured badge */}
+                {project.featured && (
+                  <div className="absolute top-3 right-3 z-10">
+                    <Badge className="bg-gradient-to-r from-primary to-primary/80 border-0 shadow-lg shadow-primary/30 flex items-center gap-1">
+                      <Star className="w-3 h-3 fill-current" />
+                      Featured
+                    </Badge>
+                  </div>
                 )}
-                <p className="text-sm text-muted-foreground line-clamp-2">
-                  {project.shortDescription}
-                </p>
-                <div className="flex flex-wrap gap-1">
-                  {project.techStack.slice(0, 3).map((tech) => (
-                    <Badge key={tech} variant="outline" className="text-xs">
-                      {tech}
-                    </Badge>
-                  ))}
-                  {project.techStack.length > 3 && (
-                    <Badge variant="outline" className="text-xs">
-                      +{project.techStack.length - 3}
-                    </Badge>
-                  )}
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleOpenDialog(project)}
-                    className="flex-1"
-                  >
-                    <Edit className="mr-2 h-4 w-4" />
-                    Edit
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setSelectedProject(project);
-                      setDeleteDialogOpen(true);
-                    }}
-                    className="flex-1 text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+                
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-primary" />
+                    {project.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {project.thumbnail ? (
+                      <div className="relative overflow-hidden rounded-lg">
+                        <img
+                          src={project.thumbnail}
+                          alt={project.title}
+                          className="w-full h-40 object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-card/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      </div>
+                    ) : (
+                      <div className="w-full h-40 rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center border border-dashed border-primary/20">
+                        <Folder className="w-10 h-10 text-primary/30" />
+                      </div>
+                    )}
+                    
+                    <p className="text-sm text-muted-foreground line-clamp-2">
+                      {project.shortDescription}
+                    </p>
+                    
+                    <div className="flex flex-wrap gap-1.5">
+                      {project.techStack.slice(0, 3).map((tech) => (
+                        <Badge 
+                          key={tech} 
+                          variant="outline" 
+                          className="text-xs border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors"
+                        >
+                          {tech}
+                        </Badge>
+                      ))}
+                      {project.techStack.length > 3 && (
+                        <Badge variant="outline" className="text-xs bg-muted/50">
+                          +{project.techStack.length - 3}
+                        </Badge>
+                      )}
+                    </div>
+                    
+                    <Separator className="bg-primary/10" />
+                    
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleOpenDialog(project)}
+                        className="flex-1 border-primary/20 hover:border-primary/40 hover:bg-primary/10"
+                      >
+                        <Edit className="mr-2 h-4 w-4" />
+                        Edit
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedProject(project);
+                          setDeleteDialogOpen(true);
+                        }}
+                        className="flex-1 border-destructive/20 text-destructive hover:text-destructive hover:border-destructive/40 hover:bg-destructive/10"
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
 
       {projects.length === 0 && (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <p className="text-muted-foreground mb-4">No projects yet</p>
-            <Button onClick={() => handleOpenDialog()}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Your First Project
-            </Button>
-          </CardContent>
-        </Card>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Card className="border-dashed border-2 border-primary/20 bg-gradient-to-br from-card to-card/50">
+            <CardContent className="flex flex-col items-center justify-center py-16">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <Folder className="w-8 h-8 text-primary/50" />
+              </div>
+              <p className="text-muted-foreground mb-4 text-lg">No projects yet</p>
+              <p className="text-sm text-muted-foreground/60 mb-6">Create your first project to get started</p>
+              <Button onClick={() => handleOpenDialog()} className="bg-gradient-to-r from-primary to-primary/80">
+                <Plus className="mr-2 h-4 w-4" />
+                Add Your First Project
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.div>
       )}
 
+      {/* Add/Edit Dialog */}
       <Dialog
         open={dialogOpen}
         onOpenChange={(open) => {
-          // Prevent accidental data loss by disallowing outside-click close.
-          // Users should close via Cancel or the X button.
           if (!open) return;
           setDialogOpen(open);
         }}
       >
-        {/* Updated DialogContent with better max-height and fixed padding handles */}
         <DialogContent 
           ref={dialogContentRef}
-          className="max-w-4xl h-[85vh] p-0 flex flex-col gap-0 overflow-hidden"
-          style={{ overflowY: 'hidden', maxHeight: '85vh', height: '85vh' }}
+          className="max-w-4xl h-[90vh] p-0 flex flex-col gap-0 overflow-hidden border-primary/20 bg-gradient-to-br from-background via-background to-background/95"
+          style={{ overflowY: 'hidden', maxHeight: '90vh', height: '90vh' }}
           onInteractOutside={(e) => e.preventDefault()}
           onEscapeKeyDown={(e) => e.preventDefault()}
         >
-          <DialogHeader className="px-6 py-4 border-b shrink-0 bg-background/95 backdrop-blur z-10">
-            <DialogTitle className="flex items-center gap-2 text-xl">
-              {selectedProject ? <Edit className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+          {/* Header with gradient */}
+          <DialogHeader className="px-6 py-5 border-b border-primary/10 shrink-0 bg-gradient-to-r from-background via-primary/5 to-background">
+            <DialogTitle className="flex items-center gap-3 text-xl">
+              <div className="p-2 rounded-lg bg-primary/10">
+                {selectedProject ? <Edit className="w-5 h-5 text-primary" /> : <Plus className="w-5 h-5 text-primary" />}
+              </div>
               {selectedProject ? "Edit Project" : "Add New Project"}
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-muted-foreground">
               {selectedProject
                 ? "Update the details below. All changes are auto-saved to state until you submit."
                 : "Fill in the details to add a new project to your portfolio."}
@@ -374,27 +429,26 @@ export const AdminProjects = () => {
           {/* Scrollable form content */}
           <div 
             ref={scrollableRef}
-            className="flex-1 min-h-0 overflow-y-auto px-6 py-4 focus:outline-none" 
-            style={{ scrollbarWidth: 'thin', scrollbarColor: 'hsl(175 80% 50%) hsl(222 47% 8%)' }}
+            className="flex-1 min-h-0 overflow-y-auto px-6 py-6 focus:outline-none" 
+            style={{ scrollbarWidth: 'thin', scrollbarColor: 'hsl(175 80% 50% / 0.3) transparent' }}
             data-lenis-prevent="true"
             tabIndex={-1}
-            onMouseEnter={(e) => {
-              // Focus the scrollable area when mouse enters to ensure it can receive scroll events
-              e.currentTarget.focus();
-            }}
+            onMouseEnter={(e) => e.currentTarget.focus()}
           >
             <form id="project-form" onSubmit={handleSubmit} className="space-y-8 pb-6">
 
               {/* SECTION: CORE DETAILS */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 text-primary font-semibold border-b pb-2">
-                  <Layout className="w-4 h-4" />
-                  <h3>Core Details</h3>
+              <div className="space-y-5 p-5 rounded-xl bg-gradient-to-br from-card/80 to-card/40 border border-primary/10">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-primary/10">
+                    <Layout className="w-4 h-4 text-primary" />
+                  </div>
+                  <h3 className="font-semibold text-foreground">Core Details</h3>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-5">
                   <div className="space-y-2">
-                    <Label htmlFor="title">Project Title *</Label>
+                    <Label htmlFor="title" className="text-sm font-medium">Project Title *</Label>
                     <Input
                       id="title"
                       value={formData.title}
@@ -402,22 +456,24 @@ export const AdminProjects = () => {
                       maxLength={100}
                       placeholder="e.g. Portfolio v2"
                       required
+                      className="border-primary/20 focus:border-primary/50 bg-background/50"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="category">Category *</Label>
+                    <Label htmlFor="category" className="text-sm font-medium">Category *</Label>
                     <Input
                       id="category"
                       value={formData.category}
                       onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                       placeholder="e.g. Web App, Mobile, Design System"
                       required
+                      className="border-primary/20 focus:border-primary/50 bg-background/50"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="shortDescription">Short Description (Summary) *</Label>
+                  <Label htmlFor="shortDescription" className="text-sm font-medium">Short Description *</Label>
                   <Input
                     id="shortDescription"
                     value={formData.shortDescription}
@@ -425,19 +481,20 @@ export const AdminProjects = () => {
                     placeholder="Brief one-line summary for cards..."
                     maxLength={150}
                     required
+                    className="border-primary/20 focus:border-primary/50 bg-background/50"
                   />
                   <p className="text-[11px] text-muted-foreground">Appears in project cards. Max 150 chars.</p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="fullDescription">Full Description *</Label>
+                  <Label htmlFor="fullDescription" className="text-sm font-medium">Full Description *</Label>
                   <Textarea
                     id="fullDescription"
                     value={formData.fullDescription}
                     onChange={(e) => setFormData({ ...formData, fullDescription: e.target.value })}
                     rows={5}
-                    placeholder="# Project Details \n\nDescribe the challenges, features, and outcome..."
-                    className="font-mono text-sm leading-relaxed"
+                    placeholder="# Project Details &#10;&#10;Describe the challenges, features, and outcome..."
+                    className="font-mono text-sm leading-relaxed border-primary/20 focus:border-primary/50 bg-background/50"
                     required
                   />
                   <p className="text-[11px] text-muted-foreground">Markdown supported. This content appears on the details page.</p>
@@ -445,53 +502,63 @@ export const AdminProjects = () => {
               </div>
 
               {/* SECTION: TECH STACK */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 text-primary font-semibold border-b pb-2">
-                  <Code className="w-4 h-4" />
-                  <h3>Technical Info</h3>
+              <div className="space-y-5 p-5 rounded-xl bg-gradient-to-br from-card/80 to-card/40 border border-primary/10">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-primary/10">
+                    <Code className="w-4 h-4 text-primary" />
+                  </div>
+                  <h3 className="font-semibold text-foreground">Technical Info</h3>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="techStack">Technologies Used *</Label>
+                  <Label htmlFor="techStack" className="text-sm font-medium">Technologies Used *</Label>
                   <Input
                     id="techStack"
                     value={techStackInput}
                     onChange={(e) => setTechStackInput(e.target.value)}
                     placeholder="React, TypeScript, Tailwind CSS, Node.js"
                     required
+                    className="border-primary/20 focus:border-primary/50 bg-background/50"
                   />
-                  <div className="flex flex-wrap gap-2 mt-2">
+                  <div className="flex flex-wrap gap-2 mt-3">
                     {techStackInput.split(",").filter(t => t.trim()).map((t, i) => (
-                      <Badge key={i} variant="secondary" className="text-xs">{t.trim()}</Badge>
+                      <Badge key={i} className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/20">
+                        {t.trim()}
+                      </Badge>
                     ))}
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="skills">Skills (Optional)</Label>
+                  <Label htmlFor="skills" className="text-sm font-medium">Skills (Optional)</Label>
                   <Input
                     id="skills"
                     value={skillsInput}
                     onChange={(e) => setSkillsInput(e.target.value)}
                     placeholder="UI/UX, Performance, Animations"
+                    className="border-primary/20 focus:border-primary/50 bg-background/50"
                   />
-                  <div className="flex flex-wrap gap-2 mt-2">
+                  <div className="flex flex-wrap gap-2 mt-3">
                     {skillsInput.split(",").filter(t => t.trim()).map((t, i) => (
-                      <Badge key={`skill-${i}`} variant="outline" className="text-xs">{t.trim()}</Badge>
+                      <Badge key={`skill-${i}`} variant="outline" className="border-primary/20">
+                        {t.trim()}
+                      </Badge>
                     ))}
                   </div>
                 </div>
               </div>
 
               {/* SECTION: MEDIA */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 text-primary font-semibold border-b pb-2">
-                  <ImageIcon className="w-4 h-4" />
-                  <h3>Media & Visuals</h3>
+              <div className="space-y-5 p-5 rounded-xl bg-gradient-to-br from-card/80 to-card/40 border border-primary/10">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-primary/10">
+                    <ImageIcon className="w-4 h-4 text-primary" />
+                  </div>
+                  <h3 className="font-semibold text-foreground">Media & Visuals</h3>
                 </div>
 
                 <div className="space-y-3">
-                  <Label htmlFor="thumbnail">Thumbnail Image URL</Label>
+                  <Label htmlFor="thumbnail" className="text-sm font-medium">Thumbnail Image URL</Label>
                   <div className="flex gap-4 items-start">
                     <div className="flex-1 space-y-2">
                       <Input
@@ -500,11 +567,12 @@ export const AdminProjects = () => {
                         value={formData.thumbnail}
                         onChange={(e) => setFormData({ ...formData, thumbnail: e.target.value })}
                         placeholder="https://images.unsplash.com/..."
+                        className="border-primary/20 focus:border-primary/50 bg-background/50"
                       />
                       <p className="text-[11px] text-muted-foreground">Main cover image for the project card.</p>
                     </div>
                     {formData.thumbnail && (
-                      <div className="w-24 h-16 shrink-0 rounded-md overflow-hidden border bg-muted">
+                      <div className="w-28 h-20 shrink-0 rounded-lg overflow-hidden border border-primary/20 bg-muted shadow-lg">
                         <img
                           src={formData.thumbnail}
                           alt="Preview"
@@ -517,28 +585,30 @@ export const AdminProjects = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="images">Additional Screenshots (One per line)</Label>
+                  <Label htmlFor="images" className="text-sm font-medium">Additional Screenshots (One per line)</Label>
                   <Textarea
                     id="images"
                     value={additionalImagesInput}
                     onChange={(e) => setAdditionalImagesInput(e.target.value)}
                     placeholder="https://.../screen1.jpg&#10;https://.../screen2.jpg"
                     rows={3}
-                    className="font-mono text-xs"
+                    className="font-mono text-xs border-primary/20 focus:border-primary/50 bg-background/50"
                   />
                 </div>
               </div>
 
               {/* SECTION: LINKS & STATUS */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 text-primary font-semibold border-b pb-2">
-                  <LinkIcon className="w-4 h-4" />
-                  <h3>Links & Status</h3>
+              <div className="space-y-5 p-5 rounded-xl bg-gradient-to-br from-card/80 to-card/40 border border-primary/10">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-primary/10">
+                    <LinkIcon className="w-4 h-4 text-primary" />
+                  </div>
+                  <h3 className="font-semibold text-foreground">Links & Status</h3>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-5">
                   <div className="space-y-2">
-                    <Label htmlFor="liveUrl">Live Demo URL</Label>
+                    <Label htmlFor="liveUrl" className="text-sm font-medium">Live Demo URL</Label>
                     <div className="relative">
                       <ExternalLink className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
                       <Input
@@ -546,13 +616,13 @@ export const AdminProjects = () => {
                         type="url"
                         value={formData.liveUrl}
                         onChange={(e) => setFormData({ ...formData, liveUrl: e.target.value })}
-                        className="pl-9"
+                        className="pl-10 border-primary/20 focus:border-primary/50 bg-background/50"
                         placeholder="https://myproject.com"
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="githubUrl">Source Code URL</Label>
+                    <Label htmlFor="githubUrl" className="text-sm font-medium">Source Code URL</Label>
                     <div className="relative">
                       <Github className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
                       <Input
@@ -560,16 +630,16 @@ export const AdminProjects = () => {
                         type="url"
                         value={formData.githubUrl}
                         onChange={(e) => setFormData({ ...formData, githubUrl: e.target.value })}
-                        className="pl-9"
+                        className="pl-10 border-primary/20 focus:border-primary/50 bg-background/50"
                         placeholder="https://github.com/..."
                       />
                     </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-5 pt-2">
+                <div className="grid grid-cols-2 gap-5">
                   <div className="space-y-2">
-                    <Label htmlFor="status">Project Status</Label>
+                    <Label htmlFor="status" className="text-sm font-medium">Project Status</Label>
                     <div className="relative">
                       <select
                         id="status"
@@ -580,7 +650,7 @@ export const AdminProjects = () => {
                             status: e.target.value as "completed" | "in-progress",
                           })
                         }
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                        className="flex h-10 w-full rounded-md border border-primary/20 bg-background/50 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:border-primary/50"
                       >
                         <option value="completed">Completed</option>
                         <option value="in-progress">In Progress</option>
@@ -589,9 +659,12 @@ export const AdminProjects = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between border rounded-lg p-3 bg-muted/20">
+                  <div className="flex items-center justify-between rounded-lg p-4 bg-gradient-to-r from-primary/5 to-transparent border border-primary/20">
                     <div className="space-y-0.5">
-                      <Label htmlFor="featured" className="text-base">Featured</Label>
+                      <Label htmlFor="featured" className="text-base font-medium flex items-center gap-2">
+                        <Star className="w-4 h-4 text-primary" />
+                        Featured
+                      </Label>
                       <p className="text-[11px] text-muted-foreground">Show on Home page.</p>
                     </div>
                     <Switch
@@ -606,11 +679,13 @@ export const AdminProjects = () => {
             </form>
           </div>
 
-          <DialogFooter className="px-6 py-4 border-t shrink-0 bg-background/95 backdrop-blur z-10 gap-2">
+          {/* Footer with gradient */}
+          <DialogFooter className="px-6 py-4 border-t border-primary/10 shrink-0 bg-gradient-to-r from-background via-primary/5 to-background gap-3">
             <Button
               type="button"
               variant="outline"
               onClick={() => setDialogOpen(false)}
+              className="border-primary/20 hover:border-primary/40"
             >
               Cancel
             </Button>
@@ -618,7 +693,7 @@ export const AdminProjects = () => {
               type="submit"
               form="project-form"
               disabled={isSubmitting}
-              className="min-w-[100px]"
+              className="min-w-[120px] bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg shadow-primary/20"
             >
               {isSubmitting ? (
                 <>
@@ -636,18 +711,28 @@ export const AdminProjects = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="border-destructive/20 bg-gradient-to-br from-background to-background/95">
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <div className="p-2 rounded-lg bg-destructive/10">
+                <Trash2 className="w-5 h-5 text-destructive" />
+              </div>
+              Are you sure?
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the project.
+              This action cannot be undone. This will permanently delete the project
+              <span className="font-medium text-foreground"> "{selectedProject?.title}"</span>.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Delete
+            <AlertDialogCancel className="border-primary/20">Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDelete} 
+              className="bg-gradient-to-r from-destructive to-destructive/80 hover:from-destructive/90 hover:to-destructive/70 shadow-lg shadow-destructive/20"
+            >
+              Delete Project
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
