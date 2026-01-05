@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
-import { Menu, X, ArrowUpRight, Github, Linkedin, Mail } from "lucide-react";
+import { useEffect, useState, useCallback, useRef } from "react";
+import { Menu, X, ArrowUpRight } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -18,14 +17,73 @@ export const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
-  const { scrollY } = useScroll();
+  const navRef = useRef<HTMLElement>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Optimized scroll detection with threshold
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    setIsScrolled(latest > 30);
-  });
-
+  // Optimized scroll detection using IntersectionObserver
   useEffect(() => {
+    // Create a sentinel element at the top of the page to detect scroll
+    const sentinel = document.createElement("div");
+    sentinel.style.position = "absolute";
+    sentinel.style.top = "0";
+    sentinel.style.left = "0";
+    sentinel.style.width = "1px";
+    sentinel.style.height = "1px";
+    sentinel.style.pointerEvents = "none";
+    sentinel.style.zIndex = "-1";
+    document.body.appendChild(sentinel);
+
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          setIsScrolled(!entry.isIntersecting);
+        });
+      },
+      {
+        root: null,
+        rootMargin: "-50px 0px 0px 0px",
+        threshold: 0,
+      }
+    );
+
+    observerRef.current.observe(sentinel);
+
+    // Fallback scroll listener (throttled) for better compatibility
+    const handleScroll = () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+      scrollTimeoutRef.current = setTimeout(() => {
+        const scrollY = window.scrollY || document.documentElement.scrollTop;
+        setIsScrolled(scrollY > 50);
+      }, 10);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+      if (sentinel.parentNode) {
+        sentinel.parentNode.removeChild(sentinel);
+      }
+      window.removeEventListener("scroll", handleScroll);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Active section detection using IntersectionObserver
+  useEffect(() => {
+    const observerOptions: IntersectionObserverInit = {
+      root: null,
+      rootMargin: "-30% 0px -50% 0px",
+      threshold: 0.1,
+    };
+
     const observerCallback: IntersectionObserverCallback = (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
@@ -34,123 +92,120 @@ export const Navigation = () => {
       });
     };
 
-    const observerOptions: IntersectionObserverInit = {
-      root: null,
-      rootMargin: "-40% 0px -40% 0px",
-      threshold: 0.3,
-    };
-
-    const observer = new IntersectionObserver(observerCallback, observerOptions);
+    const sectionObserver = new IntersectionObserver(observerCallback, observerOptions);
 
     navLinks.forEach((link) => {
       const sectionId = link.href.substring(1);
       const element = document.getElementById(sectionId);
-      if (element) observer.observe(element);
+      if (element) {
+        sectionObserver.observe(element);
+      }
     });
 
-    return () => observer.disconnect();
+    return () => {
+      sectionObserver.disconnect();
+    };
   }, []);
 
-  const scrollToSection = (href: string) => {
+  // Smooth scroll to section
+  const scrollToSection = useCallback((href: string) => {
     const element = document.querySelector(href);
     if (element) {
       const offset = 80;
       const elementPosition = element.getBoundingClientRect().top + window.scrollY;
       const offsetPosition = elementPosition - offset;
-      window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth",
+      });
     }
     setIsMobileMenuOpen(false);
-  };
+  }, []);
+
+  // Close mobile menu on escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isMobileMenuOpen) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [isMobileMenuOpen]);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileMenuOpen]);
 
   return (
-    <motion.nav
-      className="fixed top-0 left-0 w-full z-50"
-      initial={false}
-      animate={{
-        paddingTop: isScrolled ? "1rem" : "0px",
-      }}
-      transition={{
-        duration: 0.3,
-        ease: [0.4, 0, 0.2, 1],
-      }}
+    <nav
+      ref={navRef}
+      className={cn(
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-out",
+        isScrolled ? "pt-3 pb-3" : "pt-4 pb-4"
+      )}
     >
-      <motion.div
+      <div
         className={cn(
-          "mx-auto transition-all duration-300 ease-in-out flex items-center justify-between",
+          "mx-auto flex items-center justify-between transition-all duration-300 ease-out",
           isScrolled
-            ? "w-[95%] md:max-w-5xl px-4 py-2.5"
-            : "w-full max-w-7xl px-6 py-6"
+            ? "w-[95%] max-w-6xl rounded-2xl px-4 py-3 md:px-6 bg-background/85 backdrop-blur-xl border border-border/20 shadow-lg"
+            : "w-full max-w-7xl px-4 py-2 md:px-8 bg-transparent border-0 shadow-none"
         )}
-        initial={false}
-        animate={{
-          backgroundColor: isScrolled
-            ? "hsl(var(--background) / 0.8)"
-            : "hsl(var(--background) / 0)",
-          backdropFilter: isScrolled ? "blur(20px) saturate(180%)" : "blur(0px)",
-          WebkitBackdropFilter: isScrolled ? "blur(20px) saturate(180%)" : "blur(0px)",
-          borderWidth: isScrolled ? "1px" : "0px",
-          borderColor: isScrolled
-            ? "hsl(var(--border) / 0.3)"
-            : "hsl(var(--border) / 0)",
-          borderRadius: isScrolled ? "9999px" : "0px",
-          boxShadow: isScrolled
-            ? "0 4px 24px hsl(0 0% 0% / 0.12), 0 0 1px hsl(0 0% 0% / 0.08)"
-            : "0 0 0px hsl(0 0% 0% / 0)",
-        }}
-        transition={{
-          duration: 0.3,
-          ease: [0.4, 0, 0.2, 1],
-        }}
       >
         {/* Logo Section */}
-        <motion.a
+        <a
           href="#"
-          className="flex items-center gap-2 group shrink-0"
+          className="flex items-center gap-2 group shrink-0 transition-transform duration-200 hover:scale-105 active:scale-95"
           onClick={(e) => {
             e.preventDefault();
             window.scrollTo({ top: 0, behavior: "smooth" });
           }}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+          aria-label="Go to top"
         >
-          <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-primary/10 text-primary border border-primary/20 group-hover:bg-primary/20 transition-colors">
-            <span className="font-signature font-bold text-lg">M</span>
+          <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20 group-hover:bg-primary/20 transition-colors">
+            <span className="font-signature font-bold text-xl">M</span>
           </div>
-          <motion.span
+          <span
             className={cn(
-              "font-display font-bold text-lg tracking-tight transition-all",
-              isScrolled ? "hidden sm:block" : "block"
+              "font-display font-bold text-lg tracking-tight transition-opacity duration-300",
+              isScrolled ? "hidden sm:block opacity-100" : "block opacity-100"
             )}
-            initial={false}
-            animate={{
-              opacity: isScrolled ? [1, 0, 1] : 1,
-            }}
-            transition={{
-              duration: 0.3,
-            }}
           >
             Moin<span className="text-primary">.dev</span>
-          </motion.span>
-        </motion.a>
+          </span>
+        </a>
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-1">
-          {navLinks.map((link) => (
-            <motion.button
-              key={link.name}
-              onClick={() => scrollToSection(link.href)}
-              className={cn(
-                "relative px-4 py-2 text-sm font-medium transition-colors rounded-full",
-                activeSection === link.href.substring(1)
-                  ? "text-primary bg-primary/10"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/50 dark:hover:bg-white/5"
-              )}
-              whileHover={{ scale: 1.05, y: -1 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              {link.name}
-            </motion.button>
-          ))}
+          {navLinks.map((link) => {
+            const isActive = activeSection === link.href.substring(1);
+            return (
+              <button
+                key={link.name}
+                onClick={() => scrollToSection(link.href)}
+                className={cn(
+                  "relative px-4 py-2 text-sm font-medium transition-all duration-200 rounded-full",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                  isActive
+                    ? "text-primary bg-primary/10"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/50 dark:hover:bg-white/5"
+                )}
+                aria-current={isActive ? "page" : undefined}
+              >
+                {link.name}
+              </button>
+            );
+          })}
         </div>
 
         {/* Actions */}
@@ -159,129 +214,85 @@ export const Navigation = () => {
             <ThemeToggle />
           </div>
 
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button
-              variant="hero"
-              size={isScrolled ? "sm" : "default"}
-              onClick={() => scrollToSection("#contact")}
-              className={cn(
-                "rounded-full font-semibold shadow-md transition-all gap-2 relative overflow-hidden group",
-                isScrolled ? "px-5" : "px-6"
-              )}
-            >
-              <span className="relative z-10 flex items-center gap-2">
-                Let's Talk
-                <ArrowUpRight className="w-4 h-4" />
-              </span>
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                animate={{
-                  x: ["-100%", "200%"],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "linear",
-                  repeatDelay: 1,
-                }}
-              />
-            </Button>
-          </motion.div>
-
-          {/* Mobile Toggle */}
-          <motion.button
-            className="md:hidden p-2 text-foreground hover:bg-secondary/50 dark:hover:bg-white/5 rounded-full transition-colors"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            whileTap={{ scale: 0.9 }}
-            whileHover={{ scale: 1.05 }}
-            aria-label="Toggle menu"
+          <Button
+            variant="hero"
+            size={isScrolled ? "sm" : "default"}
+            onClick={() => scrollToSection("#contact")}
+            className={cn(
+              "rounded-full font-semibold shadow-md transition-all duration-200 gap-2",
+              "hover:scale-105 active:scale-95",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+              isScrolled ? "px-5" : "px-6"
+            )}
+            aria-label="Let's Talk - Contact me"
           >
-            <AnimatePresence mode="wait" initial={false}>
-              {isMobileMenuOpen ? (
-                <motion.div
-                  key="close"
-                  initial={{ rotate: -90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: 90, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <X size={24} />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="menu"
-                  initial={{ rotate: 90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: -90, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Menu size={24} />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.button>
+            <span className="flex items-center gap-2">
+              Let's Talk
+              <ArrowUpRight className="w-4 h-4" />
+            </span>
+          </Button>
+
+          {/* Mobile Menu Toggle */}
+          <button
+            className="md:hidden p-2 text-foreground hover:bg-secondary/50 dark:hover:bg-white/5 rounded-lg transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle menu"
+            aria-expanded={isMobileMenuOpen}
+          >
+            {isMobileMenuOpen ? (
+              <X className="w-6 h-6" aria-hidden="true" />
+            ) : (
+              <Menu className="w-6 h-6" aria-hidden="true" />
+            )}
+          </button>
         </div>
-      </motion.div>
+      </div>
 
       {/* Mobile Menu */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2 }}
-            className="absolute top-[calc(100%+1rem)] left-4 right-4 md:hidden z-50"
-          >
-            <div className="bg-background/95 backdrop-blur-xl border border-border/50 rounded-2xl shadow-2xl p-4 flex flex-col gap-2">
-              {navLinks.map((link) => (
-                <motion.button
-                  key={link.name}
-                  onClick={() => scrollToSection(link.href)}
-                  className={cn(
-                    "w-full text-left px-4 py-3 rounded-xl font-medium transition-colors",
-                    activeSection === link.href.substring(1)
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:bg-secondary/50 dark:hover:bg-white/5 hover:text-foreground"
-                  )}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  {link.name}
-                </motion.button>
-              ))}
-              <div className="mt-2 pt-4 border-t border-border/50 flex items-center justify-between px-2">
-                <span className="text-sm text-muted-foreground">Follow me</span>
-                <div className="flex gap-4">
-                  <motion.a
-                    href="#"
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                    whileHover={{ scale: 1.2, y: -2 }}
-                    whileTap={{ scale: 0.9 }}
+      {isMobileMenuOpen && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="md:hidden fixed inset-0 bg-background/80 backdrop-blur-sm z-40"
+            onClick={() => setIsMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
+          {/* Menu Panel */}
+          <div className="md:hidden fixed left-0 right-0 z-50 bg-background/95 backdrop-blur-xl border-t border-border/50 shadow-2xl animate-in slide-in-from-top duration-200">
+            <div
+              className={cn(
+                "mx-auto flex flex-col gap-2 transition-all duration-300",
+                isScrolled ? "w-[95%] max-w-6xl px-4 py-4" : "w-full max-w-7xl px-4 py-6"
+              )}
+            >
+              {navLinks.map((link) => {
+                const isActive = activeSection === link.href.substring(1);
+                return (
+                  <button
+                    key={link.name}
+                    onClick={() => scrollToSection(link.href)}
+                    className={cn(
+                      "w-full text-left px-4 py-3 rounded-xl font-medium transition-all duration-200",
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+                      "touch-manipulation",
+                      isActive
+                        ? "bg-primary/10 text-primary"
+                        : "text-muted-foreground hover:bg-secondary/50 dark:hover:bg-white/5 hover:text-foreground active:bg-secondary/70"
+                    )}
+                    aria-current={isActive ? "page" : undefined}
                   >
-                    <Github className="w-5 h-5" />
-                  </motion.a>
-                  <motion.a
-                    href="#"
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                    whileHover={{ scale: 1.2, y: -2 }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    <Linkedin className="w-5 h-5" />
-                  </motion.a>
-                  <motion.a
-                    href="#"
-                    className="text-muted-foreground hover:text-foreground transition-colors"
-                    whileHover={{ scale: 1.2, y: -2 }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    <Mail className="w-5 h-5" />
-                  </motion.a>
-                </div>
+                    {link.name}
+                  </button>
+                );
+              })}
+              <div className="mt-4 pt-4 border-t border-border/50 flex items-center justify-between px-2">
+                <span className="text-sm text-muted-foreground">Theme</span>
+                <ThemeToggle />
               </div>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.nav>
+          </div>
+        </>
+      )}
+    </nav>
   );
 };
