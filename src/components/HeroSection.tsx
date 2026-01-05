@@ -1,4 +1,4 @@
-import { ArrowDown, Download, Github, Linkedin, Mail, Sparkles, ExternalLink, Eye, ChevronDown, Code2, Zap, MousePointer2 } from "lucide-react";
+import { ArrowDown, Download, Github, Linkedin, Mail, Sparkles, ExternalLink, Eye, ChevronDown, Code2, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -19,13 +19,6 @@ const socialLinks = [
 ] as const;
 
 const roles = ["Frontend Developer", "UI/UX Designer", "React Specialist", "Creative Coder"];
-
-const techStack = [
-  { name: "React", color: "from-cyan-400 to-blue-500" },
-  { name: "TypeScript", color: "from-blue-500 to-indigo-600" },
-  { name: "Next.js", color: "from-gray-700 to-gray-900 dark:from-gray-100 dark:to-white" },
-  { name: "Tailwind", color: "from-teal-400 to-cyan-500" },
-];
 
 export const HeroSection = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -369,57 +362,24 @@ export const HeroSection = () => {
                   />
 
                   {/* Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent rounded-3xl" />
                   
                   {/* Shine effect */}
                   <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full"
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full rounded-3xl"
                     animate={{ translateX: ["-100%", "200%"] }}
                     transition={{ duration: 4, repeat: Infinity, repeatDelay: 3 }}
                   />
                 </div>
 
-                {/* Tech stack pills */}
-                <motion.div 
-                  className="absolute -bottom-6 left-1/2 -translate-x-1/2 flex gap-2"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={isInView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ delay: 1.2 }}
-                >
-                  {techStack.map((tech, i) => (
-                    <motion.span 
-                      key={tech.name}
-                      className="px-3 py-1.5 rounded-full text-xs font-semibold bg-background/90 backdrop-blur-xl border border-border shadow-lg"
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={isInView ? { opacity: 1, scale: 1 } : {}}
-                      transition={{ delay: 1.3 + i * 0.1, type: "spring" }}
-                      whileHover={{ scale: 1.1, y: -2 }}
-                    >
-                      <span className={`bg-gradient-to-r ${tech.color} bg-clip-text text-transparent`}>
-                        {tech.name}
-                      </span>
-                    </motion.span>
-                  ))}
-                </motion.div>
-
-                {/* Floating decorations */}
+                {/* Floating decoration - top right */}
                 <motion.div
-                  className="absolute -top-4 -right-4"
-                  animate={{ y: [0, -10, 0], rotate: [0, 10, 0] }}
-                  transition={{ duration: 4, repeat: Infinity }}
+                  className="absolute -top-3 -right-3 z-10"
+                  animate={{ y: [0, -8, 0], rotate: [0, 5, 0] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                 >
-                  <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20 backdrop-blur-xl">
-                    <Sparkles className="w-5 h-5 text-primary" />
-                  </div>
-                </motion.div>
-                
-                <motion.div
-                  className="absolute -bottom-2 -left-6"
-                  animate={{ y: [0, 10, 0], rotate: [0, -10, 0] }}
-                  transition={{ duration: 5, repeat: Infinity, delay: 1 }}
-                >
-                  <div className="p-3 rounded-2xl bg-violet-500/10 border border-violet-500/20 backdrop-blur-xl">
-                    <MousePointer2 className="w-5 h-5 text-violet-500" />
+                  <div className="p-2.5 rounded-xl bg-background/80 border border-primary/30 backdrop-blur-xl shadow-lg shadow-primary/10">
+                    <Sparkles className="w-4 h-4 text-primary" />
                   </div>
                 </motion.div>
               </div>
