@@ -518,22 +518,54 @@ export const Navigation = () => {
             </motion.ul>
           </nav>
 
-          {/* Tablet Navigation */}
+          {/* Enhanced Tablet Navigation with better responsive effects */}
           <nav className="hidden md:flex lg:hidden items-center gap-1">
             <motion.ul
-              className="flex items-center gap-0.5 p-1.5 rounded-xl bg-background/30 backdrop-blur-md border border-primary/15 shadow-lg"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4 }}
+              className="flex items-center gap-0.5 p-1.5 rounded-xl bg-gradient-to-br from-background/40 via-background/30 to-background/40 backdrop-blur-xl border border-primary/20 shadow-lg shadow-primary/5 relative overflow-hidden"
+              initial={{ opacity: 0, scale: 0.9, y: -5 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.4, type: "spring" }}
+              whileHover={{ borderColor: "hsl(175 80% 50% / 0.3)" }}
+              style={{
+                borderColor: useTransform(scrollY, [50, 200], ["hsl(175 80% 50% / 0.2)", "hsl(175 80% 50% / 0.4)"]),
+              }}
             >
+              {/* Animated background gradient for tablet */}
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5"
+                animate={{
+                  backgroundPosition: ["0% 0%", "100% 0%"],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "linear",
+                }}
+              />
               {navLinks.slice(0, 4).map((link, index) => (
-                <EnhancedNavLink
+                <motion.div
                   key={link.name}
-                  link={link}
-                  isActive={activeSection === link.href.substring(1)}
-                  onClick={() => scrollToSection(link.href)}
-                  index={index}
-                />
+                  onHoverStart={() => setHoveredLink(link.name)}
+                  onHoverEnd={() => setHoveredLink(null)}
+                  className="relative"
+                >
+                  <EnhancedNavLink
+                    link={link}
+                    isActive={activeSection === link.href.substring(1)}
+                    onClick={() => scrollToSection(link.href)}
+                    index={index}
+                  />
+                  {/* Hover glow effect for tablet */}
+                  {hoveredLink === link.name && (
+                    <motion.div
+                      className="absolute inset-0 rounded-lg bg-primary/15 blur-sm -z-10"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1.1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  )}
+                </motion.div>
               ))}
             </motion.ul>
           </nav>
@@ -648,15 +680,21 @@ export const Navigation = () => {
             </motion.div>
           </motion.div>
 
-          {/* Enhanced Mobile Menu Toggle */}
-          <div className="flex md:hidden items-center gap-2">
-            <ThemeToggle />
+          {/* Enhanced Mobile Menu Toggle with better touch targets */}
+          <div className="flex md:hidden items-center gap-2 sm:gap-3">
+            <motion.div
+              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.05 }}
+            >
+              <ThemeToggle />
+            </motion.div>
             <motion.button
               whileTap={{ scale: 0.85, rotate: 90 }}
-              whileHover={{ scale: 1.15, rotate: 5 }}
+              whileHover={{ scale: 1.1, rotate: 5 }}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="relative p-2.5 rounded-xl bg-gradient-to-br from-secondary/80 to-secondary/60 border border-primary/20 hover:border-primary/40 transition-all text-foreground backdrop-blur-sm shadow-lg overflow-hidden"
+              className="relative p-2.5 sm:p-3 rounded-xl bg-gradient-to-br from-secondary/80 to-secondary/60 border border-primary/20 hover:border-primary/40 active:border-primary/60 transition-all text-foreground backdrop-blur-sm shadow-lg overflow-hidden touch-manipulation"
               style={{ transformStyle: "preserve-3d" }}
+              aria-label="Toggle menu"
             >
               <AnimatePresence mode="wait">
                 {isMobileMenuOpen ? (
