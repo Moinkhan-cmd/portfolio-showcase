@@ -258,13 +258,16 @@ export const Navigation = () => {
             aria-hidden="true"
           />
           {/* Menu Panel */}
-          <div className="md:hidden fixed left-0 right-0 z-50 bg-background/95 backdrop-blur-xl border-t border-border/50 shadow-2xl animate-in slide-in-from-top duration-200">
-            <div
-              className={cn(
-                "mx-auto flex flex-col gap-2 transition-all duration-300",
-                isScrolled ? "w-[95%] max-w-6xl px-4 py-4" : "w-full max-w-7xl px-4 py-6"
-              )}
-            >
+          <div
+            className={cn(
+              "md:hidden absolute left-0 right-0 z-50 bg-background/95 backdrop-blur-xl border-t border-border/50 shadow-2xl",
+              "animate-in slide-in-from-top-2 duration-200"
+            )}
+            style={{
+              top: "100%",
+            }}
+          >
+            <div className="mx-auto max-w-7xl px-4 py-6 flex flex-col gap-2">
               {navLinks.map((link) => {
                 const isActive = activeSection === link.href.substring(1);
                 return (
@@ -274,7 +277,7 @@ export const Navigation = () => {
                     className={cn(
                       "w-full text-left px-4 py-3 rounded-xl font-medium transition-all duration-200",
                       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
-                      "touch-manipulation",
+                      "touch-manipulation min-h-[44px]",
                       isActive
                         ? "bg-primary/10 text-primary"
                         : "text-muted-foreground hover:bg-secondary/50 dark:hover:bg-white/5 hover:text-foreground active:bg-secondary/70"
