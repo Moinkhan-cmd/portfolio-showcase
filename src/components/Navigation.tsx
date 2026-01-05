@@ -111,28 +111,37 @@ export const Navigation = () => {
           </div>
         </a>
 
-        <div className="hidden md:flex items-center gap-0.5 lg:gap-1 p-0.5 lg:p-1 rounded-full bg-secondary/50 border border-border/30 backdrop-blur-sm">
+        <div className="hidden md:flex items-center gap-1 lg:gap-1.5 p-1 lg:p-1.5 rounded-full bg-secondary/40 border border-border/20 backdrop-blur-sm">
           {navLinks.map((link) => {
             const isActive = activeSection === link.href.substring(1);
             return (
-              <button
+              <motion.button
                 key={link.name}
                 onClick={() => scrollToSection(link.href)}
                 className={cn(
-                  'relative px-2.5 lg:px-4 py-1.5 lg:py-2 text-xs lg:text-sm font-medium transition-all duration-300 rounded-full whitespace-nowrap',
-                  isActive ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
+                  'relative px-3 lg:px-4 py-1.5 lg:py-2 text-xs lg:text-sm font-medium rounded-full whitespace-nowrap transition-colors duration-200',
+                  isActive 
+                    ? 'text-primary-foreground' 
+                    : 'text-muted-foreground hover:text-foreground'
                 )}
+                whileHover={{ scale: isActive ? 1 : 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 aria-current={isActive ? 'page' : undefined}
               >
+                {/* Active background */}
                 {isActive && (
                   <motion.div
-                    layoutId="activeTab"
-                    className="absolute inset-0 bg-primary rounded-full"
-                    transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                    layoutId="activeNavTab"
+                    className="absolute inset-0 bg-primary rounded-full shadow-lg shadow-primary/25"
+                    transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
                   />
                 )}
+                {/* Hover background - only shows when not active */}
+                {!isActive && (
+                  <span className="absolute inset-0 rounded-full bg-foreground/0 hover:bg-foreground/5 transition-colors duration-200" />
+                )}
                 <span className="relative z-10">{link.name}</span>
-              </button>
+              </motion.button>
             );
           })}
         </div>
