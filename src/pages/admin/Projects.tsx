@@ -87,7 +87,7 @@ export const AdminProjects = () => {
     };
 
     document.addEventListener('wheel', handleWheel, { passive: false, capture: true });
-    
+
     return () => {
       document.removeEventListener('wheel', handleWheel, { capture: true } as any);
     };
@@ -267,7 +267,7 @@ export const AdminProjects = () => {
           </h1>
           <p className="text-muted-foreground mt-2">Manage your portfolio projects</p>
         </div>
-        <Button 
+        <Button
           onClick={() => handleOpenDialog()}
           className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg shadow-primary/20"
         >
@@ -297,7 +297,7 @@ export const AdminProjects = () => {
                     </Badge>
                   </div>
                 )}
-                
+
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-primary" />
@@ -320,16 +320,16 @@ export const AdminProjects = () => {
                         <Folder className="w-10 h-10 text-primary/30" />
                       </div>
                     )}
-                    
+
                     <p className="text-sm text-muted-foreground line-clamp-2">
                       {project.shortDescription}
                     </p>
-                    
+
                     <div className="flex flex-wrap gap-1.5">
                       {project.techStack.slice(0, 3).map((tech) => (
-                        <Badge 
-                          key={tech} 
-                          variant="outline" 
+                        <Badge
+                          key={tech}
+                          variant="outline"
                           className="text-xs border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors"
                         >
                           {tech}
@@ -341,9 +341,9 @@ export const AdminProjects = () => {
                         </Badge>
                       )}
                     </div>
-                    
+
                     <Separator className="bg-primary/10" />
-                    
+
                     <div className="flex gap-2">
                       <Button
                         variant="outline"
@@ -399,12 +399,9 @@ export const AdminProjects = () => {
       {/* Add/Edit Dialog */}
       <Dialog
         open={dialogOpen}
-        onOpenChange={(open) => {
-          if (!open) return;
-          setDialogOpen(open);
-        }}
+        onOpenChange={setDialogOpen}
       >
-        <DialogContent 
+        <DialogContent
           ref={dialogContentRef}
           className="max-w-4xl h-[90vh] p-0 flex flex-col gap-0 overflow-hidden border-primary/20 bg-gradient-to-br from-background via-background to-background/95"
           style={{ overflowY: 'hidden', maxHeight: '90vh', height: '90vh' }}
@@ -427,9 +424,9 @@ export const AdminProjects = () => {
           </DialogHeader>
 
           {/* Scrollable form content */}
-          <div 
+          <div
             ref={scrollableRef}
-            className="flex-1 min-h-0 overflow-y-auto px-6 py-6 focus:outline-none" 
+            className="flex-1 min-h-0 overflow-y-auto px-6 py-6 focus:outline-none"
             style={{ scrollbarWidth: 'thin', scrollbarColor: 'hsl(175 80% 50% / 0.3) transparent' }}
             data-lenis-prevent="true"
             tabIndex={-1}
@@ -728,8 +725,8 @@ export const AdminProjects = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel className="border-primary/20">Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleDelete} 
+            <AlertDialogAction
+              onClick={handleDelete}
               className="bg-gradient-to-r from-destructive to-destructive/80 hover:from-destructive/90 hover:to-destructive/70 shadow-lg shadow-destructive/20"
             >
               Delete Project
