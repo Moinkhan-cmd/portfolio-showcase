@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { Menu, X, ArrowUpRight } from "lucide-react";
+import { Menu, X, ArrowUpRight, Sparkles, Star } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -17,6 +18,7 @@ export const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
+  const [isLogoHovered, setIsLogoHovered] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -162,48 +164,195 @@ export const Navigation = () => {
             : "w-full max-w-7xl px-4 py-2 md:px-8 bg-transparent border-0 shadow-none"
         )}
       >
-        {/* Logo Section */}
-        <a
+        {/* Logo Section with 3D Star Badge */}
+        <motion.a
           href="#"
-          className="flex items-center gap-2 group shrink-0 transition-transform duration-200 hover:scale-105 active:scale-95"
+          className="relative flex items-center gap-2 group shrink-0"
+          onMouseEnter={() => setIsLogoHovered(true)}
+          onMouseLeave={() => setIsLogoHovered(false)}
           onClick={(e) => {
             e.preventDefault();
             window.scrollTo({ top: 0, behavior: "smooth" });
           }}
           aria-label="Go to top"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
-          <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20 group-hover:bg-primary/20 transition-colors">
-            <span className="font-signature font-bold text-xl">M</span>
-          </div>
+          {/* Logo Container with Enhanced Hover */}
+          <motion.div
+            className="relative w-10 h-10 flex items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20 group-hover:bg-primary/20 transition-colors"
+            whileHover={{ rotate: [0, -10, 10, -10, 0], scale: 1.1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <span className="font-signature font-bold text-xl relative z-10">M</span>
+            {/* Glow effect on hover */}
+            <motion.div
+              className="absolute inset-0 rounded-xl bg-primary/30 blur-md -z-10"
+              animate={{ opacity: isLogoHovered ? 0.6 : 0, scale: isLogoHovered ? 1.5 : 1 }}
+              transition={{ duration: 0.3 }}
+            />
+          </motion.div>
+
+          {/* Logo Text */}
           <span
             className={cn(
-              "font-display font-bold text-lg tracking-tight transition-opacity duration-300",
+              "font-display font-bold text-lg tracking-tight transition-opacity duration-300 relative",
               isScrolled ? "hidden sm:block opacity-100" : "block opacity-100"
             )}
           >
             Moin<span className="text-primary">.dev</span>
+            {/* Underline animation on hover */}
+            <motion.div
+              className="absolute bottom-0 left-0 h-0.5 bg-primary"
+              initial={{ width: 0 }}
+              animate={{ width: isLogoHovered ? "100%" : 0 }}
+              transition={{ duration: 0.3 }}
+            />
           </span>
-        </a>
 
-        {/* Desktop Navigation */}
+          {/* 3D Star Badge - Appears on Hover */}
+          <AnimatePresence>
+            {isLogoHovered && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0, rotate: -180, x: -20, y: -20 }}
+                animate={{ 
+                  opacity: 1, 
+                  scale: 1, 
+                  rotate: 0,
+                  x: 0,
+                  y: 0,
+                }}
+                exit={{ opacity: 0, scale: 0, rotate: 180 }}
+                transition={{ 
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 20,
+                  duration: 0.4
+                }}
+                className="absolute -top-2 -right-2 z-50"
+                style={{ transformStyle: "preserve-3d" }}
+              >
+                {/* Star Badge Container */}
+                <motion.div
+                  className="relative"
+                  animate={{ 
+                    rotateY: [0, 360],
+                    rotateX: [0, 15, -15, 0],
+                  }}
+                  transition={{ 
+                    rotateY: { duration: 3, repeat: Infinity, ease: "linear" },
+                    rotateX: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+                  }}
+                  style={{ transformStyle: "preserve-3d" }}
+                >
+                  {/* Star Icon */}
+                  <div className="relative w-8 h-8 flex items-center justify-center">
+                    <Star className="w-6 h-6 text-primary fill-primary drop-shadow-[0_0_12px_hsl(175_80%_50%)]" />
+                    {/* Glowing rings */}
+                    <motion.div
+                      className="absolute inset-0 rounded-full border-2 border-primary/50"
+                      animate={{ 
+                        scale: [1, 1.5, 1],
+                        opacity: [0.5, 0, 0.5]
+                      }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                    <motion.div
+                      className="absolute inset-0 rounded-full border border-primary/30"
+                      animate={{ 
+                        scale: [1, 1.8, 1],
+                        opacity: [0.3, 0, 0.3]
+                      }}
+                      transition={{ duration: 2.5, repeat: Infinity, delay: 0.3 }}
+                    />
+                    {/* Sparkle particles */}
+                    {[...Array(4)].map((_, i) => (
+                      <motion.div
+                        key={i}
+                        className="absolute w-1 h-1 bg-primary rounded-full"
+                        style={{
+                          top: "50%",
+                          left: "50%",
+                        }}
+                        animate={{
+                          x: [0, Math.cos((i * Math.PI) / 2) * 20],
+                          y: [0, Math.sin((i * Math.PI) / 2) * 20],
+                          opacity: [0, 1, 0],
+                          scale: [0, 1, 0],
+                        }}
+                        transition={{
+                          duration: 1.5,
+                          repeat: Infinity,
+                          delay: i * 0.2,
+                        }}
+                      />
+                    ))}
+                  </div>
+                  {/* Badge background glow */}
+                  <motion.div
+                    className="absolute inset-0 bg-primary/20 rounded-full blur-xl -z-10"
+                    animate={{ 
+                      scale: [1, 1.3, 1],
+                      opacity: [0.4, 0.6, 0.4]
+                    }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.a>
+
+        {/* Desktop Navigation with Enhanced Hover Effects */}
         <div className="hidden md:flex items-center gap-1">
           {navLinks.map((link) => {
             const isActive = activeSection === link.href.substring(1);
             return (
-              <button
+              <motion.button
                 key={link.name}
                 onClick={() => scrollToSection(link.href)}
                 className={cn(
-                  "relative px-4 py-2 text-sm font-medium transition-all duration-200 rounded-full",
+                  "relative px-4 py-2 text-sm font-medium transition-all duration-200 rounded-full overflow-hidden group/nav",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                   isActive
                     ? "text-primary bg-primary/10"
                     : "text-muted-foreground hover:text-foreground hover:bg-secondary/50 dark:hover:bg-white/5"
                 )}
                 aria-current={isActive ? "page" : undefined}
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
               >
-                {link.name}
-              </button>
+                {/* Shimmer effect on hover */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/nav:translate-x-full"
+                  transition={{ duration: 0.6, ease: "easeInOut" }}
+                />
+                
+                {/* Active indicator glow */}
+                {isActive && (
+                  <motion.div
+                    className="absolute inset-0 bg-primary/20 rounded-full blur-md -z-10"
+                    animate={{ opacity: [0.3, 0.6, 0.3] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
+                )}
+                
+                {/* Text with glow on hover */}
+                <span className="relative z-10">
+                  {link.name}
+                </span>
+                
+                {/* Bottom border animation */}
+                <motion.div
+                  className="absolute bottom-0 left-1/2 h-0.5 bg-primary rounded-full"
+                  initial={{ width: 0, x: "-50%" }}
+                  animate={{ 
+                    width: isActive ? "80%" : "0%",
+                    x: "-50%"
+                  }}
+                  transition={{ duration: 0.3 }}
+                />
+              </motion.button>
             );
           })}
         </div>
@@ -214,37 +363,86 @@ export const Navigation = () => {
             <ThemeToggle />
           </div>
 
-          <Button
-            variant="hero"
-            size={isScrolled ? "sm" : "default"}
-            onClick={() => scrollToSection("#contact")}
-            className={cn(
-              "rounded-full font-semibold shadow-md transition-all duration-200 gap-2",
-              "hover:scale-105 active:scale-95",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
-              isScrolled ? "px-5" : "px-6"
-            )}
-            aria-label="Let's Talk - Contact me"
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
-            <span className="flex items-center gap-2">
-              Let's Talk
-              <ArrowUpRight className="w-4 h-4" />
-            </span>
-          </Button>
+            <Button
+              variant="hero"
+              size={isScrolled ? "sm" : "default"}
+              onClick={() => scrollToSection("#contact")}
+              className={cn(
+                "rounded-full font-semibold shadow-md transition-all duration-200 gap-2 relative overflow-hidden group/cta",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+                isScrolled ? "px-5" : "px-6"
+              )}
+              aria-label="Let's Talk - Contact me"
+            >
+              {/* Animated gradient shimmer */}
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                animate={{ x: ["-100%", "200%"] }}
+                transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
+              />
+              
+              {/* Glow effect on hover */}
+              <motion.div
+                className="absolute inset-0 bg-primary/40 rounded-full blur-xl opacity-0 group-hover/cta:opacity-100 -z-10"
+                transition={{ duration: 0.3 }}
+              />
+              
+              <span className="relative z-10 flex items-center gap-2">
+                Let's Talk
+                <motion.span
+                  animate={{ x: [0, 4, 0], y: [0, -4, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <ArrowUpRight className="w-4 h-4" />
+                </motion.span>
+              </span>
+            </Button>
+          </motion.div>
 
-          {/* Mobile Menu Toggle */}
-          <button
-            className="md:hidden p-2 text-foreground hover:bg-secondary/50 dark:hover:bg-white/5 rounded-lg transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center"
+          {/* Mobile Menu Toggle with Enhanced Hover */}
+          <motion.button
+            className="md:hidden p-2 text-foreground hover:bg-secondary/50 dark:hover:bg-white/5 rounded-lg transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center relative overflow-hidden group/menu"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle menu"
             aria-expanded={isMobileMenuOpen}
+            whileHover={{ scale: 1.1, rotate: 5 }}
+            whileTap={{ scale: 0.9 }}
           >
-            {isMobileMenuOpen ? (
-              <X className="w-6 h-6" aria-hidden="true" />
-            ) : (
-              <Menu className="w-6 h-6" aria-hidden="true" />
-            )}
-          </button>
+            {/* Ripple effect on hover */}
+            <motion.div
+              className="absolute inset-0 bg-primary/20 rounded-lg"
+              initial={{ scale: 0, opacity: 0 }}
+              whileHover={{ scale: 1.5, opacity: [0, 0.5, 0] }}
+              transition={{ duration: 0.6 }}
+            />
+            <AnimatePresence mode="wait">
+              {isMobileMenuOpen ? (
+                <motion.div
+                  key="close"
+                  initial={{ rotate: -90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 90, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <X className="w-6 h-6 relative z-10" aria-hidden="true" />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="menu"
+                  initial={{ rotate: 90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: -90, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Menu className="w-6 h-6 relative z-10" aria-hidden="true" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.button>
         </div>
       </div>
 
