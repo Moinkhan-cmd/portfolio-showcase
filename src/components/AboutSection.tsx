@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
+import { AboutBackground3D } from "./AboutBackground3D";
 
 const techStack = [
   "HTML",
@@ -22,7 +24,10 @@ export const AboutSection = () => {
           setIsVisible(true);
         }
       },
-      { threshold: 0.2 }
+      { 
+        threshold: 0.2,
+        rootMargin: '50px'
+      }
     );
 
     if (sectionRef.current) {
@@ -36,68 +41,124 @@ export const AboutSection = () => {
     <section 
       id="about" 
       ref={sectionRef}
-      className="section-padding relative"
+      className="section-padding relative overflow-hidden min-h-screen"
     >
-      <div className="container mx-auto container-padding">
+      <AboutBackground3D />
+      
+      {/* Enhanced dark overlay for better text contrast with gradient - lighter to show 3D */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/65 to-background/50 pointer-events-none z-10" />
+      
+      {/* Additional radial gradient overlay for center focus - lighter */}
+      <div className="absolute inset-0 pointer-events-none z-10" 
+           style={{
+             background: 'radial-gradient(ellipse at center, transparent 0%, hsl(222 47% 6% / 0.2) 50%, hsl(222 47% 6% / 0.5) 100%)'
+           }} 
+      />
+      
+      <div className="container mx-auto container-padding relative z-20">
         <div className="max-w-4xl mx-auto">
           {/* Section Header */}
-          <div className={`text-center mb-16 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}>
-            <span className="text-primary text-sm font-medium uppercase tracking-wider">About Me</span>
-            <h2 className="font-display text-4xl md:text-5xl font-bold mt-4">
+          <motion.div 
+            initial={{ opacity: 0, y: -30 }}
+            animate={isVisible ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-10 sm:mb-16 relative z-20"
+          >
+            <span className="text-primary text-sm font-medium uppercase tracking-wider drop-shadow-sm">About Me</span>
+            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold mt-3 sm:mt-4 text-foreground drop-shadow-md">
               Get to Know <span className="gradient-text">Me</span>
             </h2>
-          </div>
+          </motion.div>
 
           {/* Content */}
-          <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 items-center">
             {/* Image/Avatar Placeholder */}
-            <div 
-              className={`${isVisible ? 'animate-slide-up' : 'opacity-0'}`}
-              style={{ animationDelay: '0.2s' }}
+            <motion.div 
+              initial={{ opacity: 0, x: -50 }}
+              animate={isVisible ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <div className="relative">
-                <div className="aspect-square rounded-2xl glass-card overflow-hidden">
-                  <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-                    <span className="text-6xl">👨‍💻</span>
-                  </div>
+              <motion.div 
+                className="relative"
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="aspect-square rounded-2xl glass-enhanced overflow-hidden card-hover">
+                  <motion.div 
+                    className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center"
+                    animate={{ 
+                      background: [
+                        "linear-gradient(135deg, hsl(175 80% 50% / 0.2) 0%, hsl(175 80% 50% / 0.05) 100%)",
+                        "linear-gradient(135deg, hsl(200 90% 60% / 0.2) 0%, hsl(175 80% 50% / 0.05) 100%)",
+                        "linear-gradient(135deg, hsl(175 80% 50% / 0.2) 0%, hsl(175 80% 50% / 0.05) 100%)"
+                      ]
+                    }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <motion.span 
+                      className="text-6xl"
+                      animate={{ rotate: [0, 10, -10, 0] }}
+                      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      👨‍💻
+                    </motion.span>
+                  </motion.div>
                 </div>
                 {/* Decorative elements */}
-                <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl" />
-                <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-primary/10 rounded-full blur-2xl" />
-              </div>
-            </div>
+                <motion.div 
+                  className="absolute -top-4 -right-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl"
+                  animate={{ 
+                    scale: [1, 1.2, 1],
+                    opacity: [0.3, 0.5, 0.3]
+                  }}
+                  transition={{ duration: 3, repeat: Infinity }}
+                />
+                <motion.div 
+                  className="absolute -bottom-4 -left-4 w-32 h-32 bg-primary/10 rounded-full blur-2xl"
+                  animate={{ 
+                    scale: [1, 1.3, 1],
+                    opacity: [0.2, 0.4, 0.2]
+                  }}
+                  transition={{ duration: 4, repeat: Infinity }}
+                />
+              </motion.div>
+            </motion.div>
 
             {/* Text Content */}
-            <div 
-              className={`${isVisible ? 'animate-slide-up' : 'opacity-0'}`}
-              style={{ animationDelay: '0.3s' }}
+            <motion.div 
+              initial={{ opacity: 0, x: 50 }}
+              animate={isVisible ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="relative z-20"
             >
-              <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-                Write a short introduction about yourself here. Mention your background, 
-                interests, and what kind of roles you are looking for.
+              <p className="text-base sm:text-lg text-foreground leading-relaxed mb-4 sm:mb-6 font-medium drop-shadow-sm">
+               I'm a passionate front-end web developer with a strong interest in building seamless digital experiences that blend modern design with clean, efficient 
+               code. I enjoy turning ideas into responsive, user-friendly interfaces using HTML, CSS, JavaScript, React and modern tools.
               </p>
-              <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-                I'm passionate about creating seamless digital experiences that combine 
-                beautiful design with clean, efficient code. Currently exploring 
-                opportunities where I can grow and contribute to meaningful projects.
+              <p className="text-base sm:text-lg text-foreground leading-relaxed mb-6 sm:mb-8 font-medium drop-shadow-sm">
+                I'm continuously learning and improving my skills while working on real-world projects that focus on performance, accessibility, and visual appeal. Currently, I'm looking for opportunities
+                 where I can grow as a developer, collaborate with creative teams, and contribute to meaningful, impactful products.
               </p>
 
               {/* Tech Stack */}
               <div>
-                <h3 className="font-display text-lg font-semibold mb-4">Tech Stack</h3>
-                <div className="flex flex-wrap gap-3">
+                <h3 className="font-display text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-foreground drop-shadow-sm">Tech Stack</h3>
+                <div className="flex flex-wrap gap-2 sm:gap-3">
                   {techStack.map((tech, index) => (
-                    <span
+                    <motion.span
                       key={tech}
-                      className="px-4 py-2 glass-card rounded-full text-sm font-medium hover:bg-primary/20 transition-all duration-300 cursor-default"
-                      style={{ animationDelay: `${0.4 + index * 0.05}s` }}
+                      initial={{ opacity: 0, scale: 0 }}
+                      animate={isVisible ? { opacity: 1, scale: 1 } : {}}
+                      transition={{ duration: 0.4, delay: 0.4 + index * 0.05, type: "spring" }}
+                      whileHover={{ scale: 1.1, y: -3 }}
+                      className="px-3 py-1.5 sm:px-4 sm:py-2 glass-card rounded-full text-xs sm:text-sm font-medium hover:bg-primary/20 transition-all duration-300 cursor-default magnetic-hover"
                     >
                       {tech}
-                    </span>
+                    </motion.span>
                   ))}
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>
