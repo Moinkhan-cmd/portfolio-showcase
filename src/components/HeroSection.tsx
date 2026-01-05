@@ -111,9 +111,9 @@ export const HeroSection = () => {
         }}
       />
 
-      {/* Main Content Container */}
-      <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-20 lg:py-32">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+      {/* Main Content Container - Enhanced Responsive */}
+      <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 py-12 sm:py-16 md:py-20 lg:py-24 xl:py-32">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 md:gap-12 lg:gap-16 items-center">
           
           {/* Left Column - Enhanced Typography */}
           <motion.div
@@ -137,14 +137,14 @@ export const HeroSection = () => {
               <span className="text-sm font-semibold text-foreground">Available for opportunities</span>
             </motion.div>
 
-            {/* Main Heading - Enhanced Typography */}
+            {/* Main Heading - Enhanced Typography - Responsive */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.4, duration: 0.8 }}
-              className="space-y-4"
+              className="space-y-3 sm:space-y-4"
             >
-              <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold leading-[0.95] tracking-tight">
+              <h1 className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold leading-[0.95] sm:leading-[0.9] tracking-tight">
                 <motion.span 
                   className="block text-foreground"
                   initial={{ opacity: 0, x: -20 }}

@@ -962,7 +962,7 @@ export const Navigation = () => {
                     whileTap={{ scale: 0.95 }}
                   >
                     <span className="relative z-10 flex items-center justify-center gap-2">
-                      Hire Me
+                      <span className="text-sm sm:text-base">Hire Me</span>
                       <motion.div
                         animate={{
                           rotate: [0, 360],
@@ -973,7 +973,7 @@ export const Navigation = () => {
                           ease: "linear",
                         }}
                       >
-                        <Rocket className="w-5 h-5" />
+                        <Rocket className="w-4 h-4 sm:w-5 sm:h-5" />
                       </motion.div>
                     </span>
                     
@@ -1007,7 +1007,7 @@ export const Navigation = () => {
                 </motion.div>
 
                 <motion.div
-                  className="flex justify-center gap-6 text-muted-foreground"
+                  className="flex justify-center gap-4 sm:gap-6 text-muted-foreground"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.5 }}
@@ -1020,14 +1020,14 @@ export const Navigation = () => {
                     <motion.a
                       key={i}
                       href={social.href}
-                      className={`p-3 rounded-xl bg-secondary/60 border-2 border-primary/20 hover:border-primary/50 hover:bg-primary/15 transition-all ${social.color} relative overflow-hidden group`}
+                      className={`p-2.5 sm:p-3 rounded-xl bg-secondary/60 border-2 border-primary/20 hover:border-primary/50 hover:bg-primary/15 active:bg-primary/20 transition-all ${social.color} relative overflow-hidden group touch-manipulation min-w-[2.75rem] min-h-[2.75rem] sm:min-w-[3rem] sm:min-h-[3rem] flex items-center justify-center`}
                       whileHover={{ scale: 1.2, rotate: 10, y: -4 }}
-                      whileTap={{ scale: 0.9 }}
+                      whileTap={{ scale: 0.85 }}
                       initial={{ opacity: 0, scale: 0, rotate: -180 }}
                       animate={{ opacity: 1, scale: 1, rotate: 0 }}
                       transition={{ delay: 0.6 + i * 0.1, type: "spring", stiffness: 200 }}
                     >
-                      <social.icon className="w-5 h-5 relative z-10 transition-colors" />
+                      <social.icon className="w-5 h-5 sm:w-6 sm:h-6 relative z-10 transition-colors" />
                       
                       {/* Hover glow */}
                       <motion.div
