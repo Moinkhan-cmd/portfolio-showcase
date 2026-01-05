@@ -705,7 +705,7 @@ export const Navigation = () => {
                     exit={{ rotate: 180, scale: 0, opacity: 0 }}
                     transition={{ duration: 0.3, type: "spring" }}
                   >
-                    <X className="w-5 h-5 relative z-10" />
+                    <X className="w-5 h-5 sm:w-6 sm:h-6 relative z-10" />
                   </motion.div>
                 ) : (
                   <motion.div
@@ -715,7 +715,7 @@ export const Navigation = () => {
                     exit={{ rotate: -180, scale: 0, opacity: 0 }}
                     transition={{ duration: 0.3, type: "spring" }}
                   >
-                    <Menu className="w-5 h-5 relative z-10" />
+                    <Menu className="w-5 h-5 sm:w-6 sm:h-6 relative z-10" />
                   </motion.div>
                 )}
               </AnimatePresence>
