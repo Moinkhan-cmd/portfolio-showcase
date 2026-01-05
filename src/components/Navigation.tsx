@@ -847,8 +847,8 @@ export const Navigation = () => {
                 </motion.div>
               </div>
 
-              {/* Enhanced Navigation Links */}
-              <div className="flex-1 flex flex-col gap-2 relative z-10 overflow-y-auto">
+              {/* Enhanced Navigation Links - Better touch targets */}
+              <div className="flex-1 flex flex-col gap-2 sm:gap-3 relative z-10 overflow-y-auto -mx-4 sm:-mx-6 px-4 sm:px-6">
                 {navLinks.map((link, i) => (
                   <motion.a
                     key={link.name}
@@ -865,14 +865,14 @@ export const Navigation = () => {
                       scrollToSection(link.href);
                     }}
                     whileHover={{ x: 8, scale: 1.03, rotateY: 5 }}
-                    whileTap={{ scale: 0.97 }}
+                    whileTap={{ scale: 0.95, x: 4 }}
                     onHoverStart={() => setHoveredLink(link.name)}
                     onHoverEnd={() => setHoveredLink(null)}
                     className={cn(
-                      "flex items-center justify-between p-4 rounded-xl text-lg font-medium transition-all group relative overflow-hidden",
+                      "flex items-center justify-between p-3.5 sm:p-4 rounded-xl text-base sm:text-lg font-medium transition-all group relative overflow-hidden touch-manipulation min-h-[3.5rem] sm:min-h-[4rem]",
                       activeSection === link.href.substring(1)
                         ? "bg-gradient-to-r from-primary/25 to-primary/15 text-primary border-2 border-primary/40 shadow-xl shadow-primary/20"
-                        : "text-muted-foreground hover:text-foreground hover:bg-secondary/60 border-2 border-transparent hover:border-primary/30"
+                        : "text-muted-foreground hover:text-foreground hover:bg-secondary/60 border-2 border-transparent hover:border-primary/30 active:bg-secondary/40"
                     )}
                     style={{ transformStyle: "preserve-3d" }}
                   >
@@ -886,9 +886,9 @@ export const Navigation = () => {
                       className="absolute inset-0 bg-primary/10 blur-xl opacity-0 group-hover:opacity-100 transition-opacity"
                     />
 
-                    <span className="relative z-10 flex items-center gap-3">
-                      <span className="text-2xl">{link.icon}</span>
-                      <span>{link.name}</span>
+                    <span className="relative z-10 flex items-center gap-2.5 sm:gap-3">
+                      <span className="text-xl sm:text-2xl">{link.icon}</span>
+                      <span className="text-sm sm:text-base">{link.name}</span>
                     </span>
                     
                     {activeSection === link.href.substring(1) && (
@@ -948,18 +948,18 @@ export const Navigation = () => {
                 ))}
               </div>
 
-              {/* Enhanced Footer Actions */}
-              <div className="mt-8 pt-8 border-t border-primary/30 relative z-10">
+              {/* Enhanced Footer Actions - Responsive */}
+              <div className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-primary/30 relative z-10">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
                 >
                   <Button
-                    className="w-full rounded-xl py-6 text-lg font-semibold bg-gradient-to-r from-primary via-primary/90 to-primary hover:from-primary/90 hover:via-primary hover:to-primary/90 shadow-xl shadow-primary/30 mb-6 relative overflow-hidden group"
+                    className="w-full rounded-xl py-5 sm:py-6 text-base sm:text-lg font-semibold bg-gradient-to-r from-primary via-primary/90 to-primary hover:from-primary/90 hover:via-primary hover:to-primary/90 shadow-xl shadow-primary/30 mb-4 sm:mb-6 relative overflow-hidden group touch-manipulation"
                     onClick={() => scrollToSection("#contact")}
                     whileHover={{ scale: 1.02, y: -2 }}
-                    whileTap={{ scale: 0.98 }}
+                    whileTap={{ scale: 0.95 }}
                   >
                     <span className="relative z-10 flex items-center justify-center gap-2">
                       Hire Me
