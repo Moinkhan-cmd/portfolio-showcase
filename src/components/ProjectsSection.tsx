@@ -428,25 +428,6 @@ export const ProjectsSection = () => {
           >
             A curated selection of projects showcasing modern web development and design expertise
           </motion.p>
-
-          {/* Stats */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex items-center justify-center gap-8 mt-8"
-          >
-            <div className="text-center">
-              <p className="text-2xl sm:text-3xl font-bold text-primary">{projects.length}</p>
-              <p className="text-xs sm:text-sm text-muted-foreground mt-1">Total Projects</p>
-            </div>
-            <div className="w-px h-8 bg-border" />
-            <div className="text-center">
-              <p className="text-2xl sm:text-3xl font-bold text-primary">{featuredProjects.length}</p>
-              <p className="text-xs sm:text-sm text-muted-foreground mt-1">Featured</p>
-            </div>
-          </motion.div>
         </motion.div>
 
         {/* Projects Grid */}
