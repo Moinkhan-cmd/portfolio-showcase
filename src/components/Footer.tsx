@@ -41,7 +41,7 @@ export const Footer = () => {
           {/* Left Column - Personal Info & Bio */}
           <div className="flex flex-col gap-4">
             <motion.button
-              onClick={scrollToTop}
+              onClick={() => scrollToTop()}
               className="text-2xl sm:text-3xl font-display font-bold text-primary text-left hover:opacity-80 transition-opacity"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -153,7 +153,7 @@ export const Footer = () => {
               </motion.a>
               <span className="hidden sm:inline text-primary/40">•</span>
               <motion.button
-                onClick={scrollToTop}
+                onClick={() => scrollToTop()}
                 className="flex items-center gap-1 hover:text-primary transition-colors duration-300"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}

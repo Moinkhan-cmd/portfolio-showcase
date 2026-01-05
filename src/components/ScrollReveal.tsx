@@ -63,15 +63,19 @@ export const ScrollReveal = ({
   const isInView = useInView(ref, { once, amount: threshold });
 
   // Enhanced variant with custom distance
-  const customVariants = {
-    ...variants[variant],
-    hidden: {
-      ...variants[variant].hidden,
-      ...(variant.includes("fade") && {
-        y: variant === "fadeUp" ? distance : variant === "fadeDown" ? -distance : variants[variant].hidden.y,
-        x: variant === "fadeLeft" ? -distance : variant === "fadeRight" ? distance : variants[variant].hidden.x,
-      }),
-    },
+  const baseHidden = variants[variant].hidden as Record<string, number | string>;
+  const getCustomHidden = () => {
+    const base = { ...baseHidden };
+    if (variant === "fadeUp") base.y = distance;
+    else if (variant === "fadeDown") base.y = -distance;
+    else if (variant === "fadeLeft") base.x = -distance;
+    else if (variant === "fadeRight") base.x = distance;
+    return base;
+  };
+  
+  const customVariants: Variants = {
+    hidden: getCustomHidden(),
+    visible: variants[variant].visible,
   };
 
   return (
