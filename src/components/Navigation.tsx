@@ -25,9 +25,9 @@ export const Navigation = () => {
   // Progressive scroll-based transforms
   const scrollProgress = useTransform(scrollY, [0, 500], [0, 1]);
   
-  // Height transitions with different breakpoints
+  // Height transitions - Minimal reduction to maintain good layout
   const height = useSpring(
-    useTransform(scrollY, [0, 50, 100], [88, 72, 64]),
+    useTransform(scrollY, [0, 50, 100], [88, 84, 80]),
     { stiffness: 150, damping: 25 }
   );
   
@@ -41,22 +41,11 @@ export const Navigation = () => {
   const borderOpacity = useTransform(scrollY, [0, 30, 150, 300], [0, 0.4, 0.6, 0.8]);
   const borderWidth = useTransform(scrollY, [0, 50, 150], [0, 1.5, 2]);
   
-  // 3D rotation based on scroll - More noticeable
-  const rotateX = useTransform(scrollY, [0, 300, 600], [0, -3, -5]);
-  const scale = useTransform(scrollY, [0, 50, 150], [1, 0.97, 0.95]);
-  
   // Shadow intensity increases with scroll - More dramatic
   const shadowIntensity = useTransform(scrollY, [0, 50, 200, 400], [0, 0.3, 0.5, 0.7]);
-  
-  // Logo scale on scroll - More visible
-  const logoScale = useTransform(scrollY, [0, 50, 150], [1, 0.88, 0.85]);
 
   // Glow intensity based on scroll - More visible
   const glowIntensity = useTransform(scrollY, [0, 100, 300, 500], [0, 0.4, 0.7, 0.9]);
-  
-  // Additional effects
-  const navScale = useTransform(scrollY, [0, 100], [1, 0.98]);
-  const navY = useTransform(scrollY, [0, 50], [0, -2]);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setIsScrolled(latest > 20);
@@ -103,19 +92,15 @@ export const Navigation = () => {
         className="fixed top-0 left-0 right-0 z-[100] w-full"
         style={{
           height,
-          y: navY,
           backgroundColor: useTransform(bgOpacity, (v) => `hsl(var(--background) / ${v})`),
           backdropFilter: useTransform(blurAmount, (v) => `blur(${v}px) saturate(200%)`),
           borderBottomWidth: borderWidth,
           borderBottomStyle: "solid",
           borderBottomColor: useTransform(borderOpacity, (v) => `hsl(175 80% 50% / ${v})`),
-          rotateX,
-          scale: navScale,
           boxShadow: useTransform(
             shadowIntensity,
             (v) => `0 15px 60px -10px hsl(175 80% 50% / ${v * 1.2}), 0 8px 30px -5px hsl(0 0% 0% / ${v * 0.8}), inset 0 1px 0 hsl(175 80% 50% / ${v * 0.3}), 0 0 40px -10px hsl(175 80% 50% / ${v * 0.4})`
           ),
-          transformStyle: "preserve-3d",
         }}
       >
         {/* Multi-layer animated gradient backgrounds - More visible */}
@@ -332,7 +317,6 @@ export const Navigation = () => {
             transition={{ duration: 0.6, type: "spring" }}
             whileHover={{ scale: 1.05, x: 2 }}
             whileTap={{ scale: 0.95 }}
-            style={{ scale: logoScale }}
           >
             {/* Enhanced 3D Logo Container - Responsive */}
             <motion.div
@@ -585,20 +569,10 @@ export const Navigation = () => {
               className="relative"
               onHoverStart={() => setHoveredLink("contact")}
               onHoverEnd={() => setHoveredLink(null)}
-              style={{
-                scale: useTransform(scrollY, [0, 100], [1, 0.98]),
-              }}
             >
               <Button
                 onClick={() => scrollToSection("#contact")}
                 className="relative overflow-hidden rounded-full px-5 lg:px-6 group bg-gradient-to-r from-primary via-primary/90 to-primary hover:from-primary/90 hover:via-primary hover:to-primary/90 text-primary-foreground font-semibold shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 transition-all border-2 border-primary/30"
-                style={{
-                  boxShadow: useTransform(
-                    scrollY,
-                    [50, 200],
-                    ["0 4px 20px -5px hsl(175 80% 50% / 0.3)", "0 8px 30px -5px hsl(175 80% 50% / 0.5)"]
-                  ),
-                }}
               >
                 <span className="relative z-10 flex items-center gap-2">
                   <span className="hidden lg:inline">Let's Talk</span>

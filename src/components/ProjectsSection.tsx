@@ -187,29 +187,29 @@ const ProjectCard = ({ project, index, isFeatured = false }: ProjectCardProps) =
           </motion.div>
         </div>
 
-        {/* Project Content */}
-        <div className="p-5 sm:p-6 relative z-10 flex flex-col h-full min-h-0">
-          {/* Title */}
-          <div className="flex items-start justify-between gap-3 mb-3">
-            <div className="flex items-center gap-2.5 min-w-0 flex-1">
+        {/* Project Content - Responsive */}
+        <div className="p-4 sm:p-5 md:p-6 relative z-10 flex flex-col h-full min-h-0">
+          {/* Title - Responsive */}
+          <div className="flex items-start justify-between gap-2 sm:gap-3 mb-2 sm:mb-3">
+            <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
               <motion.div
-                className="p-1.5 rounded-lg bg-primary/10 shrink-0"
+                className="p-1 sm:p-1.5 rounded-lg bg-primary/10 shrink-0"
                 animate={{ 
                   scale: isHovered ? 1.1 : 1,
                 }}
                 transition={{ duration: 0.3 }}
               >
-                <Code className="w-4 h-4 text-primary" />
+                <Code className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
               </motion.div>
-              <h3 className="font-display text-lg sm:text-xl font-semibold text-foreground truncate">
+              <h3 className="font-display text-base sm:text-lg md:text-xl font-semibold text-foreground truncate">
                 {project.title}
               </h3>
             </div>
           </div>
 
-          {/* Description */}
+          {/* Description - Responsive */}
           <motion.div 
-            className="mb-4 leading-relaxed min-h-[2.5rem]"
+            className="mb-3 sm:mb-4 leading-relaxed min-h-[2.5rem] sm:min-h-[3rem]"
             animate={{
               color: isHovered ? "hsl(var(--foreground) / 0.9)" : "hsl(var(--muted-foreground))",
             }}
@@ -223,7 +223,7 @@ const ProjectCard = ({ project, index, isFeatured = false }: ProjectCardProps) =
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -5 }}
                   transition={{ duration: 0.3 }}
-                  className="text-sm"
+                  className="text-xs sm:text-sm leading-relaxed"
                 >
                   {project.fullDescription}
                 </motion.p>
@@ -234,7 +234,7 @@ const ProjectCard = ({ project, index, isFeatured = false }: ProjectCardProps) =
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -5 }}
                   transition={{ duration: 0.3 }}
-                  className="text-sm line-clamp-2"
+                  className="text-xs sm:text-sm line-clamp-2 sm:line-clamp-3"
                 >
                   {project.shortDescription}
                 </motion.p>
@@ -293,8 +293,8 @@ const ProjectCard = ({ project, index, isFeatured = false }: ProjectCardProps) =
             )}
           </AnimatePresence>
 
-          {/* Tech Stack */}
-          <div className="flex flex-wrap gap-2 mb-4 min-h-[1.75rem]">
+          {/* Tech Stack - Responsive */}
+          <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-3 sm:mb-4 min-h-[1.75rem] sm:min-h-[2rem]">
             <AnimatePresence mode="popLayout">
               {(isHovered ? project.techStack : project.techStack.slice(0, isFeatured ? 5 : 4)).map((tech, techIndex) => (
                 <motion.span
@@ -306,7 +306,8 @@ const ProjectCard = ({ project, index, isFeatured = false }: ProjectCardProps) =
                     delay: isHovered ? techIndex * 0.02 : index * 0.05 + techIndex * 0.02,
                   }}
                   whileHover={{ scale: 1.05, y: -2 }}
-                  className="text-xs px-2.5 py-1 bg-primary/10 border border-primary/20 rounded-full text-primary/90 font-medium hover:bg-primary/15 hover:border-primary/30 transition-colors"
+                  whileTap={{ scale: 0.95 }}
+                  className="text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 sm:py-1 bg-primary/10 border border-primary/20 rounded-full text-primary/90 font-medium hover:bg-primary/15 hover:border-primary/30 active:bg-primary/20 transition-colors touch-manipulation"
                 >
                   {tech}
                 </motion.span>
@@ -316,17 +317,17 @@ const ProjectCard = ({ project, index, isFeatured = false }: ProjectCardProps) =
               <motion.span 
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="text-xs px-2.5 py-1 bg-muted/50 border border-border rounded-full text-muted-foreground font-medium"
+                className="text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 sm:py-1 bg-muted/50 border border-border rounded-full text-muted-foreground font-medium"
               >
                 +{project.techStack.length - (isFeatured ? 5 : 4)}
               </motion.span>
             )}
           </div>
 
-          {/* Skills (optional) */}
+          {/* Skills (optional) - Responsive */}
           {Array.isArray(project.skills) && project.skills.length > 0 && (
             <motion.div 
-              className="flex flex-wrap gap-1.5 mb-4"
+              className="flex flex-wrap gap-1 sm:gap-1.5 mb-3 sm:mb-4"
               animate={{
                 minHeight: isHovered ? "auto" : "1.5rem",
               }}
@@ -346,7 +347,7 @@ const ProjectCard = ({ project, index, isFeatured = false }: ProjectCardProps) =
                   >
                     <Badge 
                       variant="secondary" 
-                      className="text-[11px] bg-secondary/40 hover:bg-secondary/60 transition-colors"
+                      className="text-[10px] sm:text-[11px] bg-secondary/40 hover:bg-secondary/60 active:bg-secondary/50 transition-colors touch-manipulation"
                     >
                       {skill}
                     </Badge>
@@ -358,7 +359,7 @@ const ProjectCard = ({ project, index, isFeatured = false }: ProjectCardProps) =
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                 >
-                  <Badge variant="secondary" className="text-[11px] bg-secondary/30">
+                  <Badge variant="secondary" className="text-[10px] sm:text-[11px] bg-secondary/30">
                     +{project.skills.length - 4}
                   </Badge>
                 </motion.div>
@@ -369,29 +370,29 @@ const ProjectCard = ({ project, index, isFeatured = false }: ProjectCardProps) =
           {/* Spacer to push buttons to bottom */}
           <div className="flex-grow" />
 
-          {/* Action Buttons - Always at bottom */}
-          <div className="flex gap-2.5 mt-auto pt-2">
+          {/* Action Buttons - Always at bottom - Responsive */}
+          <div className="flex gap-2 sm:gap-2.5 mt-auto pt-2">
             {project.liveUrl && (
               <motion.div 
                 className="flex-1" 
                 whileHover={{ scale: 1.02 }} 
-                whileTap={{ scale: 0.98 }}
+                whileTap={{ scale: 0.95 }}
               >
                 <Button
                   variant="hero"
                   size="sm"
                   asChild
-                  className="w-full text-sm font-medium shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30"
+                  className="w-full text-xs sm:text-sm font-medium shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 touch-manipulation py-2 sm:py-2.5"
                 >
                   <a
                     href={project.liveUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2"
+                    className="flex items-center justify-center gap-1.5 sm:gap-2"
                   >
-                    <Zap className="w-4 h-4" />
-                    <span>Live Demo</span>
-                    <ArrowRight className="w-4 h-4" />
+                    <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    <span className="text-xs sm:text-sm">Live Demo</span>
+                    <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </a>
                 </Button>
               </motion.div>
@@ -400,13 +401,14 @@ const ProjectCard = ({ project, index, isFeatured = false }: ProjectCardProps) =
             {project.githubUrl && (
               <motion.div 
                 whileHover={{ scale: 1.05, rotate: 5 }} 
-                whileTap={{ scale: 0.95 }}
+                whileTap={{ scale: 0.9 }}
+                className="flex-shrink-0"
               >
                 <Button 
                   variant="outline" 
                   size="sm" 
                   asChild 
-                  className="px-4 border-primary/25 hover:border-primary/50 hover:bg-primary/10"
+                  className="px-3 sm:px-4 border-primary/25 hover:border-primary/50 hover:bg-primary/10 touch-manipulation min-w-[2.5rem] sm:min-w-[2.75rem]"
                 >
                   <a 
                     href={project.githubUrl} 
@@ -414,7 +416,7 @@ const ProjectCard = ({ project, index, isFeatured = false }: ProjectCardProps) =
                     rel="noopener noreferrer"
                     className="flex items-center justify-center"
                   >
-                    <Github className="w-4 h-4" />
+                    <Github className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </a>
                 </Button>
               </motion.div>
@@ -552,7 +554,7 @@ export const ProjectsSection = () => {
             <p className="text-muted-foreground text-sm">Loading projects...</p>
           </div>
         ) : displayProjects.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 lg:gap-8 max-w-7xl mx-auto">
             <AnimatePresence mode="popLayout">
               {displayProjects.map((project, index) => (
                 <ProjectCard 

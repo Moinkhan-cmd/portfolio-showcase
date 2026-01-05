@@ -218,27 +218,27 @@ const CertificationCard = ({ cert, index }: CertificationCardProps) => {
           </AnimatePresence>
         </div>
 
-        {/* Enhanced Content Section */}
-        <div className="p-6 sm:p-7 relative z-20 bg-gradient-to-b from-transparent to-background/50">
-          {/* Header with enhanced styling */}
-          <div className="flex items-start justify-between gap-4 mb-4">
+        {/* Enhanced Content Section - Responsive */}
+        <div className="p-4 sm:p-5 md:p-6 lg:p-7 relative z-20 bg-gradient-to-b from-transparent to-background/50">
+          {/* Header with enhanced styling - Responsive */}
+          <div className="flex items-start justify-between gap-3 sm:gap-4 mb-3 sm:mb-4">
             <div className="flex-1 min-w-0">
               <motion.div
-                className="flex items-center gap-2 mb-2"
+                className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2"
                 animate={{ x: isHovered ? 4 : 0 }}
                 transition={{ duration: 0.3 }}
               >
                 <motion.div
-                  className="p-1.5 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/30"
+                  className="p-1 sm:p-1.5 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/30 flex-shrink-0"
                   animate={{
                     scale: isHovered ? 1.15 : 1,
                     rotate: isHovered ? 10 : 0,
                   }}
                   transition={{ duration: 0.3 }}
                 >
-                  <Star className="w-4 h-4 text-primary fill-primary/30" />
+                  <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary fill-primary/30" />
                 </motion.div>
-                <h3 className="font-display text-xl sm:text-2xl font-bold leading-tight bg-gradient-to-r from-foreground via-foreground to-foreground/80 bg-clip-text text-transparent group-hover:from-primary group-hover:via-primary/90 group-hover:to-primary transition-all duration-300">
+                <h3 className="font-display text-base sm:text-xl md:text-2xl font-bold leading-tight bg-gradient-to-r from-foreground via-foreground to-foreground/80 bg-clip-text text-transparent group-hover:from-primary group-hover:via-primary/90 group-hover:to-primary transition-all duration-300 line-clamp-2">
                   {cert.title}
                 </h3>
               </motion.div>
@@ -258,15 +258,15 @@ const CertificationCard = ({ cert, index }: CertificationCardProps) => {
                 href={cert.credentialUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="shrink-0 inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold border-2 border-primary/40 bg-gradient-to-r from-primary/20 to-primary/10 hover:from-primary/30 hover:to-primary/20 hover:border-primary/60 transition-all duration-300 relative overflow-hidden group/btn"
+                className="shrink-0 inline-flex items-center gap-1.5 sm:gap-2 rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-bold border-2 border-primary/40 bg-gradient-to-r from-primary/20 to-primary/10 hover:from-primary/30 hover:to-primary/20 hover:border-primary/60 active:from-primary/25 active:to-primary/15 transition-all duration-300 relative overflow-hidden group/btn touch-manipulation"
                 onClick={(e) => e.stopPropagation()}
                 whileHover={{ scale: 1.1, y: -2 }}
-                whileTap={{ scale: 0.95 }}
+                whileTap={{ scale: 0.9 }}
               >
-                <span className="relative z-10 flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4" />
-                  Verify
-                  <ExternalLink className="w-4 h-4" />
+                <span className="relative z-10 flex items-center gap-1 sm:gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Verify</span>
+                  <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </span>
                 <motion.div
                   className="absolute inset-0 bg-gradient-to-r from-primary/30 to-primary/20 opacity-0 group-hover/btn:opacity-100"
@@ -286,8 +286,8 @@ const CertificationCard = ({ cert, index }: CertificationCardProps) => {
             )}
           </div>
 
-          {/* Enhanced Meta Information */}
-          <div className="flex flex-wrap gap-2 mb-4">
+          {/* Enhanced Meta Information - Responsive */}
+          <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-3 sm:mb-4">
             {cert.issueDate && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -295,10 +295,11 @@ const CertificationCard = ({ cert, index }: CertificationCardProps) => {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.05 + 0.1 }}
                 whileHover={{ scale: 1.1, y: -2 }}
+                whileTap={{ scale: 0.95 }}
               >
-                <Badge variant="secondary" className="gap-1.5 text-xs font-semibold bg-gradient-to-r from-primary/15 to-primary/10 border border-primary/25 hover:border-primary/40">
-                  <Calendar className="w-3.5 h-3.5" />
-                  {cert.issueDate}
+                <Badge variant="secondary" className="gap-1 sm:gap-1.5 text-[10px] sm:text-xs font-semibold bg-gradient-to-r from-primary/15 to-primary/10 border border-primary/25 hover:border-primary/40 touch-manipulation">
+                  <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                  <span className="truncate max-w-[120px] sm:max-w-none">{cert.issueDate}</span>
                 </Badge>
               </motion.div>
             )}
@@ -309,19 +310,20 @@ const CertificationCard = ({ cert, index }: CertificationCardProps) => {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.05 + 0.15 }}
                 whileHover={{ scale: 1.1, y: -2 }}
+                whileTap={{ scale: 0.95 }}
               >
-                <Badge variant="outline" className="gap-1.5 border-primary/30 bg-background/50 hover:bg-primary/10 hover:border-primary/50 text-xs font-semibold">
-                  <Hash className="w-3.5 h-3.5" />
-                  {cert.credentialId}
+                <Badge variant="outline" className="gap-1 sm:gap-1.5 border-primary/30 bg-background/50 hover:bg-primary/10 hover:border-primary/50 text-[10px] sm:text-xs font-semibold touch-manipulation">
+                  <Hash className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                  <span className="truncate max-w-[100px] sm:max-w-none">{cert.credentialId}</span>
                 </Badge>
               </motion.div>
             )}
           </div>
 
-          {/* Enhanced Description */}
+          {/* Enhanced Description - Responsive */}
           {cert.description && (
             <motion.p
-              className="text-sm text-muted-foreground leading-relaxed line-clamp-2 mb-4"
+              className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-2 sm:line-clamp-3 mb-3 sm:mb-4"
               animate={{
                 color: isHovered ? "hsl(var(--foreground) / 0.9)" : "hsl(var(--muted-foreground))",
               }}
@@ -331,9 +333,9 @@ const CertificationCard = ({ cert, index }: CertificationCardProps) => {
             </motion.p>
           )}
 
-          {/* Enhanced Skills Section */}
+          {/* Enhanced Skills Section - Responsive */}
           {skills.length > 0 && (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {skills.slice(0, 5).map((skill, i) => (
                 <motion.span
                   key={skill}
@@ -342,7 +344,8 @@ const CertificationCard = ({ cert, index }: CertificationCardProps) => {
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.05 + i * 0.03 }}
                   whileHover={{ scale: 1.15, y: -3, rotate: 2 }}
-                  className="text-xs px-2.5 py-1 bg-gradient-to-r from-primary/15 via-primary/10 to-primary/15 border border-primary/25 rounded-full text-primary/90 font-semibold hover:bg-primary/20 hover:border-primary/40 transition-all cursor-default"
+                  whileTap={{ scale: 0.95 }}
+                  className="text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 sm:py-1 bg-gradient-to-r from-primary/15 via-primary/10 to-primary/15 border border-primary/25 rounded-full text-primary/90 font-semibold hover:bg-primary/20 hover:border-primary/40 active:bg-primary/25 transition-all cursor-default touch-manipulation"
                 >
                   {skill}
                 </motion.span>
@@ -352,7 +355,7 @@ const CertificationCard = ({ cert, index }: CertificationCardProps) => {
                   initial={{ opacity: 0, scale: 0.8 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
-                  className="text-xs px-2.5 py-1 bg-muted/50 border border-border rounded-full text-muted-foreground font-semibold"
+                  className="text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 sm:py-1 bg-muted/50 border border-border rounded-full text-muted-foreground font-semibold"
                 >
                   +{skills.length - 5}
                 </motion.span>
@@ -517,7 +520,7 @@ export const CertificationsSection = () => {
           </div>
         ) : certifications.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 lg:gap-8 max-w-7xl mx-auto">
               <AnimatePresence mode="popLayout">
                 {displayedCertifications.map((cert, index) => (
                   <CertificationCard key={cert.id || index} cert={cert} index={index} />

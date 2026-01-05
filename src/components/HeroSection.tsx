@@ -59,7 +59,7 @@ export const HeroSection = () => {
       id="hero"
       ref={containerRef}
       onMouseMove={handleMouseMove}
-      className="relative min-h-screen overflow-hidden bg-background pt-20 flex items-center"
+      className="relative min-h-[calc(100vh-65px)] sm:min-h-[calc(100vh-70px)] md:min-h-[calc(100vh-80px)] lg:min-h-screen overflow-hidden bg-background pt-4 sm:pt-8 md:pt-12 lg:pt-20 flex items-center"
     >
       {/* 3D Background */}
       <HeroBackground3D />
@@ -112,8 +112,8 @@ export const HeroSection = () => {
       />
 
       {/* Main Content Container - Enhanced Responsive */}
-      <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 py-12 sm:py-16 md:py-20 lg:py-24 xl:py-32">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 md:gap-12 lg:gap-16 items-center">
+      <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 py-6 sm:py-10 md:py-16 lg:py-24 xl:py-32">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 md:gap-10 lg:gap-12 xl:gap-16 items-center">
           
           {/* Left Column - Enhanced Typography */}
           <motion.div
@@ -121,20 +121,20 @@ export const HeroSection = () => {
             initial={{ opacity: 0, x: -50 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="space-y-8 lg:space-y-10"
+            className="space-y-4 sm:space-y-6 md:space-y-8 lg:space-y-10"
           >
-            {/* Status Badge - Enhanced */}
+            {/* Status Badge - Enhanced - Responsive */}
             <motion.div
               initial={{ opacity: 0, y: 20, scale: 0.9 }}
               animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
               transition={{ delay: 0.3, type: "spring" }}
-              className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border border-primary/30 backdrop-blur-md shadow-lg shadow-primary/10"
+              className="inline-flex items-center gap-2 sm:gap-3 px-3 sm:px-4 md:px-5 py-1.5 sm:py-2 md:py-2.5 rounded-full bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border border-primary/30 backdrop-blur-md shadow-lg shadow-primary/10 text-xs sm:text-sm"
             >
-              <span className="relative flex h-2.5 w-2.5">
+              <span className="relative flex h-2 w-2 sm:h-2.5 sm:w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+                <span className="relative inline-flex rounded-full h-2 w-2 sm:h-2.5 sm:w-2.5 bg-emerald-500" />
               </span>
-              <span className="text-sm font-semibold text-foreground">Available for opportunities</span>
+              <span className="text-xs sm:text-sm font-semibold text-foreground">Available for opportunities</span>
             </motion.div>
 
             {/* Main Heading - Enhanced Typography - Responsive */}
@@ -142,9 +142,9 @@ export const HeroSection = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.4, duration: 0.8 }}
-              className="space-y-3 sm:space-y-4"
+              className="space-y-2 sm:space-y-3 md:space-y-4"
             >
-              <h1 className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold leading-[0.95] sm:leading-[0.9] tracking-tight">
+              <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-bold leading-[1] sm:leading-[0.95] md:leading-[0.9] tracking-tight">
                 <motion.span 
                   className="block text-foreground"
                   initial={{ opacity: 0, x: -20 }}
@@ -181,7 +181,7 @@ export const HeroSection = () => {
               initial={{ opacity: 0 }}
               animate={isInView ? { opacity: 1 } : {}}
               transition={{ delay: 0.8 }}
-              className="h-12 sm:h-14 md:h-16 overflow-hidden"
+              className="h-10 sm:h-12 md:h-14 lg:h-16 overflow-hidden"
             >
               <AnimatePresence mode="wait">
                 <motion.div
@@ -190,9 +190,9 @@ export const HeroSection = () => {
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: -50, opacity: 0 }}
                   transition={{ duration: 0.6, type: "spring" }}
-                  className="text-xl sm:text-2xl md:text-3xl lg:text-4xl text-muted-foreground font-light flex items-center gap-2 sm:gap-3"
+                  className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-muted-foreground font-light flex items-center gap-2 sm:gap-3"
                 >
-                  <Code2 className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-primary flex-shrink-0" />
+                  <Code2 className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 text-primary flex-shrink-0" />
                   <span className="truncate">{roles[currentRole]}</span>
                 </motion.div>
               </AnimatePresence>
@@ -203,7 +203,7 @@ export const HeroSection = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.9 }}
-              className="text-base sm:text-lg md:text-xl lg:text-2xl text-foreground/80 leading-relaxed max-w-2xl font-light"
+              className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-foreground/80 leading-relaxed max-w-2xl font-light"
             >
               Transforming ideas into seamless, user-centric interfaces with{" "}
               <span className="text-primary font-medium">clean code</span> and{" "}
