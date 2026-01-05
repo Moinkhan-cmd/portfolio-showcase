@@ -1,6 +1,7 @@
 import { Github, Linkedin, Mail, Heart, Code2, Sparkles, ArrowUp } from "lucide-react";
 import { motion } from "framer-motion";
 import { FooterBackground3D } from "./FooterBackground3D";
+import { scrollToSection, scrollToTop } from "@/components/SmoothScroll";
 
 const socialLinks = [
   { icon: Github, url: "https://github.com/Moinkhan-cmd", label: "GitHub" },
@@ -20,16 +21,6 @@ const quickLinks = [
 const techStack = ["React", "TypeScript", "Tailwind"];
 
 export const Footer = () => {
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const scrollToSection = (href: string) => {
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
-  };
 
   return (
     <footer className="relative mt-20 border-t border-primary/20 bg-background overflow-hidden">

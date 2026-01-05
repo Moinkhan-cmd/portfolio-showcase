@@ -1,10 +1,8 @@
 import { ArrowUp } from "lucide-react";
 import { motion } from "framer-motion";
+import { scrollToTop } from "@/components/SmoothScroll";
 
 export const ScrollToTop = () => {
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
 
   return (
     <motion.button

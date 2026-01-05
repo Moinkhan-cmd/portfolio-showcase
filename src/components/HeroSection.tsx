@@ -10,6 +10,7 @@ import { motion, useMotionValue, useSpring, useTransform, useInView, AnimatePres
 import { useRef, useState, useEffect } from "react";
 import myPhoto from "@/images/my photo.jpg";
 import { HeroBackground3D } from "./HeroBackground3D";
+import { scrollToSection } from "@/components/SmoothScroll";
 
 const socialLinks = [
   { icon: Github, href: "https://github.com/Moinkhan-cmd", label: "GitHub", color: "hover:text-[#333] dark:hover:text-[#f0f0f0]" },
@@ -48,10 +49,6 @@ export const HeroSection = () => {
     mouseX.set(x);
     mouseY.set(y);
     setMousePos({ x: e.clientX, y: e.clientY });
-  };
-
-  const scrollToSection = (id: string) => {
-    document.querySelector(id)?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (

@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import { Code2, Database, Users, Wrench, Code, Loader2, Search, TrendingUp, Star, Sparkles, Filter, X } from "lucide-react";
-import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { SkillsBackground3D } from "./SkillsBackground3D";
 import { useSkills } from "@/hooks/useSkills";
 import type { Skill } from "@/lib/admin/skills";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 // Category enum system
 type SkillCategory =
@@ -32,12 +32,37 @@ const categoryIcons: Record<SkillCategory, typeof Code2> = {
   soft_skills: Users,
 };
 
-const categoryColors: Record<SkillCategory, string> = {
-  frontend_development: "from-blue-500/20 to-cyan-500/20",
-  backend_database: "from-purple-500/20 to-pink-500/20",
-  programming_languages: "from-green-500/20 to-emerald-500/20",
-  tools_platform: "from-orange-500/20 to-red-500/20",
-  soft_skills: "from-yellow-500/20 to-amber-500/20",
+const categoryColors: Record<SkillCategory, { gradient: string; border: string; glow: string; shadow: string }> = {
+  frontend_development: { 
+    gradient: "from-blue-500/20 to-cyan-500/20", 
+    border: "border-blue-500/30",
+    glow: "group-hover:shadow-blue-500/25",
+    shadow: "hover:shadow-blue-500/20"
+  },
+  backend_database: { 
+    gradient: "from-purple-500/20 to-pink-500/20", 
+    border: "border-purple-500/30",
+    glow: "group-hover:shadow-purple-500/25",
+    shadow: "hover:shadow-purple-500/20"
+  },
+  programming_languages: { 
+    gradient: "from-green-500/20 to-emerald-500/20", 
+    border: "border-green-500/30",
+    glow: "group-hover:shadow-green-500/25",
+    shadow: "hover:shadow-green-500/20"
+  },
+  tools_platform: { 
+    gradient: "from-orange-500/20 to-red-500/20", 
+    border: "border-orange-500/30",
+    glow: "group-hover:shadow-orange-500/25",
+    shadow: "hover:shadow-orange-500/20"
+  },
+  soft_skills: { 
+    gradient: "from-yellow-500/20 to-amber-500/20", 
+    border: "border-yellow-500/30",
+    glow: "group-hover:shadow-yellow-500/25",
+    shadow: "hover:shadow-yellow-500/20"
+  },
 };
 
 const normalizeCategory = (category: unknown): SkillCategory => {
@@ -70,235 +95,193 @@ const normalizeCategory = (category: unknown): SkillCategory => {
   return "tools_platform";
 };
 
-// --- ENHANCED 3D CARD COMPONENT ---
-interface Skill3DCardProps {
+// --- SMOOTH ANIMATED CARD COMPONENT ---
+interface SkillCardProps {
   title: string;
   icon: typeof Code2;
   skills: Skill[];
   index: number;
   category: SkillCategory;
-  isVisible: boolean;
 }
 
-const Skill3DCard = ({ title, icon: Icon, skills, index, category, isVisible }: Skill3DCardProps) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-
-  const mouseXSpring = useSpring(x, { stiffness: 400, damping: 50 });
-  const mouseYSpring = useSpring(y, { stiffness: 400, damping: 50 });
-
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["8deg", "-8deg"]);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-8deg", "8deg"]);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    const xPct = (mouseX / rect.width) - 0.5;
-    const yPct = (mouseY / rect.height) - 0.5;
-    x.set(xPct);
-    y.set(yPct);
-  };
-
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-    setIsHovered(false);
-  };
-
+const SkillCard = ({ title, icon: Icon, skills, index, category }: SkillCardProps) => {
+  const colors = categoryColors[category];
+  
   return (
     <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 50, scale: 0.9, rotateX: 15 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.6, delay: index * 0.1, type: "spring", stiffness: 100 }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      style={{
-        rotateX,
-        rotateY,
-        transformStyle: "preserve-3d",
+      transition={{ 
+        duration: 0.6, 
+        delay: index * 0.1, 
+        ease: [0.25, 0.1, 0.25, 1] 
       }}
-      className="relative group perspective-1000"
+      whileHover={{ 
+        y: -8,
+        transition: { duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }
+      }}
+      className={cn("group relative", colors.glow)}
     >
-      {/* Enhanced Glow Effect */}
+      {/* Card Container */}
       <motion.div
-        className={`absolute -inset-1 rounded-3xl bg-gradient-to-br ${categoryColors[category]} opacity-0 blur-2xl -z-10`}
-        animate={{
-          opacity: isHovered ? 0.6 : 0,
-          scale: isHovered ? 1.05 : 1,
-        }}
-        transition={{ duration: 0.4 }}
-      />
-
-      {/* 3D Content Container */}
-      <motion.div
-        className="relative bg-gradient-to-br from-card/90 via-card/80 to-card/90 backdrop-blur-xl border border-primary/20 rounded-2xl p-6 h-full shadow-2xl transition-all duration-300 overflow-hidden"
-        animate={{
-          y: isHovered ? -8 : 0,
-          borderColor: isHovered ? "hsl(175 80% 50% / 0.4)" : "hsl(175 80% 50% / 0.2)",
-        }}
-        style={{
-          boxShadow: isHovered
-            ? "0 25px 80px -12px hsl(175 80% 50% / 0.3), 0 10px 30px -10px hsl(0 0% 0% / 0.3)"
-            : "0 8px 30px -5px hsl(0 0% 0% / 0.2)",
-        }}
+        className={cn(
+          "relative h-full rounded-2xl p-6",
+          "bg-gradient-to-br from-card/95 via-card/90 to-card/85",
+          "backdrop-blur-xl border",
+          colors.border,
+          "shadow-lg group-hover:shadow-2xl",
+          "transition-shadow duration-500"
+        )}
       >
-        {/* Animated Background Gradient */}
-        <motion.div
-          className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${categoryColors[category]} opacity-0 pointer-events-none`}
-          animate={{
-            opacity: isHovered ? 0.15 : 0,
-          }}
-          transition={{ duration: 0.4 }}
+        {/* Gradient Overlay - Animated */}
+        <motion.div 
+          className={cn(
+            "absolute inset-0 rounded-2xl",
+            "bg-gradient-to-br", colors.gradient,
+          )}
+          initial={{ opacity: 0 }}
+          whileHover={{ opacity: 1 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
         />
 
-        {/* Shimmer Effect */}
-        <motion.div
-          className="absolute inset-0 rounded-2xl opacity-0 pointer-events-none"
-          animate={{
-            opacity: isHovered ? 1 : 0,
-          }}
-          transition={{ duration: 0.5 }}
-          style={{
-            background: `linear-gradient(110deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%)`,
-            backgroundSize: "200% 100%",
-          }}
-        />
-
-        {/* Floating Header */}
-        <div style={{ transform: "translateZ(30px)" }} className="flex items-center gap-4 mb-6 relative z-10">
+        {/* Shine sweep effect */}
+        <motion.div 
+          className="absolute inset-0 rounded-2xl overflow-hidden"
+          initial="initial"
+          whileHover="hover"
+        >
           <motion.div
-            className={`p-3 rounded-xl bg-gradient-to-br ${categoryColors[category]} border border-primary/30 shadow-lg backdrop-blur-sm`}
-            animate={{
-              scale: isHovered ? 1.1 : 1,
-              rotate: isHovered ? 5 : 0,
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
+            variants={{
+              initial: { x: "-100%", opacity: 0 },
+              hover: { x: "100%", opacity: 1 }
             }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.6, ease: "easeInOut" }}
+          />
+        </motion.div>
+
+        {/* Border glow on hover */}
+        <motion.div
+          className={cn(
+            "absolute -inset-[1px] rounded-2xl opacity-0",
+            "bg-gradient-to-br from-primary/50 via-primary/20 to-primary/50"
+          )}
+          whileHover={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          style={{ zIndex: -1 }}
+        />
+
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-5 relative z-10">
+          <motion.div
+            className={cn(
+              "p-3 rounded-xl",
+              "bg-gradient-to-br", colors.gradient,
+              "border border-white/10"
+            )}
+            whileHover={{ 
+              scale: 1.1, 
+              rotate: 5,
+              transition: { type: "spring", stiffness: 400, damping: 17 }
+            }}
           >
             <Icon className="w-6 h-6 text-primary" />
           </motion.div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-display text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+            <h3 className="font-display text-xl font-bold text-foreground">
               {title}
             </h3>
-            <p className="text-xs text-muted-foreground mt-0.5">{skills.length} skills</p>
+            <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
+              <motion.span 
+                className="inline-block w-1.5 h-1.5 rounded-full bg-primary/60"
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              />
+              {skills.length} skills
+            </p>
           </div>
         </div>
 
-        {/* Skills Grid with Enhanced Badges */}
-        <div style={{ transform: "translateZ(20px)" }} className="flex flex-wrap gap-2 relative z-10">
+        {/* Skills Grid with Animated Badges */}
+        <div className="flex flex-wrap gap-2 relative z-10">
           {skills.map((skill, i) => (
-            <EnhancedSkillBadge key={skill.id || i} skill={skill} index={i} category={category} />
+            <SkillBadge key={skill.id || i} skill={skill} index={i} category={category} />
           ))}
         </div>
 
-        {/* Floating Particles on Hover */}
-        <AnimatePresence>
-          {isHovered && (
-            <>
-              {[...Array(6)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute w-1 h-1 bg-primary rounded-full"
-                  initial={{
-                    x: "50%",
-                    y: "50%",
-                    opacity: 0,
-                    scale: 0,
-                  }}
-                  animate={{
-                    x: `${50 + (Math.random() - 0.5) * 200}%`,
-                    y: `${50 + (Math.random() - 0.5) * 200}%`,
-                    opacity: [0, 1, 0],
-                    scale: [0, 1, 0],
-                  }}
-                  exit={{ opacity: 0 }}
-                  transition={{
-                    duration: 2 + Math.random(),
-                    repeat: Infinity,
-                    delay: i * 0.2,
-                  }}
-                />
-              ))}
-            </>
-          )}
-        </AnimatePresence>
+        {/* Bottom Accent Line - Animated */}
+        <motion.div 
+          className="absolute bottom-0 left-6 right-6 h-0.5 rounded-full bg-gradient-to-r from-transparent via-primary/30 to-transparent"
+          whileHover={{ 
+            scaleX: 1.1,
+            opacity: 1,
+          }}
+          initial={{ opacity: 0.5 }}
+          transition={{ duration: 0.3 }}
+        />
       </motion.div>
     </motion.div>
   );
 };
 
-// --- ENHANCED MAGNETIC BADGE COMPONENT ---
-const EnhancedSkillBadge = ({ skill, index, category }: { skill: Skill; index: number; category: SkillCategory }) => {
-  const [isHovered, setIsHovered] = useState(false);
+// --- SMOOTH ANIMATED SKILL BADGE ---
+const SkillBadge = ({ skill, index, category }: { skill: Skill; index: number; category: SkillCategory }) => {
+  const colors = categoryColors[category];
   
-  // Generate random proficiency for visual interest (if not provided)
-  const proficiency = (skill as any).proficiency || Math.floor(Math.random() * 40) + 60;
-
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0, y: 20 }}
+    <motion.span
+      initial={{ opacity: 0, scale: 0.8, y: 10 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
-      transition={{ delay: 0.2 + index * 0.03, type: "spring", stiffness: 200 }}
-      whileHover={{
-        scale: 1.15,
-        y: -4,
-        z: 30,
+      transition={{ 
+        delay: 0.1 + index * 0.03, 
+        duration: 0.4,
+        ease: [0.25, 0.1, 0.25, 1]
       }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-      className="relative group/badge cursor-pointer"
+      whileHover={{ 
+        scale: 1.08, 
+        y: -3,
+        transition: { type: "spring", stiffness: 400, damping: 17 }
+      }}
+      whileTap={{ scale: 0.95 }}
+      className={cn(
+        "relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium cursor-default",
+        "bg-gradient-to-br", colors.gradient,
+        "border border-white/10",
+        colors.shadow,
+        "shadow-md hover:shadow-lg",
+        "transition-shadow duration-300"
+      )}
     >
-      <motion.div
-        className={`relative px-3 py-1.5 rounded-lg bg-gradient-to-br ${categoryColors[category]} border border-primary/30 hover:border-primary/60 transition-all duration-300 backdrop-blur-sm`}
-        animate={{
-          boxShadow: isHovered
-            ? "0 8px 20px -5px hsl(175 80% 50% / 0.4)"
-            : "0 2px 8px -2px hsl(175 80% 50% / 0.1)",
+      <span className="relative z-10 text-foreground/90 group-hover:text-foreground">
+        {skill.name}
+      </span>
+      
+      {/* Star icon with smooth animation */}
+      <motion.span
+        initial={{ opacity: 0, scale: 0, rotate: -180 }}
+        whileHover={{ 
+          opacity: 1, 
+          scale: 1, 
+          rotate: 0,
+          transition: { type: "spring", stiffness: 500, damping: 15 }
         }}
       >
-        <span className="text-sm font-medium text-foreground relative z-10 flex items-center gap-1.5">
-          {skill.name}
-          {isHovered && (
-            <motion.span
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: 1, rotate: 0 }}
-              className="text-primary"
-            >
-              <Star className="w-3 h-3 fill-primary" />
-            </motion.span>
-          )}
-        </span>
-
-        {/* Proficiency Indicator */}
-        <motion.div
-          className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary/20 rounded-b-lg overflow-hidden"
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: proficiency / 100 }}
-          transition={{ delay: 0.3 + index * 0.03, duration: 0.8 }}
-        >
-          <motion.div
-            className="h-full bg-gradient-to-r from-primary to-primary/60"
-            animate={{
-              boxShadow: isHovered ? "0 0 10px hsl(175 80% 50% / 0.6)" : "none",
-            }}
-          />
-        </motion.div>
-
-        {/* Glow on hover */}
-        <motion.div
-          className={`absolute inset-0 rounded-lg bg-gradient-to-br ${categoryColors[category]} blur-md opacity-0 -z-10`}
-          animate={{ opacity: isHovered ? 0.4 : 0 }}
-          transition={{ duration: 0.3 }}
-        />
-      </motion.div>
-    </motion.div>
+        <Star className="w-3 h-3 text-primary fill-primary" />
+      </motion.span>
+      
+      {/* Hover glow effect */}
+      <motion.div
+        className={cn(
+          "absolute inset-0 rounded-lg -z-10",
+          "bg-gradient-to-br", colors.gradient
+        )}
+        initial={{ opacity: 0, scale: 0.8 }}
+        whileHover={{ opacity: 0.5, scale: 1.1 }}
+        transition={{ duration: 0.3 }}
+        style={{ filter: "blur(8px)" }}
+      />
+    </motion.span>
   );
 };
 
@@ -403,33 +386,23 @@ export const SkillsSection = () => {
         }}
       />
 
-      {/* Animated Background Orbs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-10 opacity-30">
-        <motion.div
+      {/* Subtle animated background orbs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-10 opacity-20">
+        <motion.div 
           className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl"
-          animate={{
-            x: [0, 50, 0],
-            y: [0, 30, 0],
-            scale: [1, 1.2, 1],
+          animate={{ 
+            x: [0, 30, 0],
+            y: [0, 20, 0],
           }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
         />
-        <motion.div
+        <motion.div 
           className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-500/8 rounded-full blur-3xl"
-          animate={{
-            x: [0, -40, 0],
-            y: [0, -25, 0],
-            scale: [1, 1.15, 1],
+          animate={{ 
+            x: [0, -20, 0],
+            y: [0, -15, 0],
           }}
-          transition={{
-            duration: 18,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
         />
       </div>
 
@@ -495,22 +468,38 @@ export const SkillsSection = () => {
           className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 max-w-3xl mx-auto"
         >
           {[
-            { label: "Total Skills", value: stats.totalSkills, icon: Code2, color: "from-blue-500/20 to-cyan-500/20" },
-            { label: "Categories", value: stats.totalCategories, icon: Database, color: "from-purple-500/20 to-pink-500/20" },
-            { label: "Avg per Category", value: stats.avgSkillsPerCategory, icon: TrendingUp, color: "from-green-500/20 to-emerald-500/20" },
+            { label: "Total Skills", value: stats.totalSkills, icon: Code2, gradient: "from-blue-500/20 to-cyan-500/20" },
+            { label: "Categories", value: stats.totalCategories, icon: Database, gradient: "from-purple-500/20 to-pink-500/20" },
+            { label: "Avg per Category", value: stats.avgSkillsPerCategory, icon: TrendingUp, gradient: "from-green-500/20 to-emerald-500/20" },
           ].map((stat, index) => (
             <motion.div
               key={stat.label}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              whileInView={{ opacity: 1, scale: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.3 + index * 0.1 }}
-              whileHover={{ scale: 1.05, y: -4 }}
-              className={`relative p-4 rounded-xl bg-gradient-to-br ${stat.color} border border-primary/20 backdrop-blur-sm`}
+              transition={{ delay: 0.3 + index * 0.1, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+              whileHover={{ 
+                scale: 1.05, 
+                y: -4,
+                transition: { type: "spring", stiffness: 400, damping: 17 }
+              }}
+              className={cn(
+                "relative p-4 rounded-xl border border-primary/20 backdrop-blur-sm cursor-default",
+                "bg-gradient-to-br", stat.gradient,
+                "shadow-lg hover:shadow-xl transition-shadow duration-300"
+              )}
             >
               <div className="flex items-center justify-between mb-2">
                 <stat.icon className="w-5 h-5 text-primary" />
-                <span className="text-2xl font-bold text-foreground">{stat.value}</span>
+                <motion.span 
+                  className="text-2xl font-bold text-foreground"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.5 + index * 0.1 }}
+                >
+                  {stat.value}
+                </motion.span>
               </div>
               <p className="text-xs text-muted-foreground">{stat.label}</p>
             </motion.div>
@@ -534,16 +523,21 @@ export const SkillsSection = () => {
                 placeholder="Search skills..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-10 bg-background/50 border-primary/20 focus:border-primary/50 backdrop-blur-sm"
+                className="pl-10 pr-10 bg-background/50 border-primary/20 focus:border-primary/50 backdrop-blur-sm transition-all duration-300"
               />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
+              <AnimatePresence>
+                {searchQuery && (
+                  <motion.button
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </motion.button>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* Category Filter */}
@@ -552,7 +546,7 @@ export const SkillsSection = () => {
                 variant={selectedCategory === "all" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedCategory("all")}
-                className="gap-2"
+                className="gap-2 transition-all duration-300"
               >
                 <Filter className="w-4 h-4" />
                 All
@@ -566,7 +560,7 @@ export const SkillsSection = () => {
                     variant={selectedCategory === category ? "default" : "outline"}
                     size="sm"
                     onClick={() => setSelectedCategory(category)}
-                    className="gap-2"
+                    className="gap-2 transition-all duration-300"
                   >
                     {categoryData.skills.length}
                     <span className="hidden sm:inline">{CATEGORY_LABELS[category].split(" ")[0]}</span>
@@ -577,31 +571,39 @@ export const SkillsSection = () => {
           </div>
         </motion.div>
 
-        {/* 3D Grid */}
+        {/* Cards Grid */}
         {isLoading ? (
           <div className="flex items-center justify-center min-h-[400px]">
-            <Loader2 className="w-12 h-12 animate-spin text-primary" />
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            >
+              <Loader2 className="w-12 h-12 text-primary" />
+            </motion.div>
           </div>
         ) : filteredCategories.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-7xl mx-auto">
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-7xl mx-auto"
+            layout
+          >
             <AnimatePresence mode="popLayout">
               {filteredCategories.map((category, index) => (
-                <Skill3DCard
+                <SkillCard
                   key={category.title}
                   title={category.title}
                   icon={category.icon}
                   skills={category.skills}
                   index={index}
                   category={category.category}
-                  isVisible={isVisible}
                 />
               ))}
             </AnimatePresence>
-          </div>
+          </motion.div>
         ) : (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
             className="text-center py-20 px-6 rounded-2xl border border-dashed border-primary/20 bg-card/30 backdrop-blur-sm max-w-md mx-auto"
           >
             <Code className="w-12 h-12 text-primary/40 mx-auto mb-4" />
