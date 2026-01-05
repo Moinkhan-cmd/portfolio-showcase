@@ -77,7 +77,7 @@ const ProjectCard = ({ project, index, isFeatured = false }: ProjectCardProps) =
       />
 
       <motion.div
-        className="relative h-full rounded-2xl overflow-hidden border border-primary/10 bg-gradient-to-br from-card/90 via-card/80 to-card/90 backdrop-blur-sm transition-all duration-300"
+        className="relative h-full rounded-2xl overflow-hidden border border-primary/10 bg-gradient-to-br from-card/90 via-card/80 to-card/90 backdrop-blur-sm transition-all duration-300 flex flex-col"
         animate={{
           y: isHovered ? -8 : 0,
           borderColor: isHovered ? "hsl(175 80% 50% / 0.25)" : "hsl(175 80% 50% / 0.1)",
@@ -188,7 +188,7 @@ const ProjectCard = ({ project, index, isFeatured = false }: ProjectCardProps) =
         </div>
 
         {/* Project Content */}
-        <div className="p-5 sm:p-6 relative z-10">
+        <div className="p-5 sm:p-6 relative z-10 flex flex-col h-full min-h-0">
           {/* Title */}
           <div className="flex items-start justify-between gap-3 mb-3">
             <div className="flex items-center gap-2.5 min-w-0 flex-1">
@@ -208,12 +208,12 @@ const ProjectCard = ({ project, index, isFeatured = false }: ProjectCardProps) =
           </div>
 
           {/* Description */}
-          <p className="text-sm text-muted-foreground mb-4 leading-relaxed line-clamp-2">
+          <p className="text-sm text-muted-foreground mb-4 leading-relaxed line-clamp-2 min-h-[2.5rem]">
             {project.shortDescription}
           </p>
 
           {/* Tech Stack */}
-          <div className="flex flex-wrap gap-2 mb-5">
+          <div className="flex flex-wrap gap-2 mb-4 min-h-[1.75rem]">
             {project.techStack.slice(0, isFeatured ? 5 : 4).map((tech, techIndex) => (
               <motion.span
                 key={tech}
@@ -238,7 +238,7 @@ const ProjectCard = ({ project, index, isFeatured = false }: ProjectCardProps) =
 
           {/* Skills (optional) */}
           {Array.isArray(project.skills) && project.skills.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mb-5">
+            <div className="flex flex-wrap gap-1.5 mb-4 min-h-[1.5rem]">
               {project.skills.slice(0, 4).map((skill) => (
                 <Badge 
                   key={skill} 
@@ -256,8 +256,11 @@ const ProjectCard = ({ project, index, isFeatured = false }: ProjectCardProps) =
             </div>
           )}
 
-          {/* Action Buttons */}
-          <div className="flex gap-2.5">
+          {/* Spacer to push buttons to bottom */}
+          <div className="flex-grow" />
+
+          {/* Action Buttons - Always at bottom */}
+          <div className="flex gap-2.5 mt-auto pt-2">
             {project.liveUrl && (
               <motion.div 
                 className="flex-1" 
