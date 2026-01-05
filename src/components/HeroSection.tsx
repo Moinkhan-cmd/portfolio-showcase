@@ -227,13 +227,13 @@ export const HeroSection = () => {
                   onClick={() => scrollToSection("#projects")}
                   className="group relative overflow-hidden bg-gradient-to-r from-primary via-primary/90 to-primary hover:from-primary/90 hover:via-primary hover:to-primary/90 text-primary-foreground font-semibold px-6 sm:px-8 py-5 sm:py-6 text-sm sm:text-base md:text-lg shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/40 transition-all w-full sm:w-auto touch-manipulation"
                 >
-                  <span className="relative z-10 flex items-center gap-2">
-                    View My Work
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    <span className="text-sm sm:text-base">View My Work</span>
                     <motion.div
                       animate={{ x: [0, 4, 0] }}
                       transition={{ duration: 1.5, repeat: Infinity }}
                     >
-                      <ExternalLink className="w-5 h-5" />
+                      <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
                     </motion.div>
                   </span>
                   <motion.div
@@ -247,16 +247,17 @@ export const HeroSection = () => {
               <motion.div
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
+                className="w-full sm:w-auto"
               >
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       size="lg"
                       variant="outline"
-                      className="group border-2 border-primary/30 hover:border-primary/50 hover:bg-primary/10 px-8 py-6 text-base sm:text-lg font-semibold backdrop-blur-sm"
+                      className="group border-2 border-primary/30 hover:border-primary/50 hover:bg-primary/10 px-6 sm:px-8 py-5 sm:py-6 text-sm sm:text-base md:text-lg font-semibold backdrop-blur-sm w-full sm:w-auto touch-manipulation"
                     >
-                      <Download className="mr-2 h-5 w-5" />
-                      Resume
+                      <Download className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                      <span className="text-sm sm:text-base">Resume</span>
                       <ChevronDown className="ml-2 h-4 w-4 group-hover:rotate-180 transition-transform" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -300,12 +301,12 @@ export const HeroSection = () => {
               </motion.div>
             </motion.div>
 
-            {/* Social Links - Enhanced */}
+            {/* Social Links - Enhanced - Responsive */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={isInView ? { opacity: 1 } : {}}
               transition={{ delay: 1.2 }}
-              className="flex gap-4 pt-4"
+              className="flex gap-3 sm:gap-4 pt-2 sm:pt-4"
             >
               {socialLinks.map((link, index) => (
                 <motion.a
@@ -313,14 +314,15 @@ export const HeroSection = () => {
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`p-4 rounded-xl border-2 border-primary/20 bg-background/50 backdrop-blur-sm text-muted-foreground ${link.color} hover:border-primary/40 hover:bg-primary/10 transition-all duration-300 relative overflow-hidden group`}
+                  className={`p-3 sm:p-4 rounded-xl border-2 border-primary/20 bg-background/50 backdrop-blur-sm text-muted-foreground ${link.color} hover:border-primary/40 hover:bg-primary/10 active:bg-primary/15 transition-all duration-300 relative overflow-hidden group touch-manipulation min-w-[3rem] min-h-[3rem] sm:min-w-[3.5rem] sm:min-h-[3.5rem] flex items-center justify-center`}
                   initial={{ opacity: 0, scale: 0 }}
                   animate={isInView ? { opacity: 1, scale: 1 } : {}}
                   transition={{ delay: 1.3 + index * 0.1, type: "spring" }}
                   whileHover={{ scale: 1.1, y: -4, rotate: 5 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileTap={{ scale: 0.9 }}
                   onMouseEnter={() => setIsHovered(true)}
                   onMouseLeave={() => setIsHovered(false)}
+                  aria-label={link.label}
                 >
                   <link.icon className="w-5 h-5 sm:w-6 sm:h-6 relative z-10" />
                   <motion.div
