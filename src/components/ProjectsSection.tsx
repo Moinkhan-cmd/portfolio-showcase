@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { ExternalLink, Github, Folder, Sparkles, ArrowRight, Loader2, Star, Zap, Code } from "lucide-react";
+import { ExternalLink, Github, Folder, Sparkles, ArrowRight, Loader2, Star, Zap, Code, Tag, Clock, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from "framer-motion";
 import { ProjectsBackground3D } from "./ProjectsBackground3D";
@@ -208,52 +208,162 @@ const ProjectCard = ({ project, index, isFeatured = false }: ProjectCardProps) =
           </div>
 
           {/* Description */}
-          <p className="text-sm text-muted-foreground mb-4 leading-relaxed line-clamp-2 min-h-[2.5rem]">
-            {project.shortDescription}
-          </p>
+          <motion.div 
+            className="mb-4 leading-relaxed min-h-[2.5rem]"
+            animate={{
+              color: isHovered ? "hsl(var(--foreground) / 0.9)" : "hsl(var(--muted-foreground))",
+            }}
+            transition={{ duration: 0.3 }}
+          >
+            <AnimatePresence mode="wait">
+              {isHovered && project.fullDescription ? (
+                <motion.p
+                  key="full"
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  transition={{ duration: 0.3 }}
+                  className="text-sm"
+                >
+                  {project.fullDescription}
+                </motion.p>
+              ) : (
+                <motion.p
+                  key="short"
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  transition={{ duration: 0.3 }}
+                  className="text-sm line-clamp-2"
+                >
+                  {project.shortDescription}
+                </motion.p>
+              )}
+            </AnimatePresence>
+          </motion.div>
+
+          {/* Category and Status - Show on hover */}
+          <AnimatePresence>
+            {isHovered && (
+              <motion.div
+                initial={{ opacity: 0, height: 0, y: -10 }}
+                animate={{ opacity: 1, height: "auto", y: 0 }}
+                exit={{ opacity: 0, height: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                className="flex flex-wrap gap-2 mb-4 overflow-hidden"
+              >
+                {project.category && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.1 }}
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <Badge variant="outline" className="gap-1.5 border-primary/30 bg-background/50 hover:bg-primary/10 hover:border-primary/50 text-xs font-semibold">
+                      <Tag className="w-3 h-3" />
+                      {project.category}
+                    </Badge>
+                  </motion.div>
+                )}
+                {project.status && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.15 }}
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <Badge 
+                      variant={project.status === "completed" ? "default" : "secondary"}
+                      className={`gap-1.5 text-xs font-semibold ${
+                        project.status === "completed" 
+                          ? "bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/30" 
+                          : "bg-yellow-500/20 text-yellow-400 border-yellow-500/30 hover:bg-yellow-500/30"
+                      }`}
+                    >
+                      {project.status === "completed" ? (
+                        <CheckCircle2 className="w-3 h-3" />
+                      ) : (
+                        <Clock className="w-3 h-3" />
+                      )}
+                      {project.status === "completed" ? "Completed" : "In Progress"}
+                    </Badge>
+                  </motion.div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Tech Stack */}
           <div className="flex flex-wrap gap-2 mb-4 min-h-[1.75rem]">
-            {project.techStack.slice(0, isFeatured ? 5 : 4).map((tech, techIndex) => (
-              <motion.span
-                key={tech}
+            <AnimatePresence mode="popLayout">
+              {(isHovered ? project.techStack : project.techStack.slice(0, isFeatured ? 5 : 4)).map((tech, techIndex) => (
+                <motion.span
+                  key={tech}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ 
+                    delay: isHovered ? techIndex * 0.02 : index * 0.05 + techIndex * 0.02,
+                  }}
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  className="text-xs px-2.5 py-1 bg-primary/10 border border-primary/20 rounded-full text-primary/90 font-medium hover:bg-primary/15 hover:border-primary/30 transition-colors"
+                >
+                  {tech}
+                </motion.span>
+              ))}
+            </AnimatePresence>
+            {!isHovered && project.techStack.length > (isFeatured ? 5 : 4) && (
+              <motion.span 
                 initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ 
-                  delay: index * 0.05 + techIndex * 0.02,
-                }}
-                whileHover={{ scale: 1.05, y: -2 }}
-                className="text-xs px-2.5 py-1 bg-primary/10 border border-primary/20 rounded-full text-primary/90 font-medium hover:bg-primary/15 hover:border-primary/30 transition-colors"
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-xs px-2.5 py-1 bg-muted/50 border border-border rounded-full text-muted-foreground font-medium"
               >
-                {tech}
-              </motion.span>
-            ))}
-            {project.techStack.length > (isFeatured ? 5 : 4) && (
-              <span className="text-xs px-2.5 py-1 bg-muted/50 border border-border rounded-full text-muted-foreground font-medium">
                 +{project.techStack.length - (isFeatured ? 5 : 4)}
-              </span>
+              </motion.span>
             )}
           </div>
 
           {/* Skills (optional) */}
           {Array.isArray(project.skills) && project.skills.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mb-4 min-h-[1.5rem]">
-              {project.skills.slice(0, 4).map((skill) => (
-                <Badge 
-                  key={skill} 
-                  variant="secondary" 
-                  className="text-[11px] bg-secondary/40 hover:bg-secondary/60 transition-colors"
+            <motion.div 
+              className="flex flex-wrap gap-1.5 mb-4"
+              animate={{
+                minHeight: isHovered ? "auto" : "1.5rem",
+              }}
+              transition={{ duration: 0.3 }}
+            >
+              <AnimatePresence mode="popLayout">
+                {(isHovered ? project.skills : project.skills.slice(0, 4)).map((skill, skillIndex) => (
+                  <motion.div
+                    key={skill}
+                    initial={{ opacity: 0, scale: 0.8, y: 5 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.8, y: -5 }}
+                    transition={{ 
+                      delay: isHovered ? skillIndex * 0.03 : 0,
+                    }}
+                    whileHover={{ scale: 1.1, y: -2 }}
+                  >
+                    <Badge 
+                      variant="secondary" 
+                      className="text-[11px] bg-secondary/40 hover:bg-secondary/60 transition-colors"
+                    >
+                      {skill}
+                    </Badge>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+              {!isHovered && project.skills.length > 4 && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
                 >
-                  {skill}
-                </Badge>
-              ))}
-              {project.skills.length > 4 && (
-                <Badge variant="secondary" className="text-[11px] bg-secondary/30">
-                  +{project.skills.length - 4}
-                </Badge>
+                  <Badge variant="secondary" className="text-[11px] bg-secondary/30">
+                    +{project.skills.length - 4}
+                  </Badge>
+                </motion.div>
               )}
-            </div>
+            </motion.div>
           )}
 
           {/* Spacer to push buttons to bottom */}

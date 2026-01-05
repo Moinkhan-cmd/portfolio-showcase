@@ -1,15 +1,13 @@
 import { useEffect, useRef, useState, useMemo } from "react";
-import { Briefcase, Calendar, Loader2, MapPin, Laptop, Building2, TrendingUp, Award, Sparkles, Filter, Clock, CheckCircle2 } from "lucide-react";
-import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from "framer-motion";
+import { Briefcase, Calendar, Loader2, MapPin, Laptop, Building2, Award, Sparkles, CheckCircle2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { ExperienceBackground3D } from "./ExperienceBackground3D";
 import { useExperience } from "@/hooks/useExperience";
 import type { Experience } from "@/lib/admin/experience";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 
 export const ExperienceSection = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const [selectedWorkType, setSelectedWorkType] = useState<Experience["workType"] | "all">("all");
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const { data: experiences = [], isLoading } = useExperience();
@@ -50,37 +48,16 @@ export const ExperienceSection = () => {
     }
   };
 
-  // Calculate statistics
-  const stats = useMemo(() => {
-    const total = experiences.length;
-    const current = experiences.filter((e) => e.current).length;
-    const remote = experiences.filter((e) => e.workType === "remote").length;
-    const totalYears = experiences.reduce((acc, exp) => {
-      if (!exp.startDate) return acc;
-      const start = new Date(exp.startDate + "-01");
-      const end = exp.endDate ? new Date(exp.endDate + "-01") : new Date();
-      const years = (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24 * 365);
-      return acc + Math.max(0, years);
-    }, 0);
-    return { total, current, remote, totalYears: Math.round(totalYears * 10) / 10 };
-  }, [experiences]);
-
-  // Filter experiences
-  const filteredExperiences = useMemo(() => {
-    if (selectedWorkType === "all") return experiences;
-    return experiences.filter((exp) => exp.workType === selectedWorkType);
-  }, [experiences, selectedWorkType]);
-
   // Sort experiences by date (newest first)
   const sortedExperiences = useMemo(() => {
-    return [...filteredExperiences].sort((a, b) => {
+    return [...experiences].sort((a, b) => {
       if (a.current && !b.current) return -1;
       if (!a.current && b.current) return 1;
       const dateA = a.startDate ? new Date(a.startDate + "-01").getTime() : 0;
       const dateB = b.startDate ? new Date(b.startDate + "-01").getTime() : 0;
       return dateB - dateA;
     });
-  }, [filteredExperiences]);
+  }, [experiences]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -192,71 +169,6 @@ export const ExperienceSection = () => {
           >
             A timeline of my professional journey, showcasing growth, achievements, and expertise
           </motion.p>
-        </motion.div>
-
-        {/* Statistics Cards */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8 max-w-4xl mx-auto"
-        >
-          {[
-            { label: "Total Roles", value: stats.total, icon: Briefcase, color: "from-blue-500/20 to-cyan-500/20" },
-            { label: "Current", value: stats.current, icon: CheckCircle2, color: "from-green-500/20 to-emerald-500/20" },
-            { label: "Remote", value: stats.remote, icon: Laptop, color: "from-purple-500/20 to-pink-500/20" },
-            { label: "Years", value: stats.totalYears, icon: TrendingUp, color: "from-orange-500/20 to-red-500/20" },
-          ].map((stat, index) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 + index * 0.1 }}
-              whileHover={{ scale: 1.05, y: -4 }}
-              className={`relative p-4 rounded-xl bg-gradient-to-br ${stat.color} border border-primary/20 backdrop-blur-sm`}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <stat.icon className="w-5 h-5 text-primary" />
-                <span className="text-2xl font-bold text-foreground">{stat.value}</span>
-              </div>
-              <p className="text-xs text-muted-foreground">{stat.label}</p>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Filter Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="flex flex-wrap items-center justify-center gap-2 mb-8 max-w-2xl mx-auto"
-        >
-          <span className="text-sm text-muted-foreground flex items-center gap-2">
-            <Filter className="w-4 h-4" />
-            Filter:
-          </span>
-          <Button
-            variant={selectedWorkType === "all" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setSelectedWorkType("all")}
-            className="gap-2"
-          >
-            All
-          </Button>
-          {(["remote", "onsite", "hybrid"] as const).map((type) => (
-            <Button
-              key={type}
-              variant={selectedWorkType === type ? "default" : "outline"}
-              size="sm"
-              onClick={() => setSelectedWorkType(type)}
-              className="gap-2"
-            >
-              {workTypeLabel(type)}
-            </Button>
-          ))}
         </motion.div>
 
         {/* Experience Timeline */}
