@@ -24,21 +24,24 @@ const CertificationCard = ({ cert, index }: CertificationCardProps) => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.55, delay: index * 0.06 }}
-      whileHover={{ y: -8 }}
-      className="glass-enhanced rounded-2xl overflow-hidden border border-primary/10 card-hover"
+      whileHover={{ y: -8, scale: 1.02 }}
+      className="group relative glass-enhanced rounded-2xl overflow-hidden border border-primary/10 card-hover transition-all duration-300"
     >
+      {/* Gradient overlay on hover */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0" />
+      
       {/* Image */}
-      <div className="relative aspect-[16/9] bg-gradient-to-br from-primary/10 via-primary/5 to-transparent">
+      <div className="relative aspect-[16/9] bg-gradient-to-br from-primary/10 via-primary/5 to-transparent overflow-hidden">
         {cert.imageUrl && !imageError ? (
           <>
             <img
               src={cert.imageUrl}
               alt={`${cert.title} certificate`}
-              className="absolute inset-0 w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               loading="lazy"
               onError={() => setImageError(true)}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/10 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
           </>
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
@@ -47,18 +50,24 @@ const CertificationCard = ({ cert, index }: CertificationCardProps) => {
             </div>
           </div>
         )}
+        {/* Badge overlay */}
+        <div className="absolute top-3 right-3 z-10">
+          <div className="bg-background/90 backdrop-blur-sm rounded-lg px-2 py-1 border border-primary/20">
+            <Award className="w-4 h-4 text-primary" />
+          </div>
+        </div>
       </div>
 
       {/* Content */}
-      <div className="p-5 sm:p-6">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <h3 className="font-display text-lg sm:text-xl font-semibold leading-snug truncate">
+      <div className="p-5 sm:p-6 relative z-10">
+        <div className="flex items-start justify-between gap-3 mb-3">
+          <div className="min-w-0 flex-1">
+            <h3 className="font-display text-lg sm:text-xl font-semibold leading-snug group-hover:text-primary transition-colors">
               {cert.title}
             </h3>
-            <div className="flex items-center gap-2 mt-1 text-primary/90 font-medium">
+            <div className="flex items-center gap-2 mt-1.5 text-primary/90 font-medium">
               <Award className="w-4 h-4 shrink-0" />
-              <span className="truncate">{cert.issuer}</span>
+              <span className="truncate text-sm">{cert.issuer}</span>
             </div>
           </div>
           {showVerify && (
@@ -66,7 +75,8 @@ const CertificationCard = ({ cert, index }: CertificationCardProps) => {
               href={cert.credentialUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="shrink-0 inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold border border-primary/25 bg-primary/10 hover:bg-primary/15 hover:border-primary/40 transition-colors"
+              className="shrink-0 inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold border border-primary/25 bg-primary/10 hover:bg-primary/20 hover:border-primary/40 transition-all duration-300 hover:scale-105"
+              onClick={(e) => e.stopPropagation()}
             >
               Verify
               <ExternalLink className="w-4 h-4" />
@@ -75,15 +85,15 @@ const CertificationCard = ({ cert, index }: CertificationCardProps) => {
         </div>
 
         {/* Meta */}
-        <div className="flex flex-wrap gap-2 mt-4 text-muted-foreground">
+        <div className="flex flex-wrap gap-2 mb-3">
           {cert.issueDate && (
-            <Badge variant="secondary" className="gap-1.5">
+            <Badge variant="secondary" className="gap-1.5 text-xs">
               <Calendar className="w-3.5 h-3.5" />
               {cert.issueDate}
             </Badge>
           )}
           {cert.credentialId && (
-            <Badge variant="outline" className="gap-1.5 border-primary/20">
+            <Badge variant="outline" className="gap-1.5 border-primary/20 text-xs">
               <Hash className="w-3.5 h-3.5" />
               {cert.credentialId}
             </Badge>
@@ -92,22 +102,22 @@ const CertificationCard = ({ cert, index }: CertificationCardProps) => {
 
         {/* Description */}
         {cert.description && (
-          <p className="text-sm text-muted-foreground leading-relaxed mt-4 line-clamp-3">
+          <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2 mb-3">
             {cert.description}
           </p>
         )}
 
         {/* Skills */}
         {skills.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-4">
-            {skills.slice(0, 8).map((skill) => (
+          <div className="flex flex-wrap gap-2">
+            {skills.slice(0, 6).map((skill) => (
               <Badge key={skill} variant="secondary" className="text-xs">
                 {skill}
               </Badge>
             ))}
-            {skills.length > 8 && (
+            {skills.length > 6 && (
               <Badge variant="secondary" className="text-xs">
-                +{skills.length - 8}
+                +{skills.length - 6}
               </Badge>
             )}
           </div>
@@ -119,6 +129,7 @@ const CertificationCard = ({ cert, index }: CertificationCardProps) => {
 
 export const CertificationsSection = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [showAll, setShowAll] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const { data: certifications = [], isLoading } = useCertifications();
 
@@ -130,6 +141,9 @@ export const CertificationsSection = () => {
     if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
   }, []);
+
+  const displayedCertifications = showAll ? certifications : certifications.slice(0, 3);
+  const hasMore = certifications.length > 3;
 
   return (
     <section
@@ -177,11 +191,43 @@ export const CertificationsSection = () => {
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
         ) : certifications.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-            {certifications.map((cert, index) => (
-              <CertificationCard key={cert.id || index} cert={cert} index={index} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+              <AnimatePresence mode="wait">
+                {displayedCertifications.map((cert, index) => (
+                  <CertificationCard key={cert.id || index} cert={cert} index={index} />
+                ))}
+              </AnimatePresence>
+            </div>
+            
+            {hasMore && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="flex justify-center mt-10"
+              >
+                <Button
+                  onClick={() => setShowAll(!showAll)}
+                  variant="hero-outline"
+                  size="lg"
+                  className="group gap-2"
+                >
+                  {showAll ? (
+                    <>
+                      Show Less
+                      <ChevronUp className="w-5 h-5 transition-transform group-hover:-translate-y-1" />
+                    </>
+                  ) : (
+                    <>
+                      See More Certifications
+                      <ChevronDown className="w-5 h-5 transition-transform group-hover:translate-y-1" />
+                    </>
+                  )}
+                </Button>
+              </motion.div>
+            )}
+          </>
         ) : (
           <div className="text-center py-20 text-muted-foreground border border-dashed border-white/10 rounded-2xl">
             No certifications added yet.
