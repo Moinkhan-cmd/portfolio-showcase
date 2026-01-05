@@ -176,12 +176,12 @@ export const HeroSection = () => {
               </h1>
             </motion.div>
 
-            {/* Animated Role - Enhanced */}
+            {/* Animated Role - Enhanced - Responsive */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={isInView ? { opacity: 1 } : {}}
               transition={{ delay: 0.8 }}
-              className="h-14 sm:h-16 overflow-hidden"
+              className="h-12 sm:h-14 md:h-16 overflow-hidden"
             >
               <AnimatePresence mode="wait">
                 <motion.div
@@ -190,41 +190,42 @@ export const HeroSection = () => {
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: -50, opacity: 0 }}
                   transition={{ duration: 0.6, type: "spring" }}
-                  className="text-2xl sm:text-3xl md:text-4xl text-muted-foreground font-light flex items-center gap-3"
+                  className="text-xl sm:text-2xl md:text-3xl lg:text-4xl text-muted-foreground font-light flex items-center gap-2 sm:gap-3"
                 >
-                  <Code2 className="w-6 h-6 sm:w-7 sm:h-7 text-primary" />
-                  <span>{roles[currentRole]}</span>
+                  <Code2 className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-primary flex-shrink-0" />
+                  <span className="truncate">{roles[currentRole]}</span>
                 </motion.div>
               </AnimatePresence>
             </motion.div>
 
-            {/* Description - Enhanced */}
+            {/* Description - Enhanced - Responsive */}
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.9 }}
-              className="text-lg sm:text-xl md:text-2xl text-foreground/80 leading-relaxed max-w-2xl font-light"
+              className="text-base sm:text-lg md:text-xl lg:text-2xl text-foreground/80 leading-relaxed max-w-2xl font-light"
             >
               Transforming ideas into seamless, user-centric interfaces with{" "}
               <span className="text-primary font-medium">clean code</span> and{" "}
               <span className="text-primary font-medium">pixel-perfect precision</span>.
             </motion.p>
 
-            {/* CTA Buttons - Enhanced */}
+            {/* CTA Buttons - Enhanced - Responsive */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 1 }}
-              className="flex flex-wrap gap-4 pt-4"
+              className="flex flex-wrap gap-3 sm:gap-4 pt-2 sm:pt-4"
             >
               <motion.div
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
+                className="w-full sm:w-auto"
               >
                 <Button
                   size="lg"
                   onClick={() => scrollToSection("#projects")}
-                  className="group relative overflow-hidden bg-gradient-to-r from-primary via-primary/90 to-primary hover:from-primary/90 hover:via-primary hover:to-primary/90 text-primary-foreground font-semibold px-8 py-6 text-base sm:text-lg shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/40 transition-all"
+                  className="group relative overflow-hidden bg-gradient-to-r from-primary via-primary/90 to-primary hover:from-primary/90 hover:via-primary hover:to-primary/90 text-primary-foreground font-semibold px-6 sm:px-8 py-5 sm:py-6 text-sm sm:text-base md:text-lg shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/40 transition-all w-full sm:w-auto touch-manipulation"
                 >
                   <span className="relative z-10 flex items-center gap-2">
                     View My Work
