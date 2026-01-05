@@ -152,6 +152,7 @@ export const Navigation = () => {
             <ArrowUpRight className="w-3.5 h-3.5 lg:w-4 lg:h-4" />
           </Button>
           <motion.button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className={cn(
               'md:hidden relative z-50 p-1.5 xs:p-2 rounded-lg xs:rounded-xl transition-colors duration-200',
               'hover:bg-secondary/80 active:bg-secondary',
