@@ -1,4 +1,4 @@
-import { ArrowDown, Download, Github, Linkedin, Mail, Sparkles, ExternalLink, Rocket, Eye, ChevronDown } from "lucide-react";
+import { ArrowDown, Download, Github, Linkedin, Mail, Sparkles, ExternalLink, Rocket, Eye, ChevronDown, Code2, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -6,15 +6,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { motion, useMotionValue, useSpring, useTransform, useInView } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform, useInView, AnimatePresence } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import myPhoto from "@/images/my photo.jpg";
 import { HeroBackground3D } from "./HeroBackground3D";
 
 const socialLinks = [
-  { icon: Github, href: "https://github.com/Moinkhan-cmd", label: "GitHub" },
-  { icon: Linkedin, href: "https://www.linkedin.com/in/moin-bhatti-65363a255", label: "LinkedIn" },
-  { icon: Mail, href: "https://mail.google.com/mail/?view=cm&fs=1&to=moinbhatti59%40gmail.com", label: "Email" },
+  { icon: Github, href: "https://github.com/Moinkhan-cmd", label: "GitHub", color: "hover:text-[#333] dark:hover:text-[#f0f0f0]" },
+  { icon: Linkedin, href: "https://www.linkedin.com/in/moin-bhatti-65363a255", label: "LinkedIn", color: "hover:text-[#0077b5]" },
+  { icon: Mail, href: "https://mail.google.com/mail/?view=cm&fs=1&to=moinbhatti59%40gmail.com", label: "Email", color: "hover:text-[#ea4335]" },
 ] as const;
 
 const roles = ["Frontend Developer", "UI/UX Designer", "React Specialist", "Creative Coder"];
@@ -24,18 +24,19 @@ export const HeroSection = () => {
   const contentRef = useRef<HTMLDivElement>(null);
   const [currentRole, setCurrentRole] = useState(0);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
   
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
-  const springConfig = { damping: 25, stiffness: 150 };
-  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [8, -8]), springConfig);
-  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-8, 8]), springConfig);
-  const isInView = useInView(contentRef, { once: true, amount: 0.3 });
+  const springConfig = { damping: 30, stiffness: 200 };
+  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [6, -6]), springConfig);
+  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-6, 6]), springConfig);
+  const isInView = useInView(contentRef, { once: true, amount: 0.2 });
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentRole((prev) => (prev + 1) % roles.length);
-    }, 3000);
+    }, 3500);
     return () => clearInterval(interval);
   }, []);
 
@@ -58,459 +59,467 @@ export const HeroSection = () => {
       id="hero"
       ref={containerRef}
       onMouseMove={handleMouseMove}
-      className="relative min-h-screen overflow-hidden bg-background pt-20"
+      className="relative min-h-screen overflow-hidden bg-background pt-20 flex items-center"
     >
       {/* 3D Background */}
       <HeroBackground3D />
       
-      {/* Gradient overlay for better text contrast */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background/60 pointer-events-none z-[1]" />
+      {/* Enhanced Gradient Overlays for Better Contrast */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/70 to-background/90 pointer-events-none z-[1]" />
+      <div className="absolute inset-0 bg-gradient-to-r from-background/50 via-transparent to-background/50 pointer-events-none z-[1]" />
       
-      {/* Animated gradient mesh background - reduced opacity to show 3D */}
+      {/* Radial gradient for text contrast */}
+      <div 
+        className="absolute inset-0 pointer-events-none z-[1]"
+        style={{
+          background: "radial-gradient(ellipse at center, transparent 0%, hsl(var(--background) / 0.4) 40%, hsl(var(--background) / 0.8) 100%)"
+        }}
+      />
+      
+      {/* Animated gradient mesh background */}
       <div className="absolute inset-0 overflow-hidden z-[1]">
         <motion.div
-          className="absolute -top-1/2 -left-1/2 w-full h-full rounded-full blur-3xl opacity-20"
+          className="absolute -top-1/2 -left-1/2 w-full h-full rounded-full blur-3xl opacity-15"
           style={{ background: "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)" }}
           animate={{ x: [0, 100, 0], y: [0, 50, 0] }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
         />
         <motion.div
-          className="absolute -bottom-1/2 -right-1/2 w-full h-full rounded-full blur-3xl opacity-15"
+          className="absolute -bottom-1/2 -right-1/2 w-full h-full rounded-full blur-3xl opacity-10"
           style={{ background: "radial-gradient(circle, hsl(280 70% 50%) 0%, transparent 70%)" }}
           animate={{ x: [0, -100, 0], y: [0, -50, 0] }}
           transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
         />
         
-        {/* Grid overlay - subtle */}
+        {/* Subtle grid overlay */}
         <div 
-          className="absolute inset-0 opacity-[0.015]"
+          className="absolute inset-0 opacity-[0.02]"
           style={{
             backgroundImage: `linear-gradient(hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)`,
-            backgroundSize: '60px 60px'
+            backgroundSize: '80px 80px'
           }}
         />
       </div>
 
-      {/* Floating cursor light - enhanced */}
+      {/* Enhanced cursor light */}
       <motion.div
-        className="pointer-events-none fixed w-96 h-96 rounded-full opacity-15 blur-3xl z-40 transition-opacity duration-300"
+        className="pointer-events-none fixed w-[500px] h-[500px] rounded-full opacity-10 blur-3xl z-40 transition-opacity duration-500"
         style={{
           background: "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)",
-          left: mousePos.x - 192,
-          top: mousePos.y - 192,
+          left: mousePos.x - 250,
+          top: mousePos.y - 250,
         }}
       />
 
-      {/* Main content - Asymmetric split layout */}
-      <div className="relative z-20 min-h-screen flex flex-col lg:flex-row">
-        
-        {/* Left side - Typography focused */}
-        <div className="flex-1 flex flex-col justify-center px-6 sm:px-12 lg:px-20 py-32 lg:py-0">
+      {/* Main Content Container */}
+      <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-20 lg:py-32">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          
+          {/* Left Column - Enhanced Typography */}
           <motion.div
+            ref={contentRef}
             initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="max-w-2xl"
+            className="space-y-8 lg:space-y-10"
           >
-            {/* Status badge */}
+            {/* Status Badge - Enhanced */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8"
+              initial={{ opacity: 0, y: 20, scale: 0.9 }}
+              animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+              transition={{ delay: 0.3, type: "spring" }}
+              className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border border-primary/30 backdrop-blur-md shadow-lg shadow-primary/10"
             >
-              <span className="relative flex h-2 w-2">
+              <span className="relative flex h-2.5 w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
               </span>
-              <span className="text-sm font-medium text-foreground/80">Available for opportunities</span>
+              <span className="text-sm font-semibold text-foreground">Available for opportunities</span>
             </motion.div>
 
-            {/* Main heading */}
+            {/* Main Heading - Enhanced Typography */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.8 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: 0.4, duration: 0.8 }}
+              className="space-y-4"
             >
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold leading-[0.9] tracking-tight mb-6">
-                <span className="block text-foreground">I craft</span>
-                <span className="block bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">
+              <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold leading-[0.95] tracking-tight">
+                <motion.span 
+                  className="block text-foreground"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={isInView ? { opacity: 1, x: 0 } : {}}
+                  transition={{ delay: 0.5 }}
+                >
+                  I craft
+                </motion.span>
+                <motion.span
+                  className="block bg-gradient-to-r from-primary via-purple-500 via-pink-500 to-primary bg-clip-text text-transparent bg-[length:200%_auto]"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={isInView ? { opacity: 1, x: 0 } : {}}
+                  transition={{ delay: 0.6 }}
+                  style={{
+                    backgroundPosition: "0% center",
+                    animation: "gradient-shift 3s ease infinite",
+                  }}
+                >
                   digital
-                </span>
-                <span className="block text-foreground">experiences</span>
+                </motion.span>
+                <motion.span 
+                  className="block text-foreground"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={isInView ? { opacity: 1, x: 0 } : {}}
+                  transition={{ delay: 0.7 }}
+                >
+                  experiences
+                </motion.span>
               </h1>
             </motion.div>
 
-            {/* Animated role */}
+            {/* Animated Role - Enhanced */}
             <motion.div
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              animate={isInView ? { opacity: 1 } : {}}
               transition={{ delay: 0.8 }}
-              className="h-12 mb-8 overflow-hidden"
+              className="h-14 sm:h-16 overflow-hidden"
+            >
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentRole}
+                  initial={{ y: 50, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -50, opacity: 0 }}
+                  transition={{ duration: 0.6, type: "spring" }}
+                  className="text-2xl sm:text-3xl md:text-4xl text-muted-foreground font-light flex items-center gap-3"
+                >
+                  <Code2 className="w-6 h-6 sm:w-7 sm:h-7 text-primary" />
+                  <span>{roles[currentRole]}</span>
+                </motion.div>
+              </AnimatePresence>
+            </motion.div>
+
+            {/* Description - Enhanced */}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: 0.9 }}
+              className="text-lg sm:text-xl md:text-2xl text-foreground/80 leading-relaxed max-w-2xl font-light"
+            >
+              Transforming ideas into seamless, user-centric interfaces with{" "}
+              <span className="text-primary font-medium">clean code</span> and{" "}
+              <span className="text-primary font-medium">pixel-perfect precision</span>.
+            </motion.p>
+
+            {/* CTA Buttons - Enhanced */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: 1 }}
+              className="flex flex-wrap gap-4 pt-4"
             >
               <motion.div
-                key={currentRole}
-                initial={{ y: 40, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: -40, opacity: 0 }}
-                transition={{ duration: 0.5 }}
-                className="text-xl sm:text-2xl text-muted-foreground font-light"
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
               >
-                {roles[currentRole]}
+                <Button
+                  size="lg"
+                  onClick={() => scrollToSection("#projects")}
+                  className="group relative overflow-hidden bg-gradient-to-r from-primary via-primary/90 to-primary hover:from-primary/90 hover:via-primary hover:to-primary/90 text-primary-foreground font-semibold px-8 py-6 text-base sm:text-lg shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/40 transition-all"
+                >
+                  <span className="relative z-10 flex items-center gap-2">
+                    View My Work
+                    <motion.div
+                      animate={{ x: [0, 4, 0] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                    >
+                      <ExternalLink className="w-5 h-5" />
+                    </motion.div>
+                  </span>
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                    animate={{ x: ["-100%", "200%"] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  />
+                </Button>
+              </motion.div>
+              
+              <motion.div
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="group border-2 border-primary/30 hover:border-primary/50 hover:bg-primary/10 px-8 py-6 text-base sm:text-lg font-semibold backdrop-blur-sm"
+                    >
+                      <Download className="mr-2 h-5 w-5" />
+                      Resume
+                      <ChevronDown className="ml-2 h-4 w-4 group-hover:rotate-180 transition-transform" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48 z-[9999]" sideOffset={5}>
+                    <DropdownMenuItem
+                      onSelect={(e) => {
+                        const url = "https://drive.google.com/file/d/1p42p9NpczSWy_-iLeVaO38ciHAMHXp9r/view?usp=sharing";
+                        window.open(url, "_blank", "noopener,noreferrer");
+                      }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const url = "https://drive.google.com/file/d/1p42p9NpczSWy_-iLeVaO38ciHAMHXp9r/view?usp=sharing";
+                        window.open(url, "_blank", "noopener,noreferrer");
+                      }}
+                      className="cursor-pointer focus:bg-accent"
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      See Resume
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onSelect={(e) => {
+                        const fileId = "1p42p9NpczSWy_-iLeVaO38ciHAMHXp9r";
+                        const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+                        window.open(downloadUrl, "_blank", "noopener,noreferrer");
+                      }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const fileId = "1p42p9NpczSWy_-iLeVaO38ciHAMHXp9r";
+                        const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+                        window.open(downloadUrl, "_blank", "noopener,noreferrer");
+                      }}
+                      className="cursor-pointer focus:bg-accent"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Download
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </motion.div>
             </motion.div>
 
-            {/* Description */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.9 }}
-              className="text-lg text-muted-foreground/80 leading-relaxed mb-10 max-w-lg"
-            >
-              Transforming ideas into seamless, user-centric interfaces with clean code and pixel-perfect precision.
-            </motion.p>
-
-            {/* CTA Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1 }}
-              className="flex flex-wrap gap-4"
-            >
-              <Button
-                size="lg"
-                onClick={() => scrollToSection("#projects")}
-                className="group relative overflow-hidden bg-foreground text-background hover:bg-foreground/90 px-8"
-              >
-                <span className="relative z-10 flex items-center gap-2">
-                  View Work
-                  <ExternalLink className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                </span>
-              </Button>
-              
-              <Button
-                size="lg"
-                variant="outline"
-                asChild
-                className="group border-foreground/20 hover:bg-foreground/5 px-8"
-              >
-                <a href="/Moinkhan-CV.pdf" download>
-                  <Download className="mr-2 h-4 w-4" />
-                  Resume
-                </a>
-              </Button>
-            </motion.div>
-
-            {/* Social links */}
+            {/* Social Links - Enhanced */}
             <motion.div
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              animate={isInView ? { opacity: 1 } : {}}
               transition={{ delay: 1.2 }}
-              className="flex gap-4 mt-12"
+              className="flex gap-4 pt-4"
             >
-              {socialLinks.map((link) => (
+              {socialLinks.map((link, index) => (
                 <motion.a
                   key={link.label}
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-3 rounded-full border border-foreground/10 text-muted-foreground hover:text-foreground hover:border-foreground/30 hover:bg-foreground/5 transition-all duration-300"
-                  whileHover={{ scale: 1.1, y: -2 }}
+                  className={`p-4 rounded-xl border-2 border-primary/20 bg-background/50 backdrop-blur-sm text-muted-foreground ${link.color} hover:border-primary/40 hover:bg-primary/10 transition-all duration-300 relative overflow-hidden group`}
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={isInView ? { opacity: 1, scale: 1 } : {}}
+                  transition={{ delay: 1.3 + index * 0.1, type: "spring" }}
+                  whileHover={{ scale: 1.1, y: -4, rotate: 5 }}
                   whileTap={{ scale: 0.95 }}
+                  onMouseEnter={() => setIsHovered(true)}
+                  onMouseLeave={() => setIsHovered(false)}
                 >
-                  <link.icon className="w-5 h-5" />
+                  <link.icon className="w-5 h-5 sm:w-6 sm:h-6 relative z-10" />
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                  />
                 </motion.a>
               ))}
             </motion.div>
           </motion.div>
-        </div>
 
-        {/* Right side - Visual showcase */}
-        <div className="flex-1 flex items-center justify-center p-6 lg:p-12 relative">
+          {/* Right Column - Visual Showcase */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, scale: 0.8, x: 50 }}
+            animate={isInView ? { opacity: 1, scale: 1, x: 0 } : {}}
             transition={{ duration: 1, delay: 0.3 }}
-            className="relative"
-            style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+            className="relative flex items-center justify-center lg:justify-end"
           >
-            {/* Decorative rings */}
             <motion.div
-              className="absolute inset-0 -m-8 rounded-full border border-primary/20"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-            />
-            <motion.div
-              className="absolute inset-0 -m-16 rounded-full border border-primary/10"
-              animate={{ rotate: -360 }}
-              transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
-            />
-            <motion.div
-              className="absolute inset-0 -m-24 rounded-full border border-primary/5"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
-            />
-
-            {/* Floating elements */}
-            {[...Array(6)].map((_, i) => (
+              className="relative"
+              style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+            >
+              {/* Decorative rings - Enhanced */}
               <motion.div
-                key={i}
-                className="absolute w-3 h-3 rounded-full bg-primary/60"
-                style={{
-                  top: `${50 + Math.sin(i * 60 * Math.PI / 180) * 55}%`,
-                  left: `${50 + Math.cos(i * 60 * Math.PI / 180) * 55}%`,
-                }}
-                animate={{
-                  y: [0, -15, 0],
-                  opacity: [0.4, 1, 0.4],
-                  scale: [1, 1.3, 1],
-                }}
-                transition={{
-                  duration: 3 + i * 0.5,
-                  repeat: Infinity,
-                  delay: i * 0.3,
-                }}
+                className="absolute inset-0 -m-8 rounded-full border-2 border-primary/20"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
               />
-            ))}
-
-            {/* Main image container */}
-            <div className="relative w-72 h-72 sm:w-80 sm:h-80 lg:w-[400px] lg:h-[400px]">
-              {/* Gradient glow */}
               <motion.div
-                className="absolute inset-0 rounded-3xl blur-3xl"
-                style={{ background: "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(280 70% 50%) 100%)" }}
-                animate={{ opacity: [0.3, 0.5, 0.3] }}
-                transition={{ duration: 4, repeat: Infinity }}
+                className="absolute inset-0 -m-16 rounded-full border border-primary/10"
+                animate={{ rotate: -360 }}
+                transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
               />
-              
-              {/* Image frame */}
-              <motion.div
-                className="relative w-full h-full rounded-3xl overflow-hidden border-2 border-foreground/10"
-                whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.4 }}
-              >
-                {/* Animated border */}
+
+              {/* Floating particles - Enhanced */}
+              {[...Array(8)].map((_, i) => (
                 <motion.div
-                  className="absolute inset-0 rounded-3xl"
+                  key={i}
+                  className="absolute w-2 h-2 rounded-full bg-primary/60"
                   style={{
-                    background: "conic-gradient(from 0deg, hsl(var(--primary)), hsl(280 70% 50%), hsl(340 70% 50%), hsl(var(--primary)))",
-                    padding: "2px",
+                    top: `${50 + Math.sin(i * 45 * Math.PI / 180) * 60}%`,
+                    left: `${50 + Math.cos(i * 45 * Math.PI / 180) * 60}%`,
                   }}
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                >
-                  <div className="w-full h-full rounded-3xl bg-background" />
-                </motion.div>
-
-                <img
-                  src={myPhoto}
-                  alt="Moinkhan Bhatti"
-                  className="absolute inset-1 w-[calc(100%-8px)] h-[calc(100%-8px)] object-cover rounded-[20px]"
-                  style={{ objectPosition: "center 10%" }}
+                  animate={{
+                    y: [0, -20, 0],
+                    opacity: [0.3, 1, 0.3],
+                    scale: [1, 1.5, 1],
+                  }}
+                  transition={{
+                    duration: 3 + i * 0.3,
+                    repeat: Infinity,
+                    delay: i * 0.2,
+                    ease: "easeInOut",
+                  }}
                 />
+              ))}
 
-                {/* Overlay gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
-
-                {/* Shimmer effect */}
+              {/* Main image container - Enhanced */}
+              <div className="relative w-64 h-64 sm:w-80 sm:h-80 lg:w-[420px] lg:h-[420px] xl:w-[480px] xl:h-[480px]">
+                {/* Enhanced gradient glow */}
                 <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
-                  animate={{ x: ["-100%", "200%"] }}
-                  transition={{ duration: 3, repeat: Infinity, repeatDelay: 3 }}
+                  className="absolute inset-0 rounded-3xl blur-3xl opacity-40"
+                  style={{ background: "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(280 70% 50%) 100%)" }}
+                  animate={{ opacity: [0.3, 0.5, 0.3] }}
+                  transition={{ duration: 4, repeat: Infinity }}
                 />
-              </motion.div>
+                
+                {/* Image frame - Enhanced */}
+                <motion.div
+                  className="relative w-full h-full rounded-3xl overflow-hidden border-2 border-primary/30 shadow-2xl"
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  {/* Animated border */}
+                  <motion.div
+                    className="absolute inset-0 rounded-3xl"
+                    style={{
+                      background: "conic-gradient(from 0deg, hsl(var(--primary)), hsl(280 70% 50%), hsl(340 70% 50%), hsl(var(--primary)))",
+                      padding: "3px",
+                    }}
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                  >
+                    <div className="w-full h-full rounded-3xl bg-background" />
+                  </motion.div>
 
-                {/* Enhanced Tech Stack Tags with 3D */}
+                  <img
+                    src={myPhoto}
+                    alt="Moinkhan Bhatti"
+                    className="absolute inset-[3px] w-[calc(100%-6px)] h-[calc(100%-6px)] object-cover rounded-[20px]"
+                    style={{ objectPosition: "center 10%" }}
+                  />
+
+                  {/* Overlay gradient for better contrast */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent" />
+
+                  {/* Enhanced shimmer effect */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                    animate={{ x: ["-100%", "200%"] }}
+                    transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
+                  />
+                </div>
+
+                {/* Tech Stack Tags - Enhanced */}
                 <motion.div 
-                  className="mt-10 flex flex-wrap justify-center lg:justify-start gap-4 relative"
-                  initial={{ opacity: 0, rotateX: -10 }}
-                  animate={isInView ? { opacity: 1, rotateX: 0 } : { opacity: 0, rotateX: -10 }}
-                  transition={{ delay: 1 }}
-                  style={{ transformStyle: "preserve-3d" }}
+                  className="mt-8 flex flex-wrap justify-center lg:justify-start gap-3"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={isInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ delay: 1.1 }}
                 >
                   {[
                     { name: "React", icon: "⚛️" },
                     { name: "TypeScript", icon: "📘" },
                     { name: "Next.js", icon: "▲" },
-                    { name: "Tailwind CSS", icon: "🎨" },
-                    { name: "UI/UX Design", icon: "✨" },
+                    { name: "Tailwind", icon: "🎨" },
                   ].map((tech, i) => (
                     <motion.span 
                       key={tech.name}
-                      className="group glass-card rounded-full px-6 py-3 text-sm font-semibold text-foreground/90 border-2 border-primary/30 cursor-default backdrop-blur-xl relative overflow-hidden"
-                      initial={{ opacity: 0, scale: 0.8, rotateX: -20 }}
-                      animate={isInView ? { opacity: 1, scale: 1, rotateX: 0 } : { opacity: 0, scale: 0.8, rotateX: -20 }}
-                      transition={{ delay: 1.1 + i * 0.1, type: "spring", stiffness: 200 }}
-                      style={{ 
-                        transform: `translateZ(${i * 5}px)`,
-                        transformStyle: "preserve-3d",
-                      }}
+                      className="group px-4 py-2 rounded-full text-sm font-semibold text-foreground/90 bg-background/80 backdrop-blur-xl border-2 border-primary/30 shadow-lg relative overflow-hidden"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={isInView ? { opacity: 1, scale: 1 } : {}}
+                      transition={{ delay: 1.2 + i * 0.1, type: "spring" }}
                       whileHover={{ 
                         scale: 1.15,
-                        rotateY: 10,
-                        rotateX: 5,
-                        boxShadow: "0 20px 50px hsl(175 80% 50% / 0.4)",
+                        y: -4,
                         borderColor: "hsl(175 80% 50%)",
-                        y: -6,
-                        z: 30,
-                        transition: { duration: 0.3 }
+                        boxShadow: "0 20px 50px hsl(175 80% 50% / 0.4)",
                       }}
                     >
-                      <span className="relative z-10 flex items-center gap-2">
+                      <span className="relative z-10 flex items-center gap-1.5">
                         <span>{tech.icon}</span>
                         <span>{tech.name}</span>
                       </span>
                       <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20"
-                        initial={{ x: "-100%" }}
-                        whileHover={{ x: "100%" }}
-                        transition={{ duration: 0.5 }}
+                        className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"
                       />
                     </motion.span>
                   ))}
                 </motion.div>
 
-                {/* Enhanced CTA Buttons with 3D */}
-                <motion.div 
-                  className="mt-12 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-5 relative"
-                  initial={{ opacity: 0, y: 20, rotateX: -10 }}
-                  animate={isInView ? { opacity: 1, y: 0, rotateX: 0 } : { opacity: 0, y: 20, rotateX: -10 }}
-                  transition={{ duration: 0.6, delay: 1.2 }}
-                  style={{ transformStyle: "preserve-3d" }}
-                >
-                  <motion.div 
-                    whileHover={{ scale: 1.08, y: -5, rotateY: 5, rotateX: -5, z: 20 }} 
-                    whileTap={{ scale: 0.95 }}
-                    style={{ transformStyle: "preserve-3d" }}
+                {/* Sparkle decorations - Enhanced */}
+                {[
+                  { top: "-8%", right: "5%", delay: 0 },
+                  { bottom: "15%", left: "-10%", delay: 0.5 },
+                  { top: "25%", right: "-8%", delay: 1 },
+                ].map((pos, i) => (
+                  <motion.div
+                    key={i}
+                    className="absolute"
+                    style={{ top: pos.top, bottom: pos.bottom, right: pos.right, left: pos.left }}
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={isInView ? { opacity: 1, scale: 1 } : {}}
+                    transition={{ delay: 1.3 + pos.delay }}
                   >
-                    <Button 
-                      variant="hero" 
-                      size="lg" 
-                      onClick={() => scrollToSection("#projects")}
-                      className="glow-on-hover btn-lift min-w-[200px] h-14 text-lg relative overflow-hidden group border-2 border-primary/30"
-                      style={{ transform: "translateZ(10px)", transformStyle: "preserve-3d" }}
+                    <motion.div
+                      animate={{ rotate: 360, scale: [1, 1.3, 1] }}
+                      transition={{ duration: 4 + i, repeat: Infinity }}
                     >
-                      <span className="relative z-10 flex items-center justify-center gap-2">
-                        <Rocket className="w-5 h-5" />
-                        <span>View My Work</span>
-                      </span>
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-primary/0 via-white/20 to-primary/0"
-                        initial={{ x: "-100%" }}
-                        whileHover={{ x: "100%" }}
-                        transition={{ duration: 0.6 }}
-                      />
-                    </Button>
-                  </motion.div>
-                  
-                  <DropdownMenu>
-                    <motion.div 
-                      whileHover={{ scale: 1.08, y: -5, rotateY: -5, rotateX: -5, z: 20 }} 
-                      whileTap={{ scale: 0.95 }}
-                      style={{ transformStyle: "preserve-3d" }}
-                    >
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="hero-outline"
-                          size="lg"
-                          className="btn-lift border-2 border-primary/50 bg-transparent hover:bg-primary/10 min-w-[200px] h-14 text-lg backdrop-blur-sm"
-                          style={{ transform: "translateZ(10px)", transformStyle: "preserve-3d" }}
-                          type="button"
-                        >
-                          <Download className="w-5 h-5 mr-2" />
-                          Resume
-                          <ChevronDown className="w-4 h-4 ml-2" />
-                        </Button>
-                      </DropdownMenuTrigger>
+                      <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
                     </motion.div>
-                    <DropdownMenuContent align="end" className="w-48 z-[9999]" sideOffset={5}>
-                      <DropdownMenuItem
-                        onSelect={(e) => {
-                          const url = "https://drive.google.com/file/d/1p42p9NpczSWy_-iLeVaO38ciHAMHXp9r/view?usp=sharing";
-                          window.open(url, "_blank", "noopener,noreferrer");
-                        }}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          const url = "https://drive.google.com/file/d/1p42p9NpczSWy_-iLeVaO38ciHAMHXp9r/view?usp=sharing";
-                          window.open(url, "_blank", "noopener,noreferrer");
-                        }}
-                        className="cursor-pointer focus:bg-accent"
-                      >
-                        <Eye className="w-4 h-4 mr-2" />
-                        See Resume
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onSelect={(e) => {
-                          const fileId = "1p42p9NpczSWy_-iLeVaO38ciHAMHXp9r";
-                          const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
-                          window.open(downloadUrl, "_blank", "noopener,noreferrer");
-                        }}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          const fileId = "1p42p9NpczSWy_-iLeVaO38ciHAMHXp9r";
-                          const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
-                          window.open(downloadUrl, "_blank", "noopener,noreferrer");
-                        }}
-                        className="cursor-pointer focus:bg-accent"
-                      >
-                        <Download className="w-4 h-4 mr-2" />
-                        Download
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </motion.div>
-              {/* Sparkle decorations */}
-              {[
-                { top: "-5%", right: "10%" },
-                { bottom: "20%", left: "-8%" },
-                { top: "30%", right: "-5%" },
-              ].map((pos, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute"
-                  style={pos}
-                  animate={{ rotate: 360, scale: [1, 1.2, 1] }}
-                  transition={{ duration: 4 + i, repeat: Infinity }}
-                >
-                  <Sparkles className="w-6 h-6 text-primary" />
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Name card overlay */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.2 }}
-              className="absolute -bottom-6 left-1/2 -translate-x-1/2 px-8 py-4 rounded-2xl bg-background/80 backdrop-blur-xl border border-foreground/10 shadow-2xl"
-            >
-              <p className="text-2xl sm:text-3xl font-bold text-center bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                Moinkhan Bhatti
-              </p>
+                  </motion.div>
+                ))}
+              </div>
             </motion.div>
           </motion.div>
         </div>
       </div>
 
-      {/* Scroll indicator */}
+      {/* Enhanced Scroll Indicator */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.5 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30"
       >
         <motion.button
           onClick={() => scrollToSection("#about")}
-          className="flex flex-col items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-          animate={{ y: [0, 8, 0] }}
+          className="flex flex-col items-center gap-3 text-muted-foreground hover:text-foreground transition-colors group"
+          animate={{ y: [0, 10, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
         >
-          <span className="text-xs font-medium tracking-widest uppercase">Scroll</span>
-          <ArrowDown className="w-5 h-5" />
+          <span className="text-xs font-semibold tracking-widest uppercase">Scroll</span>
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            <ArrowDown className="w-5 h-5 group-hover:text-primary transition-colors" />
+          </motion.div>
         </motion.button>
       </motion.div>
+
+      {/* Add CSS animation for gradient */}
+      <style>{`
+        @keyframes gradient-shift {
+          0%, 100% { background-position: 0% center; }
+          50% { background-position: 100% center; }
+        }
+      `}</style>
     </section>
   );
 };
