@@ -32,17 +32,16 @@ export const Navigation = () => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "glass-card py-4"
-          : "bg-transparent py-6"
-      }`}
+      className={`fixed z-50 transition-all duration-500 ${isScrolled
+          ? "top-4 left-1/2 -translate-x-1/2 w-[90%] md:w-fit rounded-full glass-card py-3 px-8 shadow-xl"
+          : "top-0 left-0 w-full bg-transparent py-6"
+        }`}
     >
-      <div className="container mx-auto container-padding">
-        <div className="flex items-center justify-between">
+      <div className={`${isScrolled ? "w-full md:min-w-[500px]" : "container mx-auto container-padding"}`}>
+        <div className="flex items-center justify-between gap-8">
           <a
             href="#"
-            className="font-signature text-2xl md:text-3xl text-foreground hover:text-primary transition-all duration-300 relative group"
+            className="font-signature text-2xl md:text-3xl text-foreground hover:text-primary transition-all duration-300 relative group shrink-0"
             onClick={(e) => {
               e.preventDefault();
               window.scrollTo({ top: 0, behavior: "smooth" });
@@ -59,7 +58,7 @@ export const Navigation = () => {
               <button
                 key={link.name}
                 onClick={() => scrollToSection(link.href)}
-                className="text-muted-foreground hover:text-foreground transition-colors duration-200 text-sm font-medium"
+                className="text-muted-foreground hover:text-foreground transition-colors duration-200 text-sm font-medium whitespace-nowrap"
               >
                 {link.name}
               </button>
@@ -85,13 +84,13 @@ export const Navigation = () => {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <div className="md:hidden mt-4 pb-4 animate-fade-in">
+          <div className={`md:hidden mt-4 pb-4 animate-fade-in ${isScrolled ? "text-center" : ""}`}>
             <div className="flex flex-col gap-4">
               {navLinks.map((link) => (
                 <button
                   key={link.name}
                   onClick={() => scrollToSection(link.href)}
-                  className="text-muted-foreground hover:text-foreground transition-colors duration-200 text-left py-2"
+                  className="text-muted-foreground hover:text-foreground transition-colors duration-200 py-2"
                 >
                   {link.name}
                 </button>
@@ -99,7 +98,7 @@ export const Navigation = () => {
               <Button
                 variant="hero"
                 onClick={() => scrollToSection("#contact")}
-                className="mt-2"
+                className="mt-2 w-full"
               >
                 Hire Me
               </Button>
