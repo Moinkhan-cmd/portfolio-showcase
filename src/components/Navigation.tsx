@@ -1,9 +1,9 @@
-import { useEffect, useState, useCallback, useRef, MouseEvent as ReactMouseEvent } from 'react';
-import { Menu, X, ArrowUpRight, Sparkles, Zap } from 'lucide-react';
-import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { ThemeToggle } from '@/components/ThemeToggle';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { useEffect, useState, useCallback, useRef } from "react";
+import { Menu, X, ArrowUpRight, Sparkles, Star } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const navLinks = [
   { name: 'About', href: '#about' },
@@ -267,346 +267,235 @@ const PremiumCTA = ({ onClick, isScrolled, isFocused, onFocus, onBlur }: Premium
           <>
             {[...Array(6)].map((_, i) => (
               <motion.div
-                key={i}
-                className="absolute w-1 h-1 rounded-full bg-primary"
-                initial={{ opacity: 0, x: 0, y: 0, scale: 0 }}
-                animate={{
-                  opacity: [0, 1, 0],
-                  x: Math.cos((i * Math.PI * 2) / 6) * 40,
-                  y: Math.sin((i * Math.PI * 2) / 6) * 40,
-                  scale: [0, 1.5, 0],
+                initial={{ opacity: 0, scale: 0, rotate: -180, x: -20, y: -20 }}
+                animate={{ 
+                  opacity: 1, 
+                  scale: 1, 
+                  rotate: 0,
+                  x: 0,
+                  y: 0,
                 }}
-                exit={{ opacity: 0, scale: 0 }}
-                transition={{ duration: 1, repeat: Infinity, delay: i * 0.15, ease: 'easeOut' }}
-                style={{ left: '50%', top: '50%' }}
-              />
-            ))}
-          </>
-        )}
-      </AnimatePresence>
-
-      <motion.div style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}>
-        <Button
-          ref={buttonRef}
-          variant="hero"
-          size={isScrolled ? 'sm' : 'default'}
-          onClick={onClick}
-          onFocus={onFocus}
-          onBlur={onBlur}
-          onMouseMove={handleMouseMove}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={handleMouseLeave}
-          className={cn(
-            'rounded-full font-semibold shadow-lg transition-all duration-300 gap-2 relative overflow-hidden group/cta',
-            'outline-none border-0',
-            isScrolled ? 'px-5' : 'px-6',
-            isFocused && 'ring-0'
-          )}
-          aria-label="Let's Talk - Contact me"
-        >
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-primary via-purple-600 to-primary"
-            animate={{ backgroundPosition: isHovered ? ['0% 50%', '100% 50%'] : '0% 50%' }}
-            transition={{ duration: 2, repeat: isHovered ? Infinity : 0 }}
-            style={{ backgroundSize: '200% 100%' }}
-          />
-          
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-            animate={{ x: ['-100%', '200%'] }}
-            transition={{ duration: 2, repeat: Infinity, repeatDelay: 2 }}
-          />
-
-          <motion.div
-            className="absolute inset-0 rounded-full"
-            animate={{
-              boxShadow: isHovered 
-                ? '0 0 40px hsl(var(--primary) / 0.6), 0 10px 40px hsl(var(--primary) / 0.4)' 
-                : '0 0 0 transparent',
-            }}
-            transition={{ duration: 0.3 }}
-          />
-
-          <span className={cn(
-            'relative z-10 flex items-center gap-2 font-semibold text-white transition-all duration-200',
-            (isHovered || isFocused) && 'drop-shadow-[0_0_12px_rgba(255,255,255,0.8)]'
-          )}>
-            Let's Talk
-            <motion.span
-              animate={{ 
-                x: isHovered ? [0, 4, 0] : 0, 
-                y: isHovered ? [0, -4, 0] : 0,
-                rotate: isHovered ? [0, 15, 0] : 0,
-              }}
-              transition={{ duration: 0.6, repeat: isHovered ? Infinity : 0 }}
-            >
-              <ArrowUpRight className="w-4 h-4" />
-            </motion.span>
-          </span>
-        </Button>
-      </motion.div>
-    </motion.div>
-  );
-};
-
-// ============ ANIMATED LOGO ============
-const AnimatedLogo = ({ isScrolled }: { isScrolled: boolean }) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const logoRef = useRef<HTMLDivElement>(null);
-  
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const rotateX = useTransform(y, [-15, 15], [15, -15]);
-  const rotateY = useTransform(x, [-15, 15], [-15, 15]);
-
-  const handleMouseMove = (e: ReactMouseEvent<HTMLAnchorElement>) => {
-    const rect = logoRef.current.getBoundingClientRect();
-    x.set((e.clientX - (rect.left + rect.width / 2)) * 0.3);
-    y.set((e.clientY - (rect.top + rect.height / 2)) * 0.3);
-  };
-
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-    setIsHovered(false);
-  };
-
-  return (
-    <motion.a
-      href="#"
-      className="relative flex items-center gap-2 group shrink-0"
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={handleMouseLeave}
-      onClick={(e) => {
-        e.preventDefault();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }}
-      aria-label="Go to top"
-      style={{ perspective: 500 }}
-    >
-      <motion.div
-        ref={logoRef}
-        style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-      >
-        <motion.div
-          className="relative w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-purple-500/20 text-primary border border-primary/30"
-          animate={{
-            borderColor: isHovered ? 'hsl(var(--primary))' : 'hsl(var(--primary) / 0.3)',
-            boxShadow: isHovered 
-              ? '0 0 30px hsl(var(--primary) / 0.5), inset 0 0 20px hsl(var(--primary) / 0.1)' 
-              : '0 0 0 transparent',
-          }}
-          transition={{ duration: 0.3 }}
-        >
-          <motion.span 
-            className="font-signature font-bold text-xl relative z-10"
-            animate={{ textShadow: isHovered ? '0 0 20px hsl(var(--primary))' : 'none' }}
-          >
-            M
-          </motion.span>
-          
-          <motion.div
-            className="absolute inset-0 rounded-xl bg-primary/20 blur-md"
-            animate={{ opacity: isHovered ? 0.8 : 0 }}
-            transition={{ duration: 0.3 }}
-          />
-          
-          <AnimatePresence>
-            {isHovered && (
-              <motion.div
-                className="absolute -inset-1 rounded-xl border border-primary/40"
-                initial={{ opacity: 0, scale: 0.8, rotate: 0 }}
-                animate={{ opacity: 1, scale: 1, rotate: 90 }}
-                exit={{ opacity: 0, scale: 1.2 }}
-                transition={{ duration: 0.5 }}
-              />
+                exit={{ opacity: 0, scale: 0, rotate: 180 }}
+                transition={{ 
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 20,
+                  duration: 0.4
+                }}
+                className="absolute -top-2 -right-2 z-50"
+                style={{ transformStyle: "preserve-3d" }}
+              >
+                {/* Star Badge Container */}
+                <motion.div
+                  className="relative"
+                  animate={{ 
+                    rotateY: [0, 360],
+                    rotateX: [0, 15, -15, 0],
+                  }}
+                  transition={{ 
+                    rotateY: { duration: 3, repeat: Infinity, ease: "linear" },
+                    rotateX: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+                  }}
+                  style={{ transformStyle: "preserve-3d" }}
+                >
+                  {/* Star Icon */}
+                  <div className="relative w-8 h-8 flex items-center justify-center">
+                    <Star className="w-6 h-6 text-primary fill-primary drop-shadow-[0_0_12px_hsl(175_80%_50%)]" />
+                    {/* Glowing rings */}
+                    <motion.div
+                      className="absolute inset-0 rounded-full border-2 border-primary/50"
+                      animate={{ 
+                        scale: [1, 1.5, 1],
+                        opacity: [0.5, 0, 0.5]
+                      }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                    <motion.div
+                      className="absolute inset-0 rounded-full border border-primary/30"
+                      animate={{ 
+                        scale: [1, 1.8, 1],
+                        opacity: [0.3, 0, 0.3]
+                      }}
+                      transition={{ duration: 2.5, repeat: Infinity, delay: 0.3 }}
+                    />
+                    {/* Sparkle particles */}
+                    {[...Array(4)].map((_, i) => (
+                      <motion.div
+                        key={i}
+                        className="absolute w-1 h-1 bg-primary rounded-full"
+                        style={{
+                          top: "50%",
+                          left: "50%",
+                        }}
+                        animate={{
+                          x: [0, Math.cos((i * Math.PI) / 2) * 20],
+                          y: [0, Math.sin((i * Math.PI) / 2) * 20],
+                          opacity: [0, 1, 0],
+                          scale: [0, 1, 0],
+                        }}
+                        transition={{
+                          duration: 1.5,
+                          repeat: Infinity,
+                          delay: i * 0.2,
+                        }}
+                      />
+                    ))}
+                  </div>
+                  {/* Badge background glow */}
+                  <motion.div
+                    className="absolute inset-0 bg-primary/20 rounded-full blur-xl -z-10"
+                    animate={{ 
+                      scale: [1, 1.3, 1],
+                      opacity: [0.4, 0.6, 0.4]
+                    }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
+                </motion.div>
+              </motion.div>
             )}
           </AnimatePresence>
-        </motion.div>
-      </motion.div>
+        </motion.a>
 
-      <div className={cn('relative transition-opacity duration-300', isScrolled ? 'hidden sm:block' : 'block')}>
-        <motion.span
-          className="font-display font-bold text-lg tracking-tight block"
-          animate={{ textShadow: isHovered ? '0 0 15px hsl(var(--primary) / 0.5)' : 'none' }}
-        >
-          Moin<span className="text-primary">.dev</span>
-        </motion.span>
-        
-        <motion.div
-          className="absolute -bottom-0.5 left-0 h-0.5 bg-gradient-to-r from-primary via-purple-500 to-primary rounded-full"
-          initial={{ width: 0 }}
-          animate={{ width: isHovered ? '100%' : 0 }}
-          transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-        />
-      </div>
-
-      <AnimatePresence>
-        {isHovered && (
-          <motion.div
-            className="absolute -top-1 -right-1"
-            initial={{ opacity: 0, scale: 0, rotate: -45 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            exit={{ opacity: 0, scale: 0, rotate: 45 }}
-            transition={{ duration: 0.3 }}
-          >
-            <motion.div animate={{ rotate: 360 }} transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}>
-              <Zap className="w-4 h-4 text-primary fill-primary drop-shadow-[0_0_8px_hsl(var(--primary))]" />
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.a>
-  );
-};
-
-// ============ MOBILE MENU BUTTON ============
-const MobileMenuButton = ({ isOpen, onClick, isFocused, onFocus, onBlur }: { 
-  isOpen: boolean; onClick: () => void; isFocused: boolean; onFocus: () => void; onBlur: () => void;
-}) => {
-  const [isHovered, setIsHovered] = useState(false);
-
-  return (
-    <motion.button
-      className={cn(
-        'md:hidden relative p-2 rounded-xl transition-colors duration-200',
-        'outline-none touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center'
-      )}
-      onClick={onClick}
-      onFocus={onFocus}
-      onBlur={onBlur}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      aria-label="Toggle menu"
-      aria-expanded={isOpen}
-      whileHover={{ scale: 1.1 }}
-      whileTap={{ scale: 0.9, rotate: 10 }}
-    >
-      <motion.div
-        className="absolute inset-0 rounded-xl bg-primary/10"
-        animate={{ opacity: isHovered || isFocused ? 1 : 0, scale: isHovered || isFocused ? 1 : 0.8 }}
-        transition={{ duration: 0.2 }}
-      />
-      
-      <AnimatePresence>
-        {isFocused && (
-          <motion.div
-            className="absolute -inset-1 rounded-xl border-2 border-primary"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1, boxShadow: '0 0 20px hsl(var(--primary) / 0.4)' }}
-            exit={{ opacity: 0, scale: 1.1 }}
-          />
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence mode="wait">
-        {isOpen ? (
-          <motion.div key="close" initial={{ rotate: -90, opacity: 0, scale: 0.5 }} animate={{ rotate: 0, opacity: 1, scale: 1 }} exit={{ rotate: 90, opacity: 0, scale: 0.5 }} transition={{ duration: 0.25 }}>
-            <X className="w-6 h-6 text-foreground relative z-10" />
-          </motion.div>
-        ) : (
-          <motion.div key="menu" initial={{ rotate: 90, opacity: 0, scale: 0.5 }} animate={{ rotate: 0, opacity: 1, scale: 1 }} exit={{ rotate: -90, opacity: 0, scale: 0.5 }} transition={{ duration: 0.25 }}>
-            <Menu className="w-6 h-6 text-foreground relative z-10" />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {isHovered && (
-          <motion.div
-            className="absolute inset-0 rounded-xl bg-primary/20"
-            initial={{ scale: 0 }}
-            animate={{ scale: [0, 1.5], opacity: [0.5, 0] }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.6 }}
-          />
-        )}
-      </AnimatePresence>
-    </motion.button>
-  );
-};
-
-// ============ MAIN NAVIGATION ============
-export const Navigation = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('');
-  const [focusedLink, setFocusedLink] = useState<string | null>(null);
-  const [ctaFocused, setCtaFocused] = useState(false);
-  const [menuButtonFocused, setMenuButtonFocused] = useState(false);
-  const navRef = useRef<HTMLElement>(null);
-  const linksContainerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => { entries.forEach((entry) => { if (entry.isIntersecting) setActiveSection(entry.target.id); }); },
-      { rootMargin: '-30% 0px -50% 0px', threshold: 0.1 }
-    );
-    navLinks.forEach((link) => { const el = document.getElementById(link.href.substring(1)); if (el) observer.observe(el); });
-    return () => observer.disconnect();
-  }, []);
-
-  const scrollToSection = useCallback((href: string) => {
-    const element = document.querySelector(href);
-    if (element) {
-      const offset = 80;
-      window.scrollTo({ top: element.getBoundingClientRect().top + window.scrollY - offset, behavior: 'smooth' });
-    }
-    setIsMobileMenuOpen(false);
-  }, []);
-
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => { if (e.key === 'Escape' && isMobileMenuOpen) setIsMobileMenuOpen(false); };
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [isMobileMenuOpen]);
-
-  useEffect(() => {
-    document.body.style.overflow = isMobileMenuOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [isMobileMenuOpen]);
-
-  const activeIndex = navLinks.findIndex((link) => link.href.substring(1) === activeSection);
-
-  return (
-    <nav ref={navRef} className={cn('fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-out', isScrolled ? 'pt-3 pb-3' : 'pt-4 pb-4')}>
-      <div className={cn(
-        'mx-auto flex items-center justify-between transition-all duration-300 ease-out',
-        isScrolled
-          ? 'w-[95%] max-w-6xl rounded-2xl px-4 py-3 md:px-6 bg-background/85 backdrop-blur-xl border border-border/20 shadow-lg'
-          : 'w-full max-w-7xl px-4 py-2 md:px-8 bg-transparent border-0 shadow-none'
-      )}>
-        <AnimatedLogo isScrolled={isScrolled} />
-
-        <div ref={linksContainerRef} className="hidden md:flex items-center gap-1 relative">
-          <SpotlightIndicator activeIndex={activeIndex} containerRef={linksContainerRef} />
-          {navLinks.map((link) => (
-            <MagneticLink
-              key={link.name}
-              onClick={() => scrollToSection(link.href)}
-              isActive={activeSection === link.href.substring(1)}
-              onFocus={() => setFocusedLink(link.name)}
-              onBlur={() => setFocusedLink(null)}
-              isFocused={focusedLink === link.name}
-            >
-              {link.name}
-            </MagneticLink>
-          ))}
+        {/* Desktop Navigation with Enhanced Hover Effects */}
+        <div className="hidden md:flex items-center gap-1">
+          {navLinks.map((link) => {
+            const isActive = activeSection === link.href.substring(1);
+            return (
+              <motion.button
+                key={link.name}
+                onClick={() => scrollToSection(link.href)}
+                className={cn(
+                  "relative px-4 py-2 text-sm font-medium transition-all duration-200 rounded-full overflow-hidden group/nav",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                  isActive
+                    ? "text-primary bg-primary/10"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/50 dark:hover:bg-white/5"
+                )}
+                aria-current={isActive ? "page" : undefined}
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {/* Shimmer effect on hover */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/nav:translate-x-full"
+                  transition={{ duration: 0.6, ease: "easeInOut" }}
+                />
+                
+                {/* Active indicator glow */}
+                {isActive && (
+                  <motion.div
+                    className="absolute inset-0 bg-primary/20 rounded-full blur-md -z-10"
+                    animate={{ opacity: [0.3, 0.6, 0.3] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
+                )}
+                
+                {/* Text with glow on hover */}
+                <span className="relative z-10">
+                  {link.name}
+                </span>
+                
+                {/* Bottom border animation */}
+                <motion.div
+                  className="absolute bottom-0 left-1/2 h-0.5 bg-primary rounded-full"
+                  initial={{ width: 0, x: "-50%" }}
+                  animate={{ 
+                    width: isActive ? "80%" : "0%",
+                    x: "-50%"
+                  }}
+                  transition={{ duration: 0.3 }}
+                />
+              </motion.button>
+            );
+          })}
         </div>
 
+        {/* Actions */}
         <div className="flex items-center gap-3">
-          <div className="hidden sm:block"><ThemeToggle /></div>
-          <PremiumCTA onClick={() => scrollToSection("#contact")} isScrolled={isScrolled} isFocused={ctaFocused} onFocus={() => setCtaFocused(true)} onBlur={() => setCtaFocused(false)} />
-          <MobileMenuButton isOpen={isMobileMenuOpen} onClick={() => setIsMobileMenuOpen(prev => !prev)} isFocused={menuButtonFocused} onFocus={() => setMenuButtonFocused(true)} onBlur={() => setMenuButtonFocused(false)} />
+          <div className="hidden sm:block">
+            <ThemeToggle />
+          </div>
+
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Button
+              variant="hero"
+              size={isScrolled ? "sm" : "default"}
+              onClick={() => scrollToSection("#contact")}
+              className={cn(
+                "rounded-full font-semibold shadow-md transition-all duration-200 gap-2 relative overflow-hidden group/cta",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+                isScrolled ? "px-5" : "px-6"
+              )}
+              aria-label="Let's Talk - Contact me"
+            >
+              {/* Animated gradient shimmer */}
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                animate={{ x: ["-100%", "200%"] }}
+                transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
+              />
+              
+              {/* Glow effect on hover */}
+              <motion.div
+                className="absolute inset-0 bg-primary/40 rounded-full blur-xl opacity-0 group-hover/cta:opacity-100 -z-10"
+                transition={{ duration: 0.3 }}
+              />
+              
+              <span className="relative z-10 flex items-center gap-2">
+                Let's Talk
+                <motion.span
+                  animate={{ x: [0, 4, 0], y: [0, -4, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <ArrowUpRight className="w-4 h-4" />
+                </motion.span>
+              </span>
+            </Button>
+          </motion.div>
+
+          {/* Mobile Menu Toggle with Enhanced Hover */}
+          <motion.button
+            className="md:hidden p-2 text-foreground hover:bg-secondary/50 dark:hover:bg-white/5 rounded-lg transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center relative overflow-hidden group/menu"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle menu"
+            aria-expanded={isMobileMenuOpen}
+            whileHover={{ scale: 1.1, rotate: 5 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            {/* Ripple effect on hover */}
+            <motion.div
+              className="absolute inset-0 bg-primary/20 rounded-lg"
+              initial={{ scale: 0, opacity: 0 }}
+              whileHover={{ scale: 1.5, opacity: [0, 0.5, 0] }}
+              transition={{ duration: 0.6 }}
+            />
+            <AnimatePresence mode="wait">
+              {isMobileMenuOpen ? (
+                <motion.div
+                  key="close"
+                  initial={{ rotate: -90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 90, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <X className="w-6 h-6 relative z-10" aria-hidden="true" />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="menu"
+                  initial={{ rotate: 90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: -90, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Menu className="w-6 h-6 relative z-10" aria-hidden="true" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.button>
         </div>
       </div>
 
@@ -651,10 +540,10 @@ export const Navigation = () => {
                   <ThemeToggle />
                 </motion.div>
               </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+            </div>
+          </div>
+        </>
+      )}
     </nav>
   );
 };
