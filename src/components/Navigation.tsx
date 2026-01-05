@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import { Menu, X, Rocket, Github, Linkedin, Mail } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
+import { Menu, X, Rocket, Github, Linkedin, Mail, ArrowUpRight } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useMotionValueEvent, useSpring, useTransform, useMotionTemplate, useMotionValue } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +20,30 @@ export const Navigation = () => {
   const [activeSection, setActiveSection] = useState("");
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
   const { scrollY } = useScroll();
+  const navRef = useRef<HTMLDivElement>(null);
+
+  // Spotlight effect
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const radius = useMotionValue(0);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!navRef.current) return;
+    const bounds = navRef.current.getBoundingClientRect();
+    mouseX.set(e.clientX - bounds.left);
+    mouseY.set(e.clientY - bounds.top);
+    radius.set(200); // Spotlight radius
+  };
+
+  const handleMouseLeave = () => {
+    radius.set(0);
+  };
+
+  const background = useMotionTemplate`radial-gradient(
+    ${radius}px circle at ${mouseX}px ${mouseY}px,
+    var(--spotlight-color),
+    transparent 80%
+  )`;
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setIsScrolled(latest > 20);
@@ -60,195 +84,194 @@ export const Navigation = () => {
   };
 
   return (
-    <nav
-      className={`fixed z-50 transition-all duration-500 ease-out ${isScrolled
-          ? "top-4 left-1/2 -translate-x-1/2 w-[90%] md:w-fit"
-          : "top-0 left-0 w-full"
-        }`}
-    >
-      <div
-        className={`relative transition-all duration-500 ease-out ${isScrolled
-            ? "rounded-full p-[1px] bg-gradient-to-r from-transparent via-primary/20 to-transparent shadow-glow"
-            : ""
+    <>
+      <nav
+        className={`fixed z-50 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${isScrolled
+            ? "top-4 left-1/2 -translate-x-1/2"
+            : "top-0 left-0 w-full"
           }`}
+        style={
+          {
+            "--spotlight-color": "hsl(var(--primary) / 0.15)"
+          } as React.CSSProperties
+        }
       >
-        <div
-          className={`relative flex items-center justify-between transition-all duration-500 ease-out ${isScrolled
-              ? "rounded-full glass-card bg-black/40 backdrop-blur-xl py-2 px-6 border-transparent"
-              : "bg-transparent py-6 px-4 md:px-8"
-            } ${isMobileMenuOpen && isScrolled ? "!rounded-2xl" : ""}`}
-        >
-          {/* Shimmer effect for the border when scrolled */}
-          {isScrolled && (
-            <div
-              className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-primary/10 to-transparent animate-shimmer pointer-events-none"
-              style={{ backgroundSize: "200% 100%" }}
-            />
+        <motion.div
+          ref={navRef}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          layout
+          className={cn(
+            "relative group isolate",
+            isScrolled
+              ? "rounded-full"
+              : "w-full"
           )}
-
+        >
+          {/* Main Container / Boat */}
           <div
-            className={`${isScrolled ? "" : "container mx-auto flex items-center justify-between w-full"
-              }`}
+            className={cn(
+              "relative flex items-center transition-all duration-500",
+              isScrolled
+                ? "rounded-full glass-card bg-black/40 backdrop-blur-2xl backdrop-saturate-150 border-t border-white/10 border-b border-black/20 shadow-glow px-3 py-2"
+                : "w-full bg-transparent py-6 px-6 md:px-12 backdrop-blur-none border-none shadow-none"
+            )}
           >
-            {/* Logo Section */}
-            <a
-              href="#"
-              className="font-signature text-2xl md:text-3xl text-foreground hover:text-primary transition-all duration-300 relative group shrink-0 mr-8"
-              onClick={(e) => {
-                e.preventDefault();
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
-            >
-              <span className="relative z-10">Your Name</span>
-              <span className="absolute inset-0 bg-primary/10 rounded-lg scale-0 group-hover:scale-100 transition-transform duration-300 -z-0" />
-            </a>
+            {/* Spotlight Overlay (Only visible when scrolled and hovering) */}
+            {isScrolled && (
+              <motion.div
+                className="absolute inset-0 rounded-full opacity-100 pointer-events-none -z-10 transition-opacity duration-300"
+                style={{ background }}
+              />
+            )}
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-1">
-              {navLinks.map((link) => (
-                <button
-                  key={link.name}
-                  onClick={() => scrollToSection(link.href)}
-                  onMouseEnter={() => setHoveredLink(link.name)}
-                  onMouseLeave={() => setHoveredLink(null)}
-                  className={cn(
-                    "relative px-4 py-2 text-sm font-medium transition-all duration-300 rounded-full",
-                    activeSection === link.href.substring(1)
-                      ? "text-primary"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  {link.name}
-                  {(hoveredLink === link.name || activeSection === link.href.substring(1)) && (
-                    <motion.div
-                      layoutId="nav-pill"
-                      className={`absolute inset-0 rounded-full -z-10 ${activeSection === link.href.substring(1)
-                          ? "bg-primary/10"
-                          : "bg-primary/5"
-                        }`}
-                      initial={false}
-                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                    />
-                  )}
-                </button>
-              ))}
-              <div className="ml-4 pl-4 border-l border-white/10">
-                <Button
-                  variant="hero"
-                  size="sm"
-                  onClick={() => scrollToSection("#contact")}
-                  className="rounded-full px-6 shadow-glow hover:shadow-primary/20 relative overflow-hidden group"
-                >
-                  <span className="relative z-10">Hire Me</span>
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                    animate={{
-                      x: ["-100%", "200%"],
-                    }}
-                    transition={{
-                      duration: 3,
-                      repeat: Infinity,
-                      ease: "linear",
-                    }}
-                  />
-                </Button>
-              </div>
-            </div>
+            {/* Inner Layout */}
+            <div className={cn(
+              "flex items-center justify-between w-full gap-4 md:gap-12",
+              !isScrolled && "container mx-auto max-w-7xl"
+            )}>
 
-            {/* Mobile Actions */}
-            <div className="md:hidden flex items-center gap-4">
-              <div className="scale-75 origin-right">
-                <ThemeToggle />
-              </div>
-              <button
-                className="text-foreground p-2 relative"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                aria-label="Toggle menu"
+              {/* Logo */}
+              <a
+                href="#"
+                className="relative group shrink-0 flex items-center gap-2"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
               >
-                <AnimatePresence mode="wait">
-                  {isMobileMenuOpen ? (
-                    <motion.div
-                      key="close"
-                      initial={{ rotate: -90, opacity: 0 }}
-                      animate={{ rotate: 0, opacity: 1 }}
-                      exit={{ rotate: 90, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <X size={24} />
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="menu"
-                      initial={{ rotate: 90, opacity: 0 }}
-                      animate={{ rotate: 0, opacity: 1 }}
-                      exit={{ rotate: -90, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <Menu size={24} />
-                    </motion.div>
+                <div className="relative w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 group-hover:border-primary/50 transition-colors overflow-hidden">
+                  <span className="font-signature font-bold text-xl text-primary relative z-10">M</span>
+                  <motion.div
+                    className="absolute inset-0 bg-primary/20 blur-md"
+                    animate={{ opacity: [0, 0.5, 0], scale: [0.8, 1.2, 0.8] }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                  />
+                </div>
+                <span className={cn(
+                  "font-display font-bold text-lg tracking-tight transition-all duration-300",
+                  isScrolled ? "w-0 opacity-0 overflow-hidden" : "w-auto opacity-100"
+                )}>
+                  Moin<span className="text-primary">.dev</span>
+                </span>
+              </a>
+
+              {/* Desktop Nav Links */}
+              <div className="hidden md:flex items-center gap-1">
+                {navLinks.map((link) => (
+                  <button
+                    key={link.name}
+                    onClick={() => scrollToSection(link.href)}
+                    onMouseEnter={() => setHoveredLink(link.name)}
+                    onMouseLeave={() => setHoveredLink(null)}
+                    className={cn(
+                      "relative px-4 py-2 text-sm font-medium transition-colors duration-200 rounded-full group/link",
+                      isScrolled ? "text-muted-foreground hover:text-foreground" : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <span className="relative z-10 flex items-center gap-2">
+                      {link.name}
+                      {/* Subtle indicator for active state */}
+                      {activeSection === link.href.substring(1) && (
+                        <motion.span
+                          layoutId="active-dot"
+                          className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_hsl(var(--primary))]"
+                        />
+                      )}
+                    </span>
+
+                    {/* Hover Background */}
+                    {hoveredLink === link.name && (
+                      <motion.div
+                        layoutId="nav-hover"
+                        className="absolute inset-0 rounded-full bg-white/5 border border-white/5"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        transition={{ duration: 0.2 }}
+                      />
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              {/* CTA & Actions */}
+              <div className="flex items-center gap-3">
+                {!isScrolled && (
+                  <div className="hidden md:flex">
+                    <ThemeToggle />
+                  </div>
+                )}
+
+                <Button
+                  variant={isScrolled ? "default" : "hero"}
+                  size={isScrolled ? "sm" : "default"}
+                  onClick={() => scrollToSection("#contact")}
+                  className={cn(
+                    "relative rounded-full font-semibold shadow-lg shadow-primary/20 transition-all duration-300",
+                    isScrolled ? "px-5 h-9 text-xs" : "px-6"
                   )}
-                </AnimatePresence>
-              </button>
+                >
+                  <span className="relative z-10 flex items-center gap-2">
+                    Let's Talk
+                    <ArrowUpRight className="w-4 h-4" />
+                  </span>
+
+                  {/* Button Shine Effect */}
+                  <div className="absolute inset-0 rounded-full overflow-hidden">
+                    <div className="absolute top-0 left-[-100%] w-[50%] h-full bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-[-20deg] animate-[shimmer_3s_infinite]" />
+                  </div>
+                </Button>
+
+                {/* Mobile Menu Toggle */}
+                <button
+                  className="md:hidden p-2 text-foreground relative z-50"
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                >
+                  {isMobileMenuOpen ? <X /> : <Menu />}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Mobile Navigation Dropdown */}
+        {/* Mobile Menu Overlay */}
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div
-              initial={{ opacity: 0, y: -20, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              transition={{ duration: 0.2 }}
-              className={`absolute top-full left-0 w-full mt-2 p-4 rounded-2xl glass-card md:hidden border border-white/10 shadow-2xl overflow-hidden z-40 bg-background/95 backdrop-blur-xl`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-40 bg-background/80 backdrop-blur-xl md:hidden flex flex-col pt-24 px-6"
             >
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-4">
                 {navLinks.map((link, i) => (
                   <motion.button
                     key={link.name}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.05 }}
+                    transition={{ delay: i * 0.1 }}
                     onClick={() => scrollToSection(link.href)}
                     className={cn(
-                      "flex items-center gap-3 p-3 rounded-xl text-left font-medium transition-all",
-                      activeSection === link.href.substring(1)
-                        ? "bg-primary/10 text-primary"
-                        : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                      "flex items-center justify-between p-4 rounded-2xl border border-white/5 bg-white/5 text-lg font-medium",
+                      activeSection === link.href.substring(1) && "border-primary/50 bg-primary/10 text-primary"
                     )}
                   >
-                    <span className="text-xl">{link.icon}</span>
-                    {link.name}
-                    {activeSection === link.href.substring(1) && (
-                      <motion.div layoutId="active-dot-mobile" className="ml-auto w-2 h-2 rounded-full bg-primary" />
-                    )}
+                    <span className="flex items-center gap-3">
+                      <span className="text-2xl">{link.icon}</span>
+                      {link.name}
+                    </span>
+                    <ArrowUpRight className={cn(
+                      "w-5 h-5 transition-transform",
+                      activeSection === link.href.substring(1) ? "rotate-45 text-primary" : "text-muted-foreground"
+                    )} />
                   </motion.button>
                 ))}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  <Button
-                    variant="hero"
-                    onClick={() => scrollToSection("#contact")}
-                    className="mt-4 w-full rounded-xl py-6"
-                  >
-                    Hire Me
-                  </Button>
-
-                  <div className="flex justify-center gap-6 mt-6">
-                    <a href="#" className="text-muted-foreground hover:text-foreground transition-colors"><Github size={20} /></a>
-                    <a href="#" className="text-muted-foreground hover:text-foreground transition-colors"><Linkedin size={20} /></a>
-                    <a href="#" className="text-muted-foreground hover:text-foreground transition-colors"><Mail size={20} /></a>
-                  </div>
-                </motion.div>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
-    </nav>
+      </nav>
+    </>
   );
 };
