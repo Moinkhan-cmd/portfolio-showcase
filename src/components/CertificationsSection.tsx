@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
-import { Award, ExternalLink, Calendar, Loader2, Image as ImageIcon, Hash } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Award, ExternalLink, Calendar, Loader2, Image as ImageIcon, Hash, ChevronDown, ChevronUp } from "lucide-react";
 import { CertificationsBackground3D } from "./CertificationsBackground3D";
 import { useCertifications } from "@/hooks/useCertifications";
 import type { Certification } from "@/lib/admin/certifications";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 interface CertificationCardProps {
   cert: Certification;
