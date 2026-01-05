@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import { Menu, X, ArrowUpRight, Github, Linkedin, Mail } from "lucide-react";
+import { useEffect, useState, useCallback, useRef } from "react";
+import { Menu, X, ArrowUpRight, Sparkles, Star, Github, Linkedin, Mail } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -18,18 +18,74 @@ export const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
-  const { scrollY } = useScroll();
+  const [isLogoHovered, setIsLogoHovered] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Performance optimized scroll handler
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    const scrolled = latest > 20;
-    if (isScrolled !== scrolled) {
-      setIsScrolled(scrolled);
-    }
-  });
-
-  // Intersection Observer for active section
+  // Optimized scroll detection using IntersectionObserver
   useEffect(() => {
+    // Create a sentinel element at the top of the page to detect scroll
+    const sentinel = document.createElement("div");
+    sentinel.style.position = "absolute";
+    sentinel.style.top = "0";
+    sentinel.style.left = "0";
+    sentinel.style.width = "1px";
+    sentinel.style.height = "1px";
+    sentinel.style.pointerEvents = "none";
+    sentinel.style.zIndex = "-1";
+    document.body.appendChild(sentinel);
+
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          setIsScrolled(!entry.isIntersecting);
+        });
+      },
+      {
+        root: null,
+        rootMargin: "-50px 0px 0px 0px",
+        threshold: 0,
+      }
+    );
+
+    observerRef.current.observe(sentinel);
+
+    // Fallback scroll listener (throttled) for better compatibility
+    const handleScroll = () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+      scrollTimeoutRef.current = setTimeout(() => {
+        const scrollY = window.scrollY || document.documentElement.scrollTop;
+        setIsScrolled(scrollY > 50);
+      }, 10);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+      if (sentinel.parentNode) {
+        sentinel.parentNode.removeChild(sentinel);
+      }
+      window.removeEventListener("scroll", handleScroll);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Active section detection using IntersectionObserver
+  useEffect(() => {
+    const observerOptions: IntersectionObserverInit = {
+      root: null,
+      rootMargin: "-30% 0px -50% 0px",
+      threshold: 0.1,
+    };
+
     const observerCallback: IntersectionObserverCallback = (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
@@ -38,189 +94,398 @@ export const Navigation = () => {
       });
     };
 
-    const observerOptions: IntersectionObserverInit = {
-      root: null,
-      rootMargin: "-40% 0px -40% 0px",
-      threshold: 0.1,
-    };
-
-    const observer = new IntersectionObserver(observerCallback, observerOptions);
+    const sectionObserver = new IntersectionObserver(observerCallback, observerOptions);
 
     navLinks.forEach((link) => {
       const sectionId = link.href.substring(1);
       const element = document.getElementById(sectionId);
-      if (element) observer.observe(element);
+      if (element) {
+        sectionObserver.observe(element);
+      }
     });
 
-    return () => observer.disconnect();
+    return () => {
+      sectionObserver.disconnect();
+    };
   }, []);
 
-  const scrollToSection = (href: string) => {
+  // Smooth scroll to section
+  const scrollToSection = useCallback((href: string) => {
     const element = document.querySelector(href);
     if (element) {
-      const navHeight = 80; // Approximate navbar height
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - navHeight;
-
+      const offset = 80;
+      const elementPosition = element.getBoundingClientRect().top + window.scrollY;
+      const offsetPosition = elementPosition - offset;
       window.scrollTo({
         top: offsetPosition,
-        behavior: "smooth"
+        behavior: "smooth",
       });
     }
     setIsMobileMenuOpen(false);
-  };
+  }, []);
+
+  // Close mobile menu on escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isMobileMenuOpen) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [isMobileMenuOpen]);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileMenuOpen]);
 
   return (
-    <>
-      <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.5, ease: [0.33, 1, 0.68, 1] }}
+    <nav
+      ref={navRef}
+      className={cn(
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-out",
+        isScrolled ? "pt-3 pb-3" : "pt-4 pb-4"
+      )}
+    >
+      <div
         className={cn(
-          "fixed top-0 left-0 w-full z-50 transition-all duration-300 ease-out border-b",
+          "mx-auto flex items-center justify-between transition-all duration-300 ease-out",
           isScrolled
-            ? "bg-background/80 backdrop-blur-xl border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.1)] py-3"
-            : "bg-transparent border-transparent py-5"
+            ? "w-[95%] max-w-6xl rounded-2xl px-4 py-3 md:px-6 bg-background/85 backdrop-blur-xl border border-border/20 shadow-lg"
+            : "w-full max-w-7xl px-4 py-2 md:px-8 bg-transparent border-0 shadow-none"
         )}
       >
-        <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
-          {/* Brand Logo */}
-          <a
-            href="#"
-            className="group flex items-center gap-3 relative z-50"
-            onClick={(e) => {
-              e.preventDefault();
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }}
+        {/* Logo Section with 3D Star Badge */}
+        <motion.a
+          href="#"
+          className="relative flex items-center gap-2 group shrink-0"
+          onMouseEnter={() => setIsLogoHovered(true)}
+          onMouseLeave={() => setIsLogoHovered(false)}
+          onClick={(e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+          aria-label="Go to top"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          {/* Logo Container with Enhanced Hover */}
+          <motion.div
+            className="relative w-10 h-10 flex items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20 group-hover:bg-primary/20 transition-colors"
+            whileHover={{ rotate: [0, -10, 10, -10, 0], scale: 1.1 }}
+            transition={{ duration: 0.5 }}
           >
-            <div className="relative w-10 h-10 flex items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 group-hover:border-primary/50 transition-all duration-500">
-              <span className="font-signature text-xl font-bold bg-gradient-to-br from-white to-white/70 bg-clip-text text-transparent transform group-hover:scale-110 transition-transform duration-500">M</span>
-              <div className="absolute inset-0 bg-primary/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-display font-bold text-lg tracking-tight leading-none group-hover:text-primary transition-colors duration-300">
-                Moin
-              </span>
-              <span className="text-[10px] font-medium tracking-[0.2em] text-muted-foreground uppercase group-hover:tracking-[0.3em] transition-all duration-300">
-                Developer
-              </span>
-            </div>
-          </a>
+            <span className="font-signature font-bold text-xl relative z-10">M</span>
+            {/* Glow effect on hover */}
+            <motion.div
+              className="absolute inset-0 rounded-xl bg-primary/30 blur-md -z-10"
+              animate={{ opacity: isLogoHovered ? 0.6 : 0, scale: isLogoHovered ? 1.5 : 1 }}
+              transition={{ duration: 0.3 }}
+            />
+          </motion.div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-1 p-1 rounded-full bg-white/5 border border-white/5 backdrop-blur-sm">
-            {navLinks.map((link) => {
-              const isActive = activeSection === link.href.substring(1);
-              return (
-                <button
-                  key={link.name}
-                  onClick={() => scrollToSection(link.href)}
-                  className={cn(
-                    "relative px-5 py-2 text-sm font-medium transition-all duration-300 rounded-full group overflow-hidden",
-                    isActive
-                      ? "text-primary-foreground"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
+          {/* Logo Text */}
+          <span
+            className={cn(
+              "font-display font-bold text-lg tracking-tight transition-opacity duration-300 relative",
+              isScrolled ? "hidden sm:block opacity-100" : "block opacity-100"
+            )}
+          >
+            Moin<span className="text-primary">.dev</span>
+            {/* Underline animation on hover */}
+            <motion.div
+              className="absolute bottom-0 left-0 h-0.5 bg-primary"
+              initial={{ width: 0 }}
+              animate={{ width: isLogoHovered ? "100%" : 0 }}
+              transition={{ duration: 0.3 }}
+            />
+          </span>
+
+          {/* 3D Star Badge - Appears on Hover */}
+          <AnimatePresence>
+            {isLogoHovered && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0, rotate: -180, x: -20, y: -20 }}
+                animate={{
+                  opacity: 1,
+                  scale: 1,
+                  rotate: 0,
+                  x: 0,
+                  y: 0,
+                }}
+                exit={{ opacity: 0, scale: 0, rotate: 180 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 20,
+                  duration: 0.4
+                }}
+                className="absolute -top-2 -right-2 z-50"
+                style={{ transformStyle: "preserve-3d" }}
+              >
+                {/* Star Badge Container */}
+                <motion.div
+                  className="relative"
+                  animate={{
+                    rotateY: [0, 360],
+                    rotateX: [0, 15, -15, 0],
+                  }}
+                  transition={{
+                    rotateY: { duration: 3, repeat: Infinity, ease: "linear" },
+                    rotateX: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+                  }}
+                  style={{ transformStyle: "preserve-3d" }}
                 >
-                  {isActive && (
+                  {/* Star Icon */}
+                  <div className="relative w-8 h-8 flex items-center justify-center">
+                    <Star className="w-6 h-6 text-primary fill-primary drop-shadow-[0_0_12px_hsl(175_80%_50%)]" />
+                    {/* Glowing rings */}
                     <motion.div
-                      layoutId="activeTab"
-                      className="absolute inset-0 bg-primary rounded-full"
-                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                      className="absolute inset-0 rounded-full border-2 border-primary/50"
+                      animate={{
+                        scale: [1, 1.5, 1],
+                        opacity: [0.5, 0, 0.5]
+                      }}
+                      transition={{ duration: 2, repeat: Infinity }}
                     />
-                  )}
-                  <span className="relative z-10">{link.name}</span>
+                    <motion.div
+                      className="absolute inset-0 rounded-full border border-primary/30"
+                      animate={{
+                        scale: [1, 1.8, 1],
+                        opacity: [0.3, 0, 0.3]
+                      }}
+                      transition={{ duration: 2.5, repeat: Infinity, delay: 0.3 }}
+                    />
+                    {/* Sparkle particles */}
+                    {[...Array(4)].map((_, i) => (
+                      <motion.div
+                        key={i}
+                        className="absolute w-1 h-1 bg-primary rounded-full"
+                        style={{
+                          top: "50%",
+                          left: "50%",
+                        }}
+                        animate={{
+                          x: [0, Math.cos((i * Math.PI) / 2) * 20],
+                          y: [0, Math.sin((i * Math.PI) / 2) * 20],
+                          opacity: [0, 1, 0],
+                          scale: [0, 1, 0],
+                        }}
+                        transition={{
+                          duration: 1.5,
+                          repeat: Infinity,
+                          delay: i * 0.2,
+                        }}
+                      />
+                    ))}
+                  </div>
+                  {/* Badge background glow */}
+                  <motion.div
+                    className="absolute inset-0 bg-primary/20 rounded-full blur-xl -z-10"
+                    animate={{
+                      scale: [1, 1.3, 1],
+                      opacity: [0.4, 0.6, 0.4]
+                    }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.a>
 
-                  {/* Subtle hover gleam for non-active items */}
-                  {!isActive && (
-                    <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full" />
-                  )}
-                </button>
-              );
-            })}
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center gap-1">
+          {navLinks.map((link) => {
+            const isActive = activeSection === link.href.substring(1);
+            return (
+              <motion.button
+                key={link.name}
+                onClick={() => scrollToSection(link.href)}
+                className={cn(
+                  "relative px-4 py-2 text-sm font-medium transition-all duration-200 rounded-full overflow-hidden group/nav",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                  isActive
+                    ? "text-primary bg-primary/10"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/50 dark:hover:bg-white/5"
+                )}
+                aria-current={isActive ? "page" : undefined}
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {/* Shimmer effect on hover */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/nav:translate-x-full"
+                  transition={{ duration: 0.6, ease: "easeInOut" }}
+                />
+
+                {isActive && (
+                  <motion.div
+                    className="absolute inset-0 bg-primary/20 rounded-full blur-md -z-10"
+                    animate={{ opacity: [0.3, 0.6, 0.3] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
+                )}
+
+                <span className="relative z-10">
+                  {link.name}
+                </span>
+
+                <motion.div
+                  className="absolute bottom-0 left-1/2 h-0.5 bg-primary rounded-full"
+                  initial={{ width: 0, x: "-50%" }}
+                  animate={{
+                    width: isActive ? "80%" : "0%",
+                    x: "-50%"
+                  }}
+                  transition={{ duration: 0.3 }}
+                />
+              </motion.button>
+            );
+          })}
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center gap-3">
+          <div className="hidden sm:block">
+            <ThemeToggle />
           </div>
 
-          {/* Actions */}
-          <div className="hidden md:flex items-center gap-4">
-            <ThemeToggle />
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
             <Button
+              variant="hero"
+              size={isScrolled ? "sm" : "default"}
               onClick={() => scrollToSection("#contact")}
-              className="relative overflow-hidden group rounded-full bg-primary text-primary-foreground font-semibold px-6 hover:bg-primary/90 transition-all duration-300 shadow-[0_0_20px_rgba(45,212,191,0.3)] hover:shadow-[0_0_30px_rgba(45,212,191,0.5)] transform hover:scale-105"
+              className={cn(
+                "rounded-full font-semibold shadow-md transition-all duration-200 gap-2 relative overflow-hidden group/cta",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+                isScrolled ? "px-5" : "px-6"
+              )}
+              aria-label="Let's Talk - Contact me"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
-              <span className="relative flex items-center gap-2">
+              {/* Animated gradient shimmer */}
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                animate={{ x: ["-100%", "200%"] }}
+                transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
+              />
+
+              {/* Glow effect on hover */}
+              <motion.div
+                className="absolute inset-0 bg-primary/40 rounded-full blur-xl opacity-0 group-hover/cta:opacity-100 -z-10"
+                transition={{ duration: 0.3 }}
+              />
+
+              <span className="relative z-10 flex items-center gap-2">
                 Let's Talk
-                <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                <motion.span
+                  animate={{ x: [0, 4, 0], y: [0, -4, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <ArrowUpRight className="w-4 h-4" />
+                </motion.span>
               </span>
             </Button>
-          </div>
+          </motion.div>
 
-          {/* Mobile Toggle */}
-          <div className="flex md:hidden items-center gap-4">
-            <ThemeToggle />
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="relative z-50 p-2 text-foreground hover:bg-white/10 rounded-full transition-colors"
-              aria-label="Toggle menu"
-            >
-              <AnimatePresence mode="wait">
-                {isMobileMenuOpen ? (
-                  <motion.div
-                    key="close"
-                    initial={{ opacity: 0, rotate: -90 }}
-                    animate={{ opacity: 1, rotate: 0 }}
-                    exit={{ opacity: 0, rotate: 90 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <X className="w-6 h-6" />
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="menu"
-                    initial={{ opacity: 0, rotate: 90 }}
-                    animate={{ opacity: 1, rotate: 0 }}
-                    exit={{ opacity: 0, rotate: -90 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <Menu className="w-6 h-6" />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </button>
-          </div>
-        </div>
-      </motion.nav>
-
-      {/* Mobile Menu Overlay */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-40 md:hidden bg-background/95 backdrop-blur-2xl"
+          {/* Mobile Menu Toggle with Enhanced Hover */}
+          <motion.button
+            className="md:hidden p-2 text-foreground hover:bg-secondary/50 dark:hover:bg-white/5 rounded-lg transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center relative overflow-hidden group/menu"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle menu"
+            aria-expanded={isMobileMenuOpen}
+            whileHover={{ scale: 1.1, rotate: 5 }}
+            whileTap={{ scale: 0.9 }}
           >
-            <div className="flex flex-col h-full pt-24 px-6 pb-10">
-              <div className="flex flex-col gap-2">
-                {navLinks.map((link, index) => (
-                  <motion.button
+            {/* Ripple effect on hover */}
+            <motion.div
+              className="absolute inset-0 bg-primary/20 rounded-lg"
+              initial={{ scale: 0, opacity: 0 }}
+              whileHover={{ scale: 1.5, opacity: [0, 0.5, 0] }}
+              transition={{ duration: 0.6 }}
+            />
+            <AnimatePresence mode="wait">
+              {isMobileMenuOpen ? (
+                <motion.div
+                  key="close"
+                  initial={{ rotate: -90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 90, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <X className="w-6 h-6 relative z-10" aria-hidden="true" />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="menu"
+                  initial={{ rotate: 90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: -90, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Menu className="w-6 h-6 relative z-10" aria-hidden="true" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.button>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="md:hidden fixed inset-0 bg-background/80 backdrop-blur-sm z-40"
+            onClick={() => setIsMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
+          {/* Menu Panel */}
+          <div
+            className={cn(
+              "md:hidden absolute left-0 right-0 z-50 bg-background/95 backdrop-blur-xl border-t border-border/50 shadow-2xl",
+              "animate-in slide-in-from-top-2 duration-200"
+            )}
+            style={{
+              top: "100%",
+            }}
+          >
+            <div className="mx-auto max-w-7xl px-4 py-6 flex flex-col gap-2">
+              {navLinks.map((link) => {
+                const isActive = activeSection === link.href.substring(1);
+                return (
+                  <button
                     key={link.name}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ delay: index * 0.1, duration: 0.3 }}
                     onClick={() => scrollToSection(link.href)}
                     className={cn(
-                      "text-3xl font-display font-medium text-left py-4 border-b border-white/5 transition-colors",
-                      activeSection === link.href.substring(1)
-                        ? "text-primary"
-                        : "text-muted-foreground active:text-foreground"
+                      "w-full text-left px-4 py-3 rounded-xl font-medium transition-all duration-200",
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+                      "touch-manipulation min-h-[44px]",
+                      isActive
+                        ? "bg-primary/10 text-primary"
+                        : "text-muted-foreground hover:bg-secondary/50 dark:hover:bg-white/5 hover:text-foreground active:bg-secondary/70"
                     )}
+                    aria-current={isActive ? "page" : undefined}
                   >
                     {link.name}
-                  </motion.button>
-                ))}
+                  </button>
+                );
+              })}
+              <div className="mt-4 pt-4 border-t border-border/50 flex items-center justify-between px-2">
+                <span className="text-sm text-muted-foreground">Theme</span>
+                <ThemeToggle />
               </div>
 
               <motion.div
@@ -251,9 +516,9 @@ export const Navigation = () => {
                 </div>
               </motion.div>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+          </div>
+        </>
+      )}
+    </nav>
   );
 };

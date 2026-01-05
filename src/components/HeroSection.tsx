@@ -426,7 +426,7 @@ export const HeroSection = () => {
                     animate={{ x: ["-100%", "200%"] }}
                     transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
                   />
-                </div>
+                </motion.div>
 
                 {/* Tech Stack Tags - Enhanced - Responsive */}
                 <motion.div 
