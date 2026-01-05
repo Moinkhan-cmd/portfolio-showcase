@@ -780,7 +780,7 @@ export const Navigation = () => {
               />
             </motion.div>
 
-            {/* Enhanced Menu Panel */}
+            {/* Enhanced Menu Panel - Better mobile responsiveness */}
             <motion.div
               initial={{ x: "100%", rotateY: 20, scale: 0.9 }}
               animate={{ x: 0, rotateY: 0, scale: 1 }}
@@ -792,7 +792,7 @@ export const Navigation = () => {
                 mass: 0.8
               }}
               onClick={(e) => e.stopPropagation()}
-              className="fixed right-0 top-0 bottom-0 w-[85%] max-w-sm bg-gradient-to-br from-background via-background/98 to-background border-l-2 border-primary/30 shadow-2xl p-6 flex flex-col backdrop-blur-2xl z-[95] relative overflow-hidden"
+              className="fixed right-0 top-0 bottom-0 w-[90%] sm:w-[85%] max-w-sm bg-gradient-to-br from-background via-background/98 to-background border-l-2 border-primary/30 shadow-2xl p-4 sm:p-6 flex flex-col backdrop-blur-2xl z-[95] relative overflow-hidden"
               style={{ transformStyle: "preserve-3d" }}
             >
               {/* Multi-layer animated backgrounds */}
@@ -820,10 +820,10 @@ export const Navigation = () => {
                 }}
               />
 
-              {/* Header */}
-              <div className="flex items-center justify-between mb-8 pb-4 border-b border-primary/30 relative z-10">
+              {/* Header - Responsive */}
+              <div className="flex items-center justify-between mb-6 sm:mb-8 pb-3 sm:pb-4 border-b border-primary/30 relative z-10">
                 <motion.span
-                  className="font-display font-bold text-xl bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent"
+                  className="font-display font-bold text-lg sm:text-xl bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent"
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.1 }}
@@ -833,9 +833,16 @@ export const Navigation = () => {
                 <motion.div
                   whileHover={{ scale: 1.15, rotate: 90 }}
                   whileTap={{ scale: 0.9 }}
+                  className="touch-manipulation"
                 >
-                  <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)}>
-                    <X className="w-5 h-5" />
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="h-9 w-9 sm:h-10 sm:w-10"
+                    aria-label="Close menu"
+                  >
+                    <X className="w-5 h-5 sm:w-6 sm:h-6" />
                   </Button>
                 </motion.div>
               </div>
