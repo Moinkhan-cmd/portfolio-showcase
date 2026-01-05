@@ -381,8 +381,8 @@ export const HeroSection = () => {
                 />
               ))}
 
-              {/* Main image container - Enhanced */}
-              <div className="relative w-64 h-64 sm:w-80 sm:h-80 lg:w-[420px] lg:h-[420px] xl:w-[480px] xl:h-[480px]">
+              {/* Main image container - Enhanced - Responsive */}
+              <div className="relative w-56 h-56 xs:w-64 xs:h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-[420px] lg:h-[420px] xl:w-[480px] xl:h-[480px] mx-auto lg:mx-0">
                 {/* Enhanced gradient glow */}
                 <motion.div
                   className="absolute inset-0 rounded-3xl blur-3xl opacity-40"
@@ -428,9 +428,9 @@ export const HeroSection = () => {
                   />
                 </div>
 
-                {/* Tech Stack Tags - Enhanced */}
+                {/* Tech Stack Tags - Enhanced - Responsive */}
                 <motion.div 
-                  className="mt-8 flex flex-wrap justify-center lg:justify-start gap-3"
+                  className="mt-6 sm:mt-8 flex flex-wrap justify-center lg:justify-start gap-2 sm:gap-3"
                   initial={{ opacity: 0, y: 20 }}
                   animate={isInView ? { opacity: 1, y: 0 } : {}}
                   transition={{ delay: 1.1 }}
@@ -443,7 +443,7 @@ export const HeroSection = () => {
                   ].map((tech, i) => (
                     <motion.span 
                       key={tech.name}
-                      className="group px-4 py-2 rounded-full text-sm font-semibold text-foreground/90 bg-background/80 backdrop-blur-xl border-2 border-primary/30 shadow-lg relative overflow-hidden"
+                      className="group px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold text-foreground/90 bg-background/80 backdrop-blur-xl border-2 border-primary/30 shadow-lg relative overflow-hidden touch-manipulation"
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={isInView ? { opacity: 1, scale: 1 } : {}}
                       transition={{ delay: 1.2 + i * 0.1, type: "spring" }}
@@ -453,9 +453,10 @@ export const HeroSection = () => {
                         borderColor: "hsl(175 80% 50%)",
                         boxShadow: "0 20px 50px hsl(175 80% 50% / 0.4)",
                       }}
+                      whileTap={{ scale: 0.95 }}
                     >
-                      <span className="relative z-10 flex items-center gap-1.5">
-                        <span>{tech.icon}</span>
+                      <span className="relative z-10 flex items-center gap-1 sm:gap-1.5">
+                        <span className="text-sm sm:text-base">{tech.icon}</span>
                         <span>{tech.name}</span>
                       </span>
                       <motion.div
