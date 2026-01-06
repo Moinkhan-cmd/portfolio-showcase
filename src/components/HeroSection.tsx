@@ -56,7 +56,7 @@ export const HeroSection = () => {
       id="hero"
       ref={containerRef}
       onMouseMove={handleMouseMove}
-      className="relative min-h-[calc(100vh-65px)] sm:min-h-[calc(100vh-70px)] md:min-h-[calc(100vh-80px)] lg:min-h-screen overflow-hidden bg-background pt-4 sm:pt-8 md:pt-12 lg:pt-20 flex items-center"
+      className="relative min-h-screen overflow-hidden bg-background pt-20 sm:pt-24 md:pt-28 lg:pt-32 flex items-center pb-16 sm:pb-20 md:pb-24 lg:pb-16"
     >
       {/* 3D Background */}
       <HeroBackground3D />
@@ -100,7 +100,7 @@ export const HeroSection = () => {
 
       {/* Enhanced cursor light */}
       <motion.div
-        className="pointer-events-none fixed w-[500px] h-[500px] rounded-full opacity-10 blur-3xl z-40 transition-opacity duration-500"
+        className="pointer-events-none fixed w-[500px] h-[500px] rounded-full opacity-10 blur-3xl z-30 transition-opacity duration-500"
         style={{
           background: "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)",
           left: mousePos.x - 250,
@@ -109,8 +109,8 @@ export const HeroSection = () => {
       />
 
       {/* Main Content Container - Enhanced Responsive */}
-      <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 py-6 sm:py-10 md:py-16 lg:py-24 xl:py-32">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 md:gap-10 lg:gap-12 xl:gap-16 items-center">
+      <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 py-8 sm:py-12 md:py-16 lg:py-20 pb-20 sm:pb-24 md:pb-28 lg:pb-20">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 md:gap-12 lg:gap-16 xl:gap-20 items-center">
           
           {/* Left Column - Enhanced Typography */}
           <motion.div
@@ -118,7 +118,7 @@ export const HeroSection = () => {
             initial={{ opacity: 0, x: -50 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="space-y-4 sm:space-y-6 md:space-y-8 lg:space-y-10"
+            className="space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-7"
           >
             {/* Status Badge - Enhanced - Responsive */}
             <motion.div
@@ -134,6 +134,18 @@ export const HeroSection = () => {
               <span className="text-xs sm:text-sm font-semibold text-foreground">Available for opportunities</span>
             </motion.div>
 
+            {/* Name in Signature Style */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: 0.35, duration: 0.6 }}
+              className="pt-2"
+            >
+              <h2 className="font-signature text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-foreground font-medium leading-tight">
+                Moinkhan Bhatti
+              </h2>
+            </motion.div>
+
             {/* Main Heading - Enhanced Typography - Responsive */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -141,7 +153,7 @@ export const HeroSection = () => {
               transition={{ delay: 0.4, duration: 0.8 }}
               className="space-y-2 sm:space-y-3 md:space-y-4"
             >
-              <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-bold leading-[1] sm:leading-[0.95] md:leading-[0.9] tracking-tight">
+              <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-black leading-[1] sm:leading-[0.95] md:leading-[0.9] tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
                 <motion.span 
                   className="block text-foreground"
                   initial={{ opacity: 0, x: -20 }}
@@ -178,7 +190,7 @@ export const HeroSection = () => {
               initial={{ opacity: 0 }}
               animate={isInView ? { opacity: 1 } : {}}
               transition={{ delay: 0.8 }}
-              className="h-10 sm:h-12 md:h-14 lg:h-16 overflow-hidden"
+              className="h-8 sm:h-9 md:h-10 lg:h-11 overflow-hidden"
             >
               <AnimatePresence mode="wait">
                 <motion.div
@@ -187,9 +199,9 @@ export const HeroSection = () => {
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: -50, opacity: 0 }}
                   transition={{ duration: 0.6, type: "spring" }}
-                  className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-muted-foreground font-light flex items-center gap-2 sm:gap-3"
+                  className="text-base sm:text-lg md:text-xl lg:text-2xl text-primary font-medium flex items-center gap-2 sm:gap-3" style={{ fontFamily: 'var(--font-body)' }}
                 >
-                  <Code2 className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 text-primary flex-shrink-0" />
+                  <Code2 className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-primary flex-shrink-0" />
                   <span className="truncate">{roles[currentRole]}</span>
                 </motion.div>
               </AnimatePresence>
@@ -200,7 +212,7 @@ export const HeroSection = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.9 }}
-              className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-foreground/80 leading-relaxed max-w-2xl font-light"
+              className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-foreground/90 leading-relaxed max-w-2xl font-normal" style={{ fontFamily: 'var(--font-body)' }}
             >
               Transforming ideas into seamless, user-centric interfaces with{" "}
               <span className="text-primary font-medium">clean code</span> and{" "}
@@ -335,7 +347,7 @@ export const HeroSection = () => {
             initial={{ opacity: 0, scale: 0.8, x: 50 }}
             animate={isInView ? { opacity: 1, scale: 1, x: 0 } : {}}
             transition={{ duration: 1, delay: 0.3 }}
-            className="relative flex items-center justify-center lg:justify-end"
+            className="relative flex items-center justify-center lg:justify-end pt-8 lg:pt-0"
           >
             <motion.div
               className="relative"
@@ -379,7 +391,7 @@ export const HeroSection = () => {
               ))}
 
               {/* Main image container - Enhanced - Responsive */}
-              <div className="relative w-56 h-56 xs:w-64 xs:h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-[420px] lg:h-[420px] xl:w-[480px] xl:h-[480px] mx-auto lg:mx-0">
+              <div className="relative w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-[420px] lg:h-[420px] xl:w-[480px] xl:h-[480px] mx-auto lg:mx-0">
                 {/* Enhanced gradient glow */}
                 <motion.div
                   className="absolute inset-0 rounded-3xl blur-3xl opacity-40"
@@ -425,44 +437,6 @@ export const HeroSection = () => {
                   />
                 </motion.div>
 
-                {/* Tech Stack Tags - Enhanced - Responsive */}
-                <motion.div 
-                  className="mt-6 sm:mt-8 flex flex-wrap justify-center lg:justify-start gap-2 sm:gap-3"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={isInView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ delay: 1.1 }}
-                >
-                  {[
-                    { name: "React", icon: "⚛️" },
-                    { name: "TypeScript", icon: "📘" },
-                    { name: "Next.js", icon: "▲" },
-                    { name: "Tailwind", icon: "🎨" },
-                  ].map((tech, i) => (
-                    <motion.span 
-                      key={tech.name}
-                      className="group px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold text-foreground/90 bg-background/80 backdrop-blur-xl border-2 border-primary/30 shadow-lg relative overflow-hidden touch-manipulation"
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={isInView ? { opacity: 1, scale: 1 } : {}}
-                      transition={{ delay: 1.2 + i * 0.1, type: "spring" }}
-                      whileHover={{ 
-                        scale: 1.15,
-                        y: -4,
-                        borderColor: "hsl(175 80% 50%)",
-                        boxShadow: "0 20px 50px hsl(175 80% 50% / 0.4)",
-                      }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <span className="relative z-10 flex items-center gap-1 sm:gap-1.5">
-                        <span className="text-sm sm:text-base">{tech.icon}</span>
-                        <span>{tech.name}</span>
-                      </span>
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"
-                      />
-                    </motion.span>
-                  ))}
-                </motion.div>
-
                 {/* Sparkle decorations - Enhanced */}
                 {[
                   { top: "-8%", right: "5%", delay: 0 },
@@ -496,11 +470,11 @@ export const HeroSection = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.5 }}
-        className="absolute bottom-4 sm:bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 z-30"
+        className="absolute bottom-4 sm:bottom-6 md:bottom-8 lg:bottom-8 left-1/2 -translate-x-1/2 z-30 w-full pointer-events-none"
       >
         <motion.button
           onClick={() => scrollToSection("#about")}
-          className="flex flex-col items-center gap-2 sm:gap-3 text-muted-foreground hover:text-foreground transition-colors group touch-manipulation p-2"
+          className="flex flex-col items-center gap-2 sm:gap-3 text-muted-foreground hover:text-foreground transition-colors group touch-manipulation p-2 pointer-events-auto"
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
           whileTap={{ scale: 0.9 }}

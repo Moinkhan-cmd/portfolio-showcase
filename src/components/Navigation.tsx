@@ -7,7 +7,6 @@ import { cn } from '@/lib/utils';
 
 const navLinks = [
   { name: 'About', href: '#about' },
-  { name: 'Skills', href: '#skills' },
   { name: 'Projects', href: '#projects' },
   { name: 'Certifications', href: '#certifications' },
   { name: 'Experience', href: '#experience' },
@@ -77,20 +76,20 @@ export const Navigation = () => {
     <nav
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-out',
-        isScrolled ? 'py-1.5 xs:py-2 sm:py-2.5' : 'py-2 xs:py-2.5 sm:py-3 md:py-4'
+        isScrolled ? 'py-1 xs:py-1.5 sm:py-2 md:py-2.5' : 'py-2 xs:py-2.5 sm:py-3 md:py-4 lg:py-5'
       )}
     >
       <div
         className={cn(
           'mx-auto flex items-center justify-between transition-all duration-300 ease-out',
           isScrolled
-            ? 'w-[96%] xs:w-[95%] max-w-6xl rounded-xl xs:rounded-2xl px-2.5 xs:px-3 sm:px-4 md:px-6 py-1.5 xs:py-2 sm:py-2.5 bg-background/90 backdrop-blur-xl border border-border/30 shadow-lg'
-            : 'w-full max-w-7xl px-3 xs:px-4 sm:px-6 md:px-8 py-1.5 xs:py-2 bg-transparent'
+            ? 'w-[95%] xs:w-[94%] sm:w-[96%] md:w-[95%] max-w-6xl rounded-lg xs:rounded-xl sm:rounded-2xl px-2 xs:px-2.5 sm:px-3 md:px-4 lg:px-6 py-1.5 xs:py-2 sm:py-2.5 bg-background/90 backdrop-blur-xl border border-border/30 shadow-lg'
+            : 'w-full max-w-7xl px-2.5 xs:px-3 sm:px-4 md:px-6 lg:px-8 xl:px-10 py-1.5 xs:py-2 sm:py-2.5 bg-transparent'
         )}
       >
         <a
           href="#"
-          className="relative flex items-center gap-1.5 xs:gap-2 group shrink-0 z-50"
+          className="relative flex items-center gap-1 xs:gap-1.5 sm:gap-2 group shrink-0 z-50"
           onClick={(e) => {
             e.preventDefault();
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -98,20 +97,20 @@ export const Navigation = () => {
           aria-label="Go to top"
         >
           <motion.div
-            className="relative w-8 h-8 xs:w-9 xs:h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg xs:rounded-xl bg-gradient-to-br from-primary/20 to-purple-500/20 text-primary border border-primary/30 group-hover:border-primary/60 transition-all duration-300"
+            className="relative w-7 h-7 xs:w-8 xs:h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 flex items-center justify-center rounded-lg xs:rounded-xl bg-gradient-to-br from-primary/20 to-purple-500/20 text-primary border border-primary/30 group-hover:border-primary/60 transition-all duration-300"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <span className="font-signature font-bold text-base xs:text-lg sm:text-xl">M</span>
+            <span className="font-signature font-bold text-sm xs:text-base sm:text-lg md:text-xl">M</span>
           </motion.div>
-          <div className={cn('transition-all duration-300', isScrolled ? 'hidden xs:block' : 'block')}>
-            <span className="font-display font-bold text-sm xs:text-base sm:text-lg tracking-tight">
+          <div className="transition-all duration-300">
+            <span className="font-display font-semibold text-[10px] xs:text-xs sm:text-sm md:text-base tracking-tight text-foreground">
               Moin<span className="text-primary">.dev</span>
             </span>
           </div>
         </a>
 
-        <div className="hidden md:flex items-center gap-0.5 lg:gap-1 p-0.5 lg:p-1 rounded-full bg-secondary/50 border border-border/30 backdrop-blur-sm">
+        <div className="hidden lg:flex items-center gap-0.5 xl:gap-1 p-0.5 xl:p-1 rounded-full bg-secondary/50 border border-border/30 backdrop-blur-sm">
           {navLinks.map((link) => {
             const isActive = activeSection === link.href.substring(1);
             return (
@@ -119,7 +118,7 @@ export const Navigation = () => {
                 key={link.name}
                 onClick={() => scrollToSection(link.href)}
                 className={cn(
-                  'relative px-2.5 lg:px-4 py-1.5 lg:py-2 text-xs lg:text-sm font-medium transition-all duration-300 rounded-full whitespace-nowrap',
+                  'relative px-2 xs:px-2.5 sm:px-3 md:px-3.5 lg:px-4 xl:px-5 py-1.5 md:py-2 text-[10px] xs:text-xs sm:text-sm md:text-sm lg:text-sm font-medium transition-all duration-300 rounded-full whitespace-nowrap',
                   isActive ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
                 )}
                 aria-current={isActive ? 'page' : undefined}
@@ -137,26 +136,26 @@ export const Navigation = () => {
           })}
         </div>
 
-        <div className="flex items-center gap-1.5 xs:gap-2 sm:gap-3">
+        <div className="flex items-center gap-1 xs:gap-1.5 sm:gap-2 md:gap-3">
           <div className="hidden xs:block"><ThemeToggle /></div>
           <Button
             onClick={() => scrollToSection('#contact')}
             size={isScrolled ? 'sm' : 'default'}
             className={cn(
-              'hidden sm:flex rounded-full font-semibold gap-1.5 lg:gap-2 transition-all duration-300 text-xs lg:text-sm',
+              'hidden md:flex rounded-full font-semibold gap-1 xs:gap-1.5 sm:gap-2 transition-all duration-300 text-[10px] xs:text-xs sm:text-sm md:text-sm lg:text-base',
               'shadow-[0_0_20px_rgba(45,212,191,0.2)] hover:shadow-[0_0_30px_rgba(45,212,191,0.4)]',
-              isScrolled ? 'px-3 lg:px-4' : 'px-4 lg:px-5'
+              isScrolled ? 'px-2.5 xs:px-3 sm:px-3.5 md:px-4 lg:px-5' : 'px-3 xs:px-3.5 sm:px-4 md:px-5 lg:px-6'
             )}
           >
-            <span>Let's Talk</span>
-            <ArrowUpRight className="w-3.5 h-3.5 lg:w-4 lg:h-4" />
+            <span className="whitespace-nowrap">Let's Talk</span>
+            <ArrowUpRight className="w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 md:w-4 md:h-4" />
           </Button>
           <motion.button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className={cn(
-              'md:hidden relative z-50 p-1.5 xs:p-2 rounded-lg xs:rounded-xl transition-colors duration-200',
+              'lg:hidden relative z-50 p-1.5 xs:p-2 rounded-lg xs:rounded-xl transition-colors duration-200',
               'hover:bg-secondary/80 active:bg-secondary',
-              'touch-manipulation min-h-[40px] min-w-[40px] xs:min-h-[44px] xs:min-w-[44px] flex items-center justify-center'
+              'touch-manipulation min-h-[36px] min-w-[36px] xs:min-h-[40px] xs:min-w-[40px] sm:min-h-[44px] sm:min-w-[44px] flex items-center justify-center'
             )}
             aria-label="Toggle menu"
             aria-expanded={isMobileMenuOpen}
@@ -165,11 +164,11 @@ export const Navigation = () => {
             <AnimatePresence mode="wait">
               {isMobileMenuOpen ? (
                 <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                  <X className="w-5 h-5 xs:w-6 xs:h-6" />
+                  <X className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6" />
                 </motion.div>
               ) : (
                 <motion.div key="menu" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                  <Menu className="w-5 h-5 xs:w-6 xs:h-6" />
+                  <Menu className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6" />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -188,21 +187,21 @@ export const Navigation = () => {
               exit={{ opacity: 0 }}
             />
             <motion.div
-              className="md:hidden fixed top-0 right-0 h-full w-full xs:w-[85%] xs:max-w-sm z-50 bg-background/98 backdrop-blur-xl border-l border-border/50 shadow-2xl"
+              className="lg:hidden fixed top-0 right-0 h-full w-full xs:w-[85%] sm:w-[75%] md:w-[60%] max-w-sm z-50 bg-background/98 backdrop-blur-xl border-l border-border/50 shadow-2xl"
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             >
-              <div className="flex items-center justify-between p-3 xs:p-4 border-b border-border/30">
+              <div className="flex items-center justify-between p-2.5 xs:p-3 sm:p-4 border-b border-border/30">
                 <div className="xs:hidden"><ThemeToggle /></div>
                 <div className="hidden xs:block" />
-                <motion.button onClick={() => setIsMobileMenuOpen(false)} className="p-2 rounded-xl hover:bg-secondary/80 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center" whileTap={{ scale: 0.9 }} aria-label="Close menu">
-                  <X className="w-5 h-5 xs:w-6 xs:h-6" />
+                <motion.button onClick={() => setIsMobileMenuOpen(false)} className="p-1.5 xs:p-2 rounded-lg xs:rounded-xl hover:bg-secondary/80 transition-colors min-h-[36px] min-w-[36px] xs:min-h-[40px] xs:min-w-[40px] sm:min-h-[44px] sm:min-w-[44px] flex items-center justify-center" whileTap={{ scale: 0.9 }} aria-label="Close menu">
+                  <X className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6" />
                 </motion.button>
               </div>
-              <div className="flex flex-col h-[calc(100%-65px)] px-4 xs:px-6 pb-6 xs:pb-8 pt-4">
-                <div className="flex flex-col gap-1">
+              <div className="flex flex-col h-[calc(100%-60px)] xs:h-[calc(100%-65px)] sm:h-[calc(100%-70px)] px-3 xs:px-4 sm:px-6 pb-4 xs:pb-6 sm:pb-8 pt-3 xs:pt-4 overflow-y-auto">
+                <div className="flex flex-col gap-0.5 xs:gap-1">
                   {navLinks.map((link, index) => {
                     const isActive = activeSection === link.href.substring(1);
                     return (
@@ -213,25 +212,25 @@ export const Navigation = () => {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.05 }}
                         className={cn(
-                          'relative w-full text-left px-3 xs:px-4 py-3 xs:py-4 rounded-lg xs:rounded-xl font-medium text-base xs:text-lg transition-all duration-200',
-                          'touch-manipulation min-h-[48px] xs:min-h-[56px] flex items-center',
+                          'relative w-full text-left px-2.5 xs:px-3 sm:px-4 py-2.5 xs:py-3 sm:py-4 rounded-lg xs:rounded-xl font-medium text-sm xs:text-base sm:text-lg transition-all duration-200',
+                          'touch-manipulation min-h-[44px] xs:min-h-[48px] sm:min-h-[52px] flex items-center',
                           isActive ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-secondary/50 hover:text-foreground active:bg-secondary'
                         )}
                       >
-                        {isActive && <motion.div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 xs:h-8 rounded-full bg-primary" layoutId="mobileActiveIndicator" />}
-                        <span className="ml-2">{link.name}</span>
+                        {isActive && <motion.div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 xs:w-1 h-5 xs:h-6 sm:h-8 rounded-full bg-primary" layoutId="mobileActiveIndicator" />}
+                        <span className="ml-2 xs:ml-3">{link.name}</span>
                       </motion.button>
                     );
                   })}
                 </div>
-                <motion.div className="mt-auto pt-4 xs:pt-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-                  <Button onClick={() => scrollToSection('#contact')} className="w-full rounded-xl font-semibold py-5 xs:py-6 text-base xs:text-lg gap-2" size="lg">
+                <motion.div className="mt-auto pt-3 xs:pt-4 sm:pt-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+                  <Button onClick={() => scrollToSection('#contact')} className="w-full rounded-xl font-semibold py-4 xs:py-5 sm:py-6 text-sm xs:text-base sm:text-lg gap-2" size="lg">
                     Let's Talk
-                    <ArrowUpRight className="w-4 h-4 xs:w-5 xs:h-5" />
+                    <ArrowUpRight className="w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-5 sm:h-5" />
                   </Button>
                 </motion.div>
-                <motion.div className="hidden xs:flex mt-4 pt-4 border-t border-border/50 items-center justify-between" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}>
-                  <span className="text-sm text-muted-foreground">Theme</span>
+                <motion.div className="hidden xs:flex mt-3 xs:mt-4 pt-3 xs:pt-4 border-t border-border/50 items-center justify-between" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}>
+                  <span className="text-xs xs:text-sm text-muted-foreground">Theme</span>
                   <ThemeToggle />
                 </motion.div>
               </div>

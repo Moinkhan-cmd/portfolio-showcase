@@ -17,7 +17,10 @@ export default {
         display: ['Outfit', 'sans-serif'],
         body: ['Inter', 'sans-serif'],
         signature: ['Dancing Script', 'cursive'],
-        hero: ['Space Grotesk', 'Poppins', 'sans-serif'],
+        hero: ['Raleway', 'Montserrat', 'Space Grotesk', 'sans-serif'],
+        elegant: ['Playfair Display', 'serif'],
+        bold: ['Oswald', 'Bebas Neue', 'sans-serif'],
+        stylish: ['Righteous', 'Bebas Neue', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
