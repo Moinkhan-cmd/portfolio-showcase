@@ -30,29 +30,96 @@ export const Navigation = () => {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
+        let maxRatio = 0;
+        let activeId = '';
+
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
+          if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
+            maxRatio = entry.intersectionRatio;
+            activeId = entry.target.id;
           }
         });
+
+        if (!activeId) {
+          const scrollPosition = window.scrollY + window.innerHeight / 3;
+          navLinks.forEach((link) => {
+            const element = document.getElementById(link.href.substring(1));
+            if (element) {
+              const { offsetTop, offsetHeight } = element;
+              if (
+                scrollPosition >= offsetTop &&
+                scrollPosition < offsetTop + offsetHeight
+              ) {
+                activeId = element.id;
+              }
+            }
+          });
+        }
+
+        if (activeId) {
+          setActiveSection(activeId);
+        }
       },
-      { rootMargin: '-30% 0px -50% 0px', threshold: 0.1 }
+      {
+        rootMargin: '-20% 0px -60% 0px',
+        threshold: [0, 0.1, 0.25, 0.5, 0.75, 1.0],
+      }
     );
 
-    navLinks.forEach((link) => {
-      const element = document.getElementById(link.href.substring(1));
-      if (element) observer.observe(element);
-    });
+    const observeSections = () => {
+      navLinks.forEach((link) => {
+        const sectionId = link.href.substring(1);
+        const element = document.getElementById(sectionId);
+        if (element) {
+          observer.observe(element);
+        }
+      });
+    };
 
-    return () => observer.disconnect();
+    const timeoutId = setTimeout(observeSections, 100);
+    observeSections();
+
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + 150;
+      let currentSection = '';
+
+      navLinks.forEach((link) => {
+        const sectionId = link.href.substring(1);
+        const element = document.getElementById(sectionId);
+        if (element) {
+          const { offsetTop, offsetHeight } = element;
+          if (
+            scrollPosition >= offsetTop &&
+            scrollPosition < offsetTop + offsetHeight
+          ) {
+            currentSection = sectionId;
+          }
+        }
+      });
+
+      if (currentSection) {
+        setActiveSection(currentSection);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+
+    return () => {
+      clearTimeout(timeoutId);
+      observer.disconnect();
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   const scrollToSection = useCallback((href: string) => {
     const element = document.querySelector(href);
     if (element) {
-      const offset = 80;
+      const offset = 100;
       const elementPosition = element.getBoundingClientRect().top + window.scrollY;
       window.scrollTo({ top: elementPosition - offset, behavior: 'smooth' });
+      const sectionId = href.substring(1);
+      setActiveSection(sectionId);
     }
     setIsMobileMenuOpen(false);
   }, []);
@@ -93,6 +160,7 @@ export const Navigation = () => {
           onClick={(e) => {
             e.preventDefault();
             window.scrollTo({ top: 0, behavior: 'smooth' });
+            setActiveSection('');
           }}
           aria-label="Go to top"
         >
@@ -125,7 +193,6 @@ export const Navigation = () => {
                 whileTap={{ scale: 0.98 }}
                 aria-current={isActive ? 'page' : undefined}
               >
-                {/* Active background */}
                 {isActive && (
                   <motion.div
                     layoutId="activeNavTab"
@@ -133,7 +200,6 @@ export const Navigation = () => {
                     transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
                   />
                 )}
-                {/* Hover background - only shows when not active */}
                 {!isActive && (
                   <span className="absolute inset-0 rounded-full bg-foreground/0 hover:bg-foreground/5 transition-colors duration-200" />
                 )}
@@ -221,10 +287,16 @@ export const Navigation = () => {
                         className={cn(
                           'relative w-full text-left px-2.5 xs:px-3 sm:px-4 py-2.5 xs:py-3 sm:py-4 rounded-lg xs:rounded-xl font-medium text-sm xs:text-base sm:text-lg transition-all duration-200',
                           'touch-manipulation min-h-[44px] xs:min-h-[48px] sm:min-h-[52px] flex items-center',
-                          isActive ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-secondary/50 hover:text-foreground active:bg-secondary'
+                          isActive ? 'bg-primary/10 text-primary border-l-2 border-primary' : 'text-muted-foreground hover:bg-secondary/50 hover:text-foreground active:bg-secondary'
                         )}
                       >
-                        {isActive && <motion.div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 xs:w-1 h-5 xs:h-6 sm:h-8 rounded-full bg-primary" layoutId="mobileActiveIndicator" />}
+                        {isActive && (
+                          <motion.div
+                            className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 xs:w-1 h-5 xs:h-6 sm:h-8 rounded-full bg-primary"
+                            layoutId="mobileActiveIndicator"
+                            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                          />
+                        )}
                         <span className="ml-2 xs:ml-3">{link.name}</span>
                       </motion.button>
                     );
@@ -248,3 +320,4 @@ export const Navigation = () => {
     </nav>
   );
 };
+

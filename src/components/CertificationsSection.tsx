@@ -83,7 +83,12 @@ const CertificationCard = ({ cert, index, onViewDetails }: CertificationCardProp
         transformStyle: "preserve-3d",
       }}
       className="group relative cursor-pointer"
-      onClick={() => onViewDetails(cert)}
+      onClick={(e) => {
+        // Only trigger card click if overlay is not visible
+        if (!isHovered) {
+          onViewDetails(cert);
+        }
+      }}
     >
       {/* Enhanced glow effect */}
       <motion.div
@@ -213,6 +218,9 @@ const CertificationCard = ({ cert, index, onViewDetails }: CertificationCardProp
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
                 className="absolute inset-0 flex items-center justify-center z-40 bg-background/80 backdrop-blur-sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
               >
                 <motion.div
                   whileHover={{ scale: 1.05 }}
@@ -1015,6 +1023,14 @@ export const CertificationsSection = () => {
     setDialogOpen(true);
   };
 
+  const handleDialogOpenChange = (open: boolean) => {
+    setDialogOpen(open);
+    if (!open) {
+      // Reset selected cert when dialog closes (after animation)
+      setTimeout(() => setSelectedCert(null), 300);
+    }
+  };
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -1501,7 +1517,7 @@ export const CertificationsSection = () => {
       <CertificateDetailDialog
         cert={selectedCert}
         open={dialogOpen}
-        onOpenChange={setDialogOpen}
+        onOpenChange={handleDialogOpenChange}
       />
     </section>
   );

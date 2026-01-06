@@ -8,6 +8,19 @@ import type { Project } from "@/lib/admin/projects";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface ProjectCardProps {
   project: Project;
@@ -434,6 +447,24 @@ export const ProjectsSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const { data: projects = [], isLoading } = useProjects();
   
+  // Predefined category options for dropdown
+  const categoryOptions = [
+    "Web Development",
+    "Mobile App",
+    "Full Stack",
+    "Frontend",
+    "Backend",
+    "UI/UX Design",
+    "E-commerce",
+    "API Development",
+    "Desktop Application",
+    "Game Development",
+    "Data Science",
+    "Machine Learning",
+    "DevOps",
+    "Other"
+  ];
+  
   // Filter state
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -442,7 +473,7 @@ export const ProjectsSection = () => {
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
 
   // Extract unique values for filters
-  const categories = useMemo(() => {
+  const availableCategories = useMemo(() => {
     const cats = projects.map(p => p.category).filter(Boolean);
     return Array.from(new Set(cats)).sort();
   }, [projects]);
@@ -513,12 +544,6 @@ export const ProjectsSection = () => {
     setShowFeaturedOnly(false);
   };
 
-  // Toggle tech filter
-  const toggleTech = (tech: string) => {
-    setSelectedTech(prev =>
-      prev.includes(tech) ? prev.filter(t => t !== tech) : [...prev, tech]
-    );
-  };
 
   return (
     <section
@@ -699,27 +724,90 @@ export const ProjectsSection = () => {
                 ))}
               </div>
 
-              {/* Category Filters */}
-              {categories.length > 0 && (
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-xs text-muted-foreground font-medium hidden sm:inline">Category:</span>
-                  {categories.map((category) => (
-                    <motion.button
-                      key={category}
-                      onClick={() => setSelectedCategory(selectedCategory === category ? null : category)}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className={cn(
-                        "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200",
-                        selectedCategory === category
-                          ? "bg-primary/20 text-primary border border-primary/30"
-                          : "bg-secondary/50 text-muted-foreground hover:bg-secondary border border-border/50"
-                      )}
-                    >
-                      <Tag className="w-3.5 h-3.5" />
-                      {category}
-                    </motion.button>
-                  ))}
+              {/* Category Filter - Dropdown */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground font-medium hidden sm:inline">Category:</span>
+                <div className="relative">
+                  <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground z-10 pointer-events-none" />
+                  <Select
+                    value={selectedCategory || "all"}
+                    onValueChange={(value) => setSelectedCategory(value === "all" ? null : value)}
+                  >
+                    <SelectTrigger className="w-[180px] h-9 bg-background/50 backdrop-blur-sm border-primary/20 focus:border-primary/50 text-sm pl-9">
+                      <SelectValue placeholder="All Categories" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Categories</SelectItem>
+                      {categoryOptions.map((category) => (
+                        <SelectItem key={category} value={category}>
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Tech Stack Filter - Dropdown */}
+              {techStack.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground font-medium hidden sm:inline">Tech Stack:</span>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className={cn(
+                          "inline-flex items-center gap-2 h-9 px-3 rounded-md text-sm font-medium transition-all duration-200 border",
+                          selectedTech.length > 0
+                            ? "bg-primary/20 text-primary border-primary/30 hover:bg-primary/25"
+                            : "bg-background/50 backdrop-blur-sm text-foreground border-primary/20 hover:bg-background/70"
+                        )}
+                      >
+                        <Filter className="w-3.5 h-3.5" />
+                        <span>
+                          {selectedTech.length > 0
+                            ? `${selectedTech.length} Selected`
+                            : "All Tech Stack"}
+                        </span>
+                      </motion.button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[280px] p-3" align="start">
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="text-sm font-semibold">Select Tech Stack</h4>
+                          {selectedTech.length > 0 && (
+                            <button
+                              onClick={() => setSelectedTech([])}
+                              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                            >
+                              Clear
+                            </button>
+                          )}
+                        </div>
+                        <div className="max-h-[300px] overflow-y-auto space-y-2 pr-2">
+                          {techStack.map((tech) => (
+                            <label
+                              key={tech}
+                              className="flex items-center gap-2 p-2 rounded-md hover:bg-secondary/50 cursor-pointer transition-colors"
+                            >
+                              <Checkbox
+                                checked={selectedTech.includes(tech)}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    setSelectedTech((prev) => [...prev, tech]);
+                                  } else {
+                                    setSelectedTech((prev) => prev.filter((t) => t !== tech));
+                                  }
+                                }}
+                              />
+                              <span className="text-sm flex-1">{tech}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
                 </div>
               )}
 
@@ -737,42 +825,6 @@ export const ProjectsSection = () => {
               )}
             </div>
 
-            {/* Tech Stack Filters - Collapsible */}
-            {techStack.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                className="overflow-hidden"
-              >
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-xs text-muted-foreground font-medium flex items-center gap-1.5">
-                    <Filter className="w-3.5 h-3.5" />
-                    Tech Stack:
-                  </span>
-                  {techStack.slice(0, 10).map((tech) => (
-                    <motion.button
-                      key={tech}
-                      onClick={() => toggleTech(tech)}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className={cn(
-                        "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-200",
-                        selectedTech.includes(tech)
-                          ? "bg-primary/20 text-primary border border-primary/30"
-                          : "bg-secondary/30 text-muted-foreground hover:bg-secondary/50 border border-border/30"
-                      )}
-                    >
-                      {tech}
-                    </motion.button>
-                  ))}
-                  {techStack.length > 10 && (
-                    <span className="text-xs text-muted-foreground">
-                      +{techStack.length - 10} more
-                    </span>
-                  )}
-                </div>
-              </motion.div>
-            )}
 
             {/* Results Count */}
             {hasActiveFilters && (
