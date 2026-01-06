@@ -27,6 +27,18 @@ export const ContactSection = () => {
   const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
   const isEmailJSConfigured = !!(serviceId && templateId && publicKey);
 
+  // Debug: Log configuration status (remove in production if needed)
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('EmailJS Config Check:', {
+        serviceId: serviceId ? '✓ Set' : '✗ Missing',
+        templateId: templateId ? '✓ Set' : '✗ Missing',
+        publicKey: publicKey ? '✓ Set' : '✗ Missing',
+        isConfigured: isEmailJSConfigured
+      });
+    }
+  }, [serviceId, templateId, publicKey, isEmailJSConfigured]);
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -54,13 +66,8 @@ export const ContactSection = () => {
     const email = formData.get("email") as string;
     const message = formData.get("message") as string;
 
-    // EmailJS configuration
-    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
-
-    // Check if EmailJS is configured
-    if (!serviceId || !templateId || !publicKey) {
+    // Check if EmailJS is configured (using the variables from component scope)
+    if (!isEmailJSConfigured || !serviceId || !templateId || !publicKey) {
       // Fallback: Open email client with pre-filled message
       const subject = encodeURIComponent(`Contact from ${name} - Portfolio`);
       const body = encodeURIComponent(`Hello Moinkhan,\n\nMy name is ${name}.\nMy email: ${email}\n\nMessage:\n${message}\n\n---\nSent from your portfolio contact form`);
