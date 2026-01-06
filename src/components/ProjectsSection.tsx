@@ -1,11 +1,13 @@
-import { useRef, useState } from "react";
-import { ExternalLink, Github, Folder, Sparkles, ArrowRight, Loader2, Star, Zap, Code, Tag, Clock, CheckCircle2 } from "lucide-react";
+import { useRef, useState, useMemo } from "react";
+import { ExternalLink, Github, Folder, Sparkles, ArrowRight, Loader2, Star, Zap, Code, Tag, Clock, CheckCircle2, Search, X, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from "framer-motion";
 import { ProjectsBackground3D } from "./ProjectsBackground3D";
 import { useProjects } from "@/hooks/useProjects";
 import type { Project } from "@/lib/admin/projects";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 interface ProjectCardProps {
   project: Project;
@@ -431,13 +433,92 @@ const ProjectCard = ({ project, index, isFeatured = false }: ProjectCardProps) =
 export const ProjectsSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const { data: projects = [], isLoading } = useProjects();
+  
+  // Filter state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+  const [selectedTech, setSelectedTech] = useState<string[]>([]);
+  const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
 
-  // Separate featured and regular projects
-  const featuredProjects = projects.filter((p) => p.featured);
-  const regularProjects = projects.filter((p) => !p.featured);
+  // Extract unique values for filters
+  const categories = useMemo(() => {
+    const cats = projects.map(p => p.category).filter(Boolean);
+    return Array.from(new Set(cats)).sort();
+  }, [projects]);
+
+  const techStack = useMemo(() => {
+    const allTech = projects.flatMap(p => p.techStack || []);
+    return Array.from(new Set(allTech)).sort();
+  }, [projects]);
+
+  // Filter projects based on all criteria
+  const filteredProjects = useMemo(() => {
+    let filtered = [...projects];
+
+    // Search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(project =>
+        project.title.toLowerCase().includes(query) ||
+        project.shortDescription.toLowerCase().includes(query) ||
+        project.fullDescription?.toLowerCase().includes(query) ||
+        project.techStack.some(tech => tech.toLowerCase().includes(query)) ||
+        project.skills?.some(skill => skill.toLowerCase().includes(query)) ||
+        project.category.toLowerCase().includes(query)
+      );
+    }
+
+    // Category filter
+    if (selectedCategory) {
+      filtered = filtered.filter(project => project.category === selectedCategory);
+    }
+
+    // Status filter
+    if (selectedStatus) {
+      filtered = filtered.filter(project => project.status === selectedStatus);
+    }
+
+    // Tech stack filter
+    if (selectedTech.length > 0) {
+      filtered = filtered.filter(project =>
+        selectedTech.some(tech => project.techStack.includes(tech))
+      );
+    }
+
+    // Featured filter
+    if (showFeaturedOnly) {
+      filtered = filtered.filter(project => project.featured);
+    }
+
+    return filtered;
+  }, [projects, searchQuery, selectedCategory, selectedStatus, selectedTech, showFeaturedOnly]);
+
+  // Separate featured and regular projects from filtered results
+  const featuredProjects = filteredProjects.filter((p) => p.featured);
+  const regularProjects = filteredProjects.filter((p) => !p.featured);
   
   // Display featured first, then regular projects
   const displayProjects = [...featuredProjects, ...regularProjects];
+
+  // Check if any filters are active
+  const hasActiveFilters = searchQuery.trim() !== "" || selectedCategory !== null || selectedStatus !== null || selectedTech.length > 0 || showFeaturedOnly;
+
+  // Clear all filters
+  const clearFilters = () => {
+    setSearchQuery("");
+    setSelectedCategory(null);
+    setSelectedStatus(null);
+    setSelectedTech([]);
+    setShowFeaturedOnly(false);
+  };
+
+  // Toggle tech filter
+  const toggleTech = (tech: string) => {
+    setSelectedTech(prev =>
+      prev.includes(tech) ? prev.filter(t => t !== tech) : [...prev, tech]
+    );
+  };
 
   return (
     <section
@@ -542,6 +623,170 @@ export const ProjectsSection = () => {
           </motion.p>
         </motion.div>
 
+        {/* Filter System */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="mb-8 sm:mb-12"
+        >
+          <div className="max-w-6xl mx-auto space-y-4">
+            {/* Search Bar */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search projects by name, description, tech stack..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 pr-10 h-11 bg-background/50 backdrop-blur-sm border-primary/20 focus:border-primary/50"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-secondary transition-colors"
+                  aria-label="Clear search"
+                >
+                  <X className="w-4 h-4 text-muted-foreground" />
+                </button>
+              )}
+            </div>
+
+            {/* Filter Chips */}
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              {/* Featured Toggle */}
+              <motion.button
+                onClick={() => setShowFeaturedOnly(!showFeaturedOnly)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={cn(
+                  "inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200",
+                  showFeaturedOnly
+                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+                    : "bg-secondary/50 text-foreground hover:bg-secondary border border-border/50"
+                )}
+              >
+                <Star className={cn("w-4 h-4", showFeaturedOnly && "fill-current")} />
+                Featured Only
+              </motion.button>
+
+              {/* Status Filters */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground font-medium hidden sm:inline">Status:</span>
+                {["completed", "in-progress"].map((status) => (
+                  <motion.button
+                    key={status}
+                    onClick={() => setSelectedStatus(selectedStatus === status ? null : status)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={cn(
+                      "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200",
+                      selectedStatus === status
+                        ? status === "completed"
+                          ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                          : "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
+                        : "bg-secondary/50 text-muted-foreground hover:bg-secondary border border-border/50"
+                    )}
+                  >
+                    {status === "completed" ? (
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                    ) : (
+                      <Clock className="w-3.5 h-3.5" />
+                    )}
+                    {status === "completed" ? "Completed" : "In Progress"}
+                  </motion.button>
+                ))}
+              </div>
+
+              {/* Category Filters */}
+              {categories.length > 0 && (
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs text-muted-foreground font-medium hidden sm:inline">Category:</span>
+                  {categories.map((category) => (
+                    <motion.button
+                      key={category}
+                      onClick={() => setSelectedCategory(selectedCategory === category ? null : category)}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className={cn(
+                        "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200",
+                        selectedCategory === category
+                          ? "bg-primary/20 text-primary border border-primary/30"
+                          : "bg-secondary/50 text-muted-foreground hover:bg-secondary border border-border/50"
+                      )}
+                    >
+                      <Tag className="w-3.5 h-3.5" />
+                      {category}
+                    </motion.button>
+                  ))}
+                </div>
+              )}
+
+              {/* Clear Filters Button */}
+              {hasActiveFilters && (
+                <motion.button
+                  onClick={clearFilters}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium bg-destructive/10 text-destructive hover:bg-destructive/20 border border-destructive/20 transition-all duration-200 ml-auto"
+                >
+                  <X className="w-3.5 h-3.5" />
+                  Clear Filters
+                </motion.button>
+              )}
+            </div>
+
+            {/* Tech Stack Filters - Collapsible */}
+            {techStack.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                className="overflow-hidden"
+              >
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs text-muted-foreground font-medium flex items-center gap-1.5">
+                    <Filter className="w-3.5 h-3.5" />
+                    Tech Stack:
+                  </span>
+                  {techStack.slice(0, 10).map((tech) => (
+                    <motion.button
+                      key={tech}
+                      onClick={() => toggleTech(tech)}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className={cn(
+                        "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-200",
+                        selectedTech.includes(tech)
+                          ? "bg-primary/20 text-primary border border-primary/30"
+                          : "bg-secondary/30 text-muted-foreground hover:bg-secondary/50 border border-border/30"
+                      )}
+                    >
+                      {tech}
+                    </motion.button>
+                  ))}
+                  {techStack.length > 10 && (
+                    <span className="text-xs text-muted-foreground">
+                      +{techStack.length - 10} more
+                    </span>
+                  )}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Results Count */}
+            {hasActiveFilters && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-sm text-muted-foreground"
+              >
+                Showing {displayProjects.length} of {projects.length} project{displayProjects.length !== 1 ? 's' : ''}
+              </motion.div>
+            )}
+          </div>
+        </motion.div>
+
         {/* Projects Grid */}
         {isLoading ? (
           <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
@@ -566,6 +811,23 @@ export const ProjectsSection = () => {
               ))}
             </AnimatePresence>
           </div>
+        ) : hasActiveFilters ? (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center py-16 px-6 rounded-2xl border border-dashed border-primary/20 bg-card/30 backdrop-blur-sm max-w-md mx-auto"
+          >
+            <Filter className="w-12 h-12 text-primary/40 mx-auto mb-4" />
+            <p className="text-muted-foreground font-medium">No projects match your filters.</p>
+            <p className="text-sm text-muted-foreground/60 mt-2">Try adjusting your search or filter criteria.</p>
+            <Button
+              onClick={clearFilters}
+              variant="outline"
+              className="mt-4"
+            >
+              Clear All Filters
+            </Button>
+          </motion.div>
         ) : (
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
