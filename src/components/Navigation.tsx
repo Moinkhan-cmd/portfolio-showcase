@@ -28,77 +28,35 @@ export const Navigation = () => {
   }, []);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        let maxRatio = 0;
-        let activeId = '';
+    let ticking = false;
+    
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrollPosition = window.scrollY + 150;
+          let currentSection = '';
 
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
-            maxRatio = entry.intersectionRatio;
-            activeId = entry.target.id;
-          }
-        });
-
-        if (!activeId) {
-          const scrollPosition = window.scrollY + window.innerHeight / 3;
           navLinks.forEach((link) => {
-            const element = document.getElementById(link.href.substring(1));
+            const sectionId = link.href.substring(1);
+            const element = document.getElementById(sectionId);
             if (element) {
               const { offsetTop, offsetHeight } = element;
               if (
                 scrollPosition >= offsetTop &&
                 scrollPosition < offsetTop + offsetHeight
               ) {
-                activeId = element.id;
+                currentSection = sectionId;
               }
             }
           });
-        }
 
-        if (activeId) {
-          setActiveSection(activeId);
-        }
-      },
-      {
-        rootMargin: '-20% 0px -60% 0px',
-        threshold: [0, 0.1, 0.25, 0.5, 0.75, 1.0],
-      }
-    );
-
-    const observeSections = () => {
-      navLinks.forEach((link) => {
-        const sectionId = link.href.substring(1);
-        const element = document.getElementById(sectionId);
-        if (element) {
-          observer.observe(element);
-        }
-      });
-    };
-
-    const timeoutId = setTimeout(observeSections, 100);
-    observeSections();
-
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY + 150;
-      let currentSection = '';
-
-      navLinks.forEach((link) => {
-        const sectionId = link.href.substring(1);
-        const element = document.getElementById(sectionId);
-        if (element) {
-          const { offsetTop, offsetHeight } = element;
-          if (
-            scrollPosition >= offsetTop &&
-            scrollPosition < offsetTop + offsetHeight
-          ) {
-            currentSection = sectionId;
+          if (currentSection && currentSection !== activeSection) {
+            setActiveSection(currentSection);
           }
-        }
-      });
-
-      if (currentSection) {
-        setActiveSection(currentSection);
+          
+          ticking = false;
+        });
+        ticking = true;
       }
     };
 
@@ -106,11 +64,9 @@ export const Navigation = () => {
     handleScroll();
 
     return () => {
-      clearTimeout(timeoutId);
-      observer.disconnect();
       window.removeEventListener('scroll', handleScroll);
     };
-  }, []);
+  }, [activeSection]);
 
   const scrollToSection = useCallback((href: string) => {
     const element = document.querySelector(href);
@@ -142,13 +98,13 @@ export const Navigation = () => {
   return (
     <nav
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-out',
+        'fixed top-0 left-0 right-0 z-50 transition-all duration-200 ease-out',
         isScrolled ? 'py-1 xs:py-1.5 sm:py-2 md:py-2.5' : 'py-2 xs:py-2.5 sm:py-3 md:py-4 lg:py-5'
       )}
     >
       <div
         className={cn(
-          'mx-auto flex items-center justify-between transition-all duration-300 ease-out',
+          'mx-auto flex items-center justify-between transition-all duration-200 ease-out',
           isScrolled
             ? 'w-[95%] xs:w-[94%] sm:w-[96%] md:w-[95%] max-w-6xl rounded-lg xs:rounded-xl sm:rounded-2xl px-2 xs:px-2.5 sm:px-3 md:px-4 lg:px-6 py-1.5 xs:py-2 sm:py-2.5 bg-background/90 backdrop-blur-xl border border-border/30 shadow-lg'
             : 'w-full max-w-7xl px-2.5 xs:px-3 sm:px-4 md:px-6 lg:px-8 xl:px-10 py-1.5 xs:py-2 sm:py-2.5 bg-transparent'
@@ -156,7 +112,7 @@ export const Navigation = () => {
       >
         <a
           href="#"
-          className="relative flex items-center gap-1 xs:gap-1.5 sm:gap-2 group shrink-0 z-50"
+          className="relative flex items-center gap-1 xs:gap-1.5 sm:gap-2 group shrink-0 z-50 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           onClick={(e) => {
             e.preventDefault();
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -165,9 +121,10 @@ export const Navigation = () => {
           aria-label="Go to top"
         >
           <motion.div
-            className="relative w-7 h-7 xs:w-8 xs:h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 flex items-center justify-center rounded-lg xs:rounded-xl bg-gradient-to-br from-primary/20 to-purple-500/20 text-primary border border-primary/30 group-hover:border-primary/60 transition-all duration-300"
+            className="relative w-7 h-7 xs:w-8 xs:h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 flex items-center justify-center rounded-lg xs:rounded-xl bg-gradient-to-br from-primary/20 to-purple-500/20 text-primary border border-primary/30 group-hover:border-primary/60 transition-all duration-200"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.15 }}
           >
             <span className="font-signature font-bold text-sm xs:text-base sm:text-lg md:text-xl">M</span>
           </motion.div>
@@ -186,7 +143,8 @@ export const Navigation = () => {
                 key={link.name}
                 onClick={() => scrollToSection(link.href)}
                 className={cn(
-                  'relative px-2 xs:px-2.5 sm:px-3 md:px-3.5 lg:px-4 xl:px-5 py-1.5 md:py-2 text-[10px] xs:text-xs sm:text-sm md:text-sm lg:text-sm font-medium transition-all duration-300 rounded-full whitespace-nowrap',
+                  'relative px-2 xs:px-2.5 sm:px-3 md:px-3.5 lg:px-4 xl:px-5 py-1.5 md:py-2 text-[10px] xs:text-xs sm:text-sm md:text-sm lg:text-sm font-medium transition-all duration-200 rounded-full whitespace-nowrap',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background',
                   isActive ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
                 )}
                 whileHover={{ scale: isActive ? 1 : 1.02 }}
@@ -197,7 +155,8 @@ export const Navigation = () => {
                   <motion.div
                     layoutId="activeNavTab"
                     className="absolute inset-0 bg-primary rounded-full shadow-lg shadow-primary/25"
-                    transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
+                    style={{ willChange: 'transform' }}
+                    transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
                   />
                 )}
                 {!isActive && (
@@ -215,7 +174,7 @@ export const Navigation = () => {
             onClick={() => scrollToSection('#contact')}
             size={isScrolled ? 'sm' : 'default'}
             className={cn(
-              'hidden md:flex rounded-full font-semibold gap-1 xs:gap-1.5 sm:gap-2 transition-all duration-300 text-[10px] xs:text-xs sm:text-sm md:text-sm lg:text-base',
+              'hidden md:flex rounded-full font-semibold gap-1 xs:gap-1.5 sm:gap-2 transition-all duration-200 text-[10px] xs:text-xs sm:text-sm md:text-sm lg:text-base',
               'shadow-[0_0_20px_rgba(45,212,191,0.2)] hover:shadow-[0_0_30px_rgba(45,212,191,0.4)]',
               isScrolled ? 'px-2.5 xs:px-3 sm:px-3.5 md:px-4 lg:px-5' : 'px-3 xs:px-3.5 sm:px-4 md:px-5 lg:px-6'
             )}
@@ -228,6 +187,7 @@ export const Navigation = () => {
             className={cn(
               'lg:hidden relative z-50 p-1.5 xs:p-2 rounded-lg xs:rounded-xl transition-colors duration-200',
               'hover:bg-secondary/80 active:bg-secondary',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background',
               'touch-manipulation min-h-[36px] min-w-[36px] xs:min-h-[40px] xs:min-w-[40px] sm:min-h-[44px] sm:min-w-[44px] flex items-center justify-center'
             )}
             aria-label="Toggle menu"
@@ -287,6 +247,7 @@ export const Navigation = () => {
                         className={cn(
                           'relative w-full text-left px-2.5 xs:px-3 sm:px-4 py-2.5 xs:py-3 sm:py-4 rounded-lg xs:rounded-xl font-medium text-sm xs:text-base sm:text-lg transition-all duration-200',
                           'touch-manipulation min-h-[44px] xs:min-h-[48px] sm:min-h-[52px] flex items-center',
+                          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background',
                           isActive ? 'bg-primary/10 text-primary border-l-2 border-primary' : 'text-muted-foreground hover:bg-secondary/50 hover:text-foreground active:bg-secondary'
                         )}
                       >
@@ -294,6 +255,7 @@ export const Navigation = () => {
                           <motion.div
                             className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 xs:w-1 h-5 xs:h-6 sm:h-8 rounded-full bg-primary"
                             layoutId="mobileActiveIndicator"
+                            style={{ willChange: 'transform' }}
                             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                           />
                         )}
