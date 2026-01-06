@@ -62,20 +62,23 @@ export const ContactSection = () => {
     // Check if EmailJS is configured
     if (!serviceId || !templateId || !publicKey) {
       // Fallback: Open email client with pre-filled message
-      const subject = encodeURIComponent(`Contact from ${name}`);
-      const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
+      const subject = encodeURIComponent(`Contact from ${name} - Portfolio`);
+      const body = encodeURIComponent(`Hello Moinkhan,\n\nMy name is ${name}.\nMy email: ${email}\n\nMessage:\n${message}\n\n---\nSent from your portfolio contact form`);
       const mailtoLink = `mailto:moinbhatti59@gmail.com?subject=${subject}&body=${body}`;
       
       toast({
-        title: "Email service not configured",
-        description: "Opening your email client instead. Please configure EmailJS for direct form submission.",
-        variant: "destructive",
-        duration: 5000,
+        title: "Opening email client",
+        description: "EmailJS is not configured. Opening your default email client with a pre-filled message.",
+        duration: 4000,
       });
       
-      // Open email client as fallback
-      window.location.href = mailtoLink;
+      // Small delay to show toast, then open email client
+      setTimeout(() => {
+        window.location.href = mailtoLink;
+      }, 500);
+      
       setIsSubmitting(false);
+      form.reset();
       return;
     }
 
@@ -100,27 +103,15 @@ export const ContactSection = () => {
       console.error("EmailJS Error:", error);
       
       // Fallback to email client on error
-      const subject = encodeURIComponent(`Contact from ${name}`);
-      const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
+      const subject = encodeURIComponent(`Contact from ${name} - Portfolio`);
+      const body = encodeURIComponent(`Hello Moinkhan,\n\nMy name is ${name}.\nMy email: ${email}\n\nMessage:\n${message}\n\n---\nSent from your portfolio contact form`);
       const mailtoLink = `mailto:moinbhatti59@gmail.com?subject=${subject}&body=${body}`;
       
       toast({
         title: "Failed to send via form",
-        description: "Opening your email client as a fallback option.",
+        description: error?.text || "An error occurred. Opening your email client as a fallback.",
         variant: "destructive",
         duration: 5000,
-        action: (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              window.location.href = mailtoLink;
-            }}
-            className="ml-2"
-          >
-            Open Email
-          </Button>
-        ),
       });
       
       // Auto-open email client after a short delay

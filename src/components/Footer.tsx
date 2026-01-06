@@ -42,9 +42,13 @@ export const Footer = () => {
           <div className="flex flex-col gap-4">
             <motion.button
               onClick={() => scrollToTop()}
-              className="text-2xl sm:text-3xl font-display font-bold text-primary text-left hover:opacity-80 transition-opacity"
+              className="text-3xl sm:text-4xl md:text-5xl font-signature font-semibold text-primary text-left hover:opacity-80 transition-opacity leading-tight"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              style={{ 
+                fontFamily: 'var(--font-signature)',
+                letterSpacing: '0.02em'
+              }}
             >
               Moinkhan Bhatti
             </motion.button>

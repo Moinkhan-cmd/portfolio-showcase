@@ -60,6 +60,41 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
+## Environment Variables Setup
+
+### EmailJS Configuration (for Contact Form)
+
+To enable the contact form to send emails directly, you need to configure EmailJS:
+
+1. **Sign up for EmailJS**: Visit [https://www.emailjs.com/](https://www.emailjs.com/) and create a free account
+
+2. **Create an Email Service**:
+   - Go to Email Services and add a service (Gmail, Outlook, etc.)
+   - Follow the setup instructions for your email provider
+
+3. **Create an Email Template**:
+   - Go to Email Templates and create a new template
+   - Use these template variables:
+     - `{{from_name}}` - Sender's name
+     - `{{from_email}}` - Sender's email
+     - `{{message}}` - Message content
+     - `{{reply_to}}` - Reply-to email
+
+4. **Get your API Keys**:
+   - Go to Account > API Keys
+   - Copy your Public Key
+
+5. **Create a `.env` file** in the root directory with:
+   ```env
+   VITE_EMAILJS_SERVICE_ID=your_service_id_here
+   VITE_EMAILJS_TEMPLATE_ID=your_template_id_here
+   VITE_EMAILJS_PUBLIC_KEY=your_public_key_here
+   ```
+
+6. **Restart your development server** after adding the environment variables
+
+**Note**: If EmailJS is not configured, the contact form will automatically fall back to opening the user's default email client with a pre-filled message.
+
 ## How can I deploy this project?
 
 Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
