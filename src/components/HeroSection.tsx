@@ -412,11 +412,11 @@ export const HeroSection = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.5 }}
-        className="absolute bottom-4 sm:bottom-6 md:bottom-8 lg:bottom-8 left-1/2 -translate-x-1/2 z-30 w-full pointer-events-none"
+        className="absolute bottom-4 sm:bottom-6 md:bottom-8 lg:bottom-8 left-1/2 -translate-x-1/2 z-30 pointer-events-none"
       >
         <motion.button
           onClick={() => scrollToSection("#about")}
-          className="flex flex-col items-center gap-2 sm:gap-3 text-muted-foreground hover:text-foreground transition-colors group touch-manipulation p-2 pointer-events-auto"
+          className="flex flex-col items-center gap-2 sm:gap-3 text-muted-foreground hover:text-foreground transition-colors group touch-manipulation p-2 pointer-events-auto mx-auto"
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
           whileTap={{ scale: 0.9 }}
