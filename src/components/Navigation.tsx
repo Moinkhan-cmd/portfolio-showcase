@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { Menu, X, ArrowUpRight } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -7,9 +7,10 @@ import { cn } from '@/lib/utils';
 
 const navLinks = [
   { name: 'About', href: '#about' },
+  { name: 'Skills', href: '#skills' },
   { name: 'Projects', href: '#projects' },
-  { name: 'Certifications', href: '#certifications' },
   { name: 'Experience', href: '#experience' },
+  { name: 'Certifications', href: '#certifications' },
   { name: 'Contact', href: '#contact' },
 ] as const;
 
@@ -27,6 +28,14 @@ export const Navigation = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Memoize section elements to avoid querying DOM on every scroll
+  const sectionElements = useMemo(() => {
+    return navLinks.map(link => ({
+      id: link.href.substring(1),
+      element: document.getElementById(link.href.substring(1))
+    }));
+  }, []);
+
   useEffect(() => {
     let ticking = false;
     
@@ -36,19 +45,19 @@ export const Navigation = () => {
           const scrollPosition = window.scrollY + 150;
           let currentSection = '';
 
-          navLinks.forEach((link) => {
-            const sectionId = link.href.substring(1);
-            const element = document.getElementById(sectionId);
+          // Use memoized elements instead of querying DOM
+          for (const { id, element } of sectionElements) {
             if (element) {
               const { offsetTop, offsetHeight } = element;
               if (
                 scrollPosition >= offsetTop &&
                 scrollPosition < offsetTop + offsetHeight
               ) {
-                currentSection = sectionId;
+                currentSection = id;
+                break; // Exit early when found
               }
             }
-          });
+          }
 
           if (currentSection && currentSection !== activeSection) {
             setActiveSection(currentSection);
@@ -66,7 +75,7 @@ export const Navigation = () => {
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [activeSection]);
+  }, [activeSection, sectionElements]);
 
   const scrollToSection = useCallback((href: string) => {
     const element = document.querySelector(href);
@@ -106,7 +115,7 @@ export const Navigation = () => {
         className={cn(
           'mx-auto flex items-center justify-between transition-all duration-200 ease-out',
           isScrolled
-            ? 'w-[95%] xs:w-[94%] sm:w-[96%] md:w-[95%] max-w-6xl rounded-lg xs:rounded-xl sm:rounded-2xl px-2 xs:px-2.5 sm:px-3 md:px-4 lg:px-6 py-1.5 xs:py-2 sm:py-2.5 bg-background/90 backdrop-blur-xl border border-border/30 shadow-lg'
+            ? 'w-[95%] xs:w-[94%] sm:w-[96%] md:w-[95%] max-w-6xl rounded-lg xs:rounded-xl sm:rounded-2xl px-2 xs:px-2.5 sm:px-3 md:px-4 lg:px-6 py-1.5 xs:py-2 sm:py-2.5 bg-background/95 backdrop-blur-md border border-border/30 shadow-lg'
             : 'w-full max-w-7xl px-2.5 xs:px-3 sm:px-4 md:px-6 lg:px-8 xl:px-10 py-1.5 xs:py-2 sm:py-2.5 bg-transparent'
         )}
       >
@@ -220,11 +229,11 @@ export const Navigation = () => {
               exit={{ opacity: 0 }}
             />
             <motion.div
-              className="lg:hidden fixed top-0 right-0 h-full w-full xs:w-[85%] sm:w-[75%] md:w-[60%] max-w-sm z-50 bg-background/98 backdrop-blur-xl border-l border-border/50 shadow-2xl"
+              className="lg:hidden fixed top-0 right-0 h-full w-full xs:w-[85%] sm:w-[75%] md:w-[60%] max-w-sm z-50 bg-background/98 backdrop-blur-md border-l border-border/50 shadow-2xl"
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              transition={{ type: 'spring', damping: 30, stiffness: 250 }}
             >
               <div className="flex items-center justify-between p-2.5 xs:p-3 sm:p-4 border-b border-border/30">
                 <div className="xs:hidden"><ThemeToggle /></div>

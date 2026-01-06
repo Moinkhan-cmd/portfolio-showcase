@@ -660,15 +660,26 @@ a, button, [role="button"] {
 
 /* Navbar performance optimizations */
 nav {
-  will-change: transform;
-  contain: layout style;
+  contain: layout style paint;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 nav button,
 nav a {
-  will-change: transform;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transform: translateZ(0);
+}
+
+/* Optimize animations */
+@media (prefers-reduced-motion: no-preference) {
+  nav button,
+  nav a {
+    transition-property: color, background-color, border-color, transform;
+    transition-duration: 0.2s;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
 }
 
 /* Focus visible styles for better accessibility */
@@ -750,11 +761,27 @@ img {
 }
 
 /* Optimize backdrop filters - use sparingly */
-.backdrop-blur-xl,
-.backdrop-blur-lg {
-  /* Only apply blur when needed */
-  will-change: backdrop-filter;
-  transform: translateZ(0);
+.backdrop-blur-xl {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.backdrop-blur-md {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Reduce blur on lower-end devices */
+@media (max-width: 768px) {
+  .backdrop-blur-xl {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  
+  .backdrop-blur-md {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
 }
 
 /* 3D Perspective for cards */

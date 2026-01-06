@@ -53,11 +53,11 @@ export const ScrollReveal = ({
   className = "",
   variant = "fadeUp",
   delay = 0,
-  duration = 0.8,
+  duration = 0.5,
   once = true,
   threshold = 0.2,
   amount = 0.3,
-  distance = 60,
+  distance = 40,
 }: ScrollRevealProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once, amount: threshold });
@@ -87,11 +87,10 @@ export const ScrollReveal = ({
       transition={{
         duration,
         delay,
-        ease: [0.25, 0.46, 0.45, 0.94], // Custom cubic bezier for smooth animation
-        type: "spring",
-        stiffness: 100,
-        damping: 15,
+        ease: [0.25, 0.46, 0.45, 0.94],
+        type: "tween", // Changed from spring to tween for better performance
       }}
+      style={{ willChange: 'opacity, transform' }}
       className={className}
     >
       {children}
@@ -112,10 +111,10 @@ interface StaggerRevealProps {
 export const StaggerReveal = ({
   children,
   className = "",
-  staggerDelay = 0.1,
+  staggerDelay = 0.08,
   variant = "fadeUp",
   once = true,
-  duration = 0.6,
+  duration = 0.4,
 }: StaggerRevealProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once, amount: 0.2 });
@@ -125,7 +124,7 @@ export const StaggerReveal = ({
     visible: {
       transition: {
         staggerChildren: staggerDelay,
-        delayChildren: 0.1,
+        delayChildren: 0.05,
       },
     },
   };
@@ -145,10 +144,9 @@ export const StaggerReveal = ({
           transition={{
             duration,
             ease: [0.25, 0.46, 0.45, 0.94],
-            type: "spring",
-            stiffness: 100,
-            damping: 15,
+            type: "tween", // Changed from spring to tween
           }}
+          style={{ willChange: 'opacity, transform' }}
         >
           {child}
         </motion.div>
