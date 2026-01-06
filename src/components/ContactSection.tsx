@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import { Mail, Github, Linkedin, Send, MapPin } from "lucide-react";
+import { Mail, Github, Linkedin, Send, MapPin, AlertCircle, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import emailjs from "@emailjs/browser";
 import { ContactBackground3D } from "./ContactBackground3D";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const socialLinks = [
   { name: "GitHub", icon: Github, url: "https://github.com/Moinkhan-cmd", label: "github.com/Moinkhan-cmd" },
@@ -19,6 +20,12 @@ export const ContactSection = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const { toast } = useToast();
+
+  // Check EmailJS configuration
+  const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+  const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+  const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+  const isEmailJSConfigured = !!(serviceId && templateId && publicKey);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -54,11 +61,20 @@ export const ContactSection = () => {
 
     // Check if EmailJS is configured
     if (!serviceId || !templateId || !publicKey) {
+      // Fallback: Open email client with pre-filled message
+      const subject = encodeURIComponent(`Contact from ${name}`);
+      const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
+      const mailtoLink = `mailto:moinbhatti59@gmail.com?subject=${subject}&body=${body}`;
+      
       toast({
         title: "Email service not configured",
-        description: "Please configure EmailJS environment variables. Check the README for setup instructions.",
+        description: "Opening your email client instead. Please configure EmailJS for direct form submission.",
         variant: "destructive",
+        duration: 5000,
       });
+      
+      // Open email client as fallback
+      window.location.href = mailtoLink;
       setIsSubmitting(false);
       return;
     }
@@ -80,13 +96,37 @@ export const ContactSection = () => {
       });
       
       form.reset();
-    } catch (error) {
+    } catch (error: any) {
       console.error("EmailJS Error:", error);
+      
+      // Fallback to email client on error
+      const subject = encodeURIComponent(`Contact from ${name}`);
+      const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
+      const mailtoLink = `mailto:moinbhatti59@gmail.com?subject=${subject}&body=${body}`;
+      
       toast({
-        title: "Failed to send message",
-        description: "Please try again later or contact me directly via email.",
+        title: "Failed to send via form",
+        description: "Opening your email client as a fallback option.",
         variant: "destructive",
+        duration: 5000,
+        action: (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              window.location.href = mailtoLink;
+            }}
+            className="ml-2"
+          >
+            Open Email
+          </Button>
+        ),
       });
+      
+      // Auto-open email client after a short delay
+      setTimeout(() => {
+        window.location.href = mailtoLink;
+      }, 2000);
     } finally {
       setIsSubmitting(false);
     }
@@ -185,6 +225,32 @@ export const ContactSection = () => {
           >
             <form onSubmit={handleSubmit} className="glass-card rounded-xl sm:rounded-2xl p-5 sm:p-8">
               <h3 className="font-display text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">Send a Message</h3>
+              
+              {/* EmailJS Configuration Alert */}
+              <AnimatePresence>
+                {!isEmailJSConfigured && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10, height: 0 }}
+                    animate={{ opacity: 1, y: 0, height: "auto" }}
+                    exit={{ opacity: 0, y: -10, height: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="mb-6"
+                  >
+                    <Alert variant="destructive" className="border-orange-500/50 bg-orange-500/10">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle className="text-sm font-semibold">Email Service Not Configured</AlertTitle>
+                      <AlertDescription className="text-xs mt-1">
+                        The form will open your email client instead. To enable direct form submission, configure EmailJS environment variables:
+                        <code className="block mt-2 p-2 bg-background/50 rounded text-[10px] font-mono">
+                          VITE_EMAILJS_SERVICE_ID<br />
+                          VITE_EMAILJS_TEMPLATE_ID<br />
+                          VITE_EMAILJS_PUBLIC_KEY
+                        </code>
+                      </AlertDescription>
+                    </Alert>
+                  </motion.div>
+                )}
+              </AnimatePresence>
               
               <div className="space-y-6">
                 <div>

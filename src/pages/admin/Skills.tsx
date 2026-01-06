@@ -23,7 +23,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Edit, Trash2, Loader2 } from "lucide-react";
+import { Plus, Edit, Trash2, Loader2, Sparkles, Code2, Database, Code, Wrench, Users, Star, TrendingUp, Zap, CheckCircle2 } from "lucide-react";
 import { getSkills, createSkill, updateSkill, deleteSkill, Skill } from "@/lib/admin/skills";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -34,6 +34,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { skillSchema, formatZodError } from "@/lib/admin/validation";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 export const AdminSkills = () => {
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -269,103 +271,362 @@ export const AdminSkills = () => {
 
       <Dialog open={dialogOpen} onOpenChange={(open) => !open && handleCloseDialog()}>
         <DialogContent
-          className="max-w-[600px] w-full max-h-[85vh] overflow-y-auto"
+          className="max-w-[700px] w-full max-h-[90vh] overflow-y-auto p-0 border-0 bg-transparent shadow-none"
           onInteractOutside={(e) => e.preventDefault()}
           onEscapeKeyDown={(e) => e.preventDefault()}
         >
-          <DialogHeader>
-            <DialogTitle>{selectedSkill ? "Edit Skill" : "Add New Skill"}</DialogTitle>
-            <DialogDescription>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+            className="relative"
+          >
+            {/* Animated Background Gradient */}
+            <motion.div
+              className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-primary/20 via-primary/10 to-purple-500/20 blur-2xl opacity-50"
+              animate={{
+                scale: [1, 1.05, 1],
+                opacity: [0.5, 0.7, 0.5],
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
+
+            {/* Main Content Container */}
+            <div className="relative bg-background/95 backdrop-blur-xl rounded-2xl border border-primary/20 shadow-2xl overflow-hidden">
+              {/* Animated Header with Gradient */}
+              <motion.div
+                className={cn(
+                  "relative px-6 pt-6 pb-4 bg-gradient-to-r",
+                  formData.category && categoryConfig[formData.category]
+                    ? categoryConfig[formData.category].gradient
+                    : "from-primary/20 via-primary/10 to-primary/20"
+                )}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.1 }}
+              >
+                {/* Shine effect */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
+                  animate={{
+                    x: ["-100%", "200%"],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    repeatDelay: 2,
+                    ease: "linear",
+                  }}
+                />
+
+                {/* Floating particles */}
+                <div className="absolute inset-0 overflow-hidden">
+                  {[...Array(6)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="absolute w-1 h-1 bg-primary/40 rounded-full"
+                      initial={{
+                        x: Math.random() * 100 + "%",
+                        y: Math.random() * 100 + "%",
+                        opacity: 0,
+                      }}
+                      animate={{
+                        y: [null, "-100%"],
+                        opacity: [0, 1, 0],
+                      }}
+                      transition={{
+                        duration: 3 + Math.random() * 2,
+                        repeat: Infinity,
+                        delay: Math.random() * 2,
+                        ease: "linear",
+                      }}
+                    />
+                  ))}
+                </div>
+
+                <DialogHeader className="relative z-10">
+                  <div className="flex items-center gap-3 mb-2">
+                    {formData.category && categoryConfig[formData.category] ? (
+                      <motion.div
+                        className={cn(
+                          "p-2 rounded-xl bg-background/20 backdrop-blur-sm border border-white/10",
+                          categoryConfig[formData.category].color
+                        )}
+                        whileHover={{ scale: 1.1, rotate: 5 }}
+                        transition={{ type: "spring", stiffness: 400 }}
+                      >
+                        {(() => {
+                          const Icon = categoryConfig[formData.category].icon;
+                          return <Icon className="w-5 h-5" />;
+                        })()}
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        className="p-2 rounded-xl bg-background/20 backdrop-blur-sm border border-white/10"
+                        animate={{ rotate: [0, 360] }}
+                        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                      >
+                        <Sparkles className="w-5 h-5 text-primary" />
+                      </motion.div>
+                    )}
+                    <div className="flex-1">
+                      <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                        {selectedSkill ? "Edit Skill" : "Add New Skill"}
+                      </DialogTitle>
+                      <DialogDescription className="text-sm mt-1">
               {selectedSkill
                 ? "Update the skill details below"
                 : "Fill in the details to add a new skill"}
             </DialogDescription>
+                    </div>
+                  </div>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Skill Name *</Label>
+              </motion.div>
+
+              <form onSubmit={handleSubmit} className="p-6 space-y-6">
+                {/* Skill Name Field */}
+                <motion.div
+                  className="space-y-2"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <Label htmlFor="name" className="flex items-center gap-2 text-sm font-semibold">
+                    <Code2 className="w-4 h-4 text-primary" />
+                    Skill Name *
+                  </Label>
+                  <div className="relative">
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
                 disabled={isSubmitting}
+                      className="pl-10 h-11 bg-background/50 border-primary/20 focus:border-primary/50 transition-all duration-300"
+                      placeholder="e.g., React, TypeScript, Node.js"
               />
+                    <Sparkles className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/50" />
             </div>
+                </motion.div>
 
-            <div className="space-y-2">
-              <Label htmlFor="category">Category *</Label>
+                {/* Category Field */}
+                <motion.div
+                  className="space-y-2"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <Label htmlFor="category" className="flex items-center gap-2 text-sm font-semibold">
+                    <Database className="w-4 h-4 text-primary" />
+                    Category *
+                  </Label>
               <Select
                 value={formData.category || ""}
                 onValueChange={(value) => setFormData({ ...formData, category: value })}
                 disabled={isSubmitting}
               >
-                <SelectTrigger id="category">
+                    <SelectTrigger 
+                      id="category"
+                      className="h-11 bg-background/50 border-primary/20 focus:border-primary/50"
+                    >
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Frontend Development">Frontend Development</SelectItem>
-                  <SelectItem value="Backend & Database">Backend & Database</SelectItem>
-                  <SelectItem value="Programming Languages">Programming Languages</SelectItem>
-                  <SelectItem value="Tools & Platforms">Tools & Platforms</SelectItem>
-                  <SelectItem value="Soft Skills">Soft Skills</SelectItem>
+                      {Object.entries(categoryConfig).map(([category, config]) => {
+                        const Icon = config.icon;
+                        return (
+                          <SelectItem key={category} value={category}>
+                            <div className="flex items-center gap-2">
+                              <Icon className={cn("w-4 h-4", config.color)} />
+                              <span>{category}</span>
+                            </div>
+                          </SelectItem>
+                        );
+                      })}
                 </SelectContent>
               </Select>
-            </div>
+                </motion.div>
 
-            <div className="space-y-2">
-              <Label htmlFor="level">Skill Level</Label>
+                {/* Skill Level with Visual Indicator */}
+                <motion.div
+                  className="space-y-3"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  <Label htmlFor="level" className="flex items-center gap-2 text-sm font-semibold">
+                    <TrendingUp className="w-4 h-4 text-primary" />
+                    Skill Level
+                  </Label>
               <Select
                 value={formData.level || "intermediate"}
                 onValueChange={(value) => setFormData({ ...formData, level: value })}
                 disabled={isSubmitting}
               >
-                <SelectTrigger id="level">
+                    <SelectTrigger 
+                      id="level"
+                      className="h-11 bg-background/50 border-primary/20 focus:border-primary/50"
+                    >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="beginner">Beginner</SelectItem>
-                  <SelectItem value="intermediate">Intermediate</SelectItem>
-                  <SelectItem value="advanced">Advanced</SelectItem>
-                  <SelectItem value="expert">Expert</SelectItem>
+                      {Object.entries(levelConfig).map(([value, config]) => (
+                        <SelectItem key={value} value={value}>
+                          <div className="flex items-center gap-2">
+                            <div className={cn("w-2 h-2 rounded-full", `bg-gradient-to-r ${config.gradient}`)} />
+                            <span>{config.label}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
                 </SelectContent>
               </Select>
+                  
+                  {/* Visual Progress Bar */}
+                  {formData.level && levelConfig[formData.level] && (
+                    <motion.div
+                      initial={{ opacity: 0, scaleX: 0 }}
+                      animate={{ opacity: 1, scaleX: 1 }}
+                      transition={{ delay: 0.5, duration: 0.5 }}
+                      className="space-y-2"
+                    >
+                      <div className="flex items-center justify-between text-xs">
+                        <span className={cn("font-medium", levelConfig[formData.level].color)}>
+                          {levelConfig[formData.level].label}
+                        </span>
+                        <span className="text-muted-foreground">
+                          {levelConfig[formData.level].value}%
+                        </span>
+                      </div>
+                      <div className="h-2 bg-secondary/50 rounded-full overflow-hidden">
+                        <motion.div
+                          className={cn(
+                            "h-full rounded-full bg-gradient-to-r",
+                            levelConfig[formData.level].gradient
+                          )}
+                          initial={{ width: 0 }}
+                          animate={{ width: `${levelConfig[formData.level].value}%` }}
+                          transition={{ delay: 0.6, duration: 0.8, ease: "easeOut" }}
+                        />
             </div>
+                    </motion.div>
+                  )}
+                </motion.div>
 
-            <div className="space-y-2">
-              <Label htmlFor="icon">Icon (Optional)</Label>
+                {/* Icon Field with Preview */}
+                <motion.div
+                  className="space-y-2"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <Label htmlFor="icon" className="flex items-center gap-2 text-sm font-semibold">
+                    <Star className="w-4 h-4 text-primary" />
+                    Icon (Optional)
+                  </Label>
+                  <div className="flex items-center gap-3">
+                    <div className="relative flex-1">
               <Input
                 id="icon"
                 value={formData.icon}
                 onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
                 placeholder="🚀 or emoji"
                 disabled={isSubmitting}
+                        className="h-11 bg-background/50 border-primary/20 focus:border-primary/50"
               />
             </div>
+                    {formData.icon && (
+                      <motion.div
+                        initial={{ scale: 0, rotate: -180 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/30 flex items-center justify-center text-2xl backdrop-blur-sm"
+                      >
+                        {formData.icon}
+                      </motion.div>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Enter an emoji or icon to represent this skill
+                  </p>
+                </motion.div>
 
-            <DialogFooter>
+                {/* Preview Card */}
+                {formData.name && formData.category && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-4 rounded-xl border border-primary/20 bg-gradient-to-br from-card/50 to-card/30 backdrop-blur-sm"
+                  >
+                    <p className="text-xs font-medium text-muted-foreground mb-3 flex items-center gap-2">
+                      <Zap className="w-3.5 h-3.5" />
+                      Preview
+                    </p>
+                    <div className="flex items-center gap-3">
+                      {formData.icon && (
+                        <div className="text-2xl">{formData.icon}</div>
+                      )}
+                      <div className="flex-1">
+                        <p className="font-semibold text-foreground">{formData.name}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Badge variant="outline" className="text-xs">
+                            {formData.category}
+                          </Badge>
+                          {formData.level && (
+                            <Badge 
+                              variant="secondary"
+                              className={cn("text-xs", levelConfig[formData.level].color)}
+                            >
+                              {levelConfig[formData.level].label}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                <DialogFooter className="gap-2 pt-4">
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleCloseDialog}
                 disabled={isSubmitting}
+                    className="min-w-[100px]"
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                    <Button 
+                      type="submit" 
+                      disabled={isSubmitting}
+                      className="min-w-[120px] bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg shadow-primary/25"
+                    >
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Saving...
                   </>
                 ) : selectedSkill ? (
-                  "Update"
+                        <>
+                          <CheckCircle2 className="mr-2 h-4 w-4" />
+                          Update
+                        </>
                 ) : (
-                  "Create"
+                        <>
+                          <Plus className="mr-2 h-4 w-4" />
+                          Create
+                        </>
                 )}
               </Button>
+                  </motion.div>
             </DialogFooter>
           </form>
+            </div>
+          </motion.div>
         </DialogContent>
       </Dialog>
 
