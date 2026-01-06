@@ -1,0 +1,130 @@
+[1mdiff --git a/src/components/HeroSection.tsx b/src/components/HeroSection.tsx[m
+[1mindex 2aa9c80..6ebfaa3 100644[m
+[1m--- a/src/components/HeroSection.tsx[m
+[1m+++ b/src/components/HeroSection.tsx[m
+[36m@@ -1,4 +1,4 @@[m
+[31m-import { ArrowDown, Download, Github, Linkedin, Mail, Sparkles, ExternalLink, Rocket, Eye, ChevronDown, Code2, Star } from "lucide-react";[m
+[32m+[m[32mimport { ArrowDown, Download, Github, Linkedin, Mail, Sparkles, ExternalLink, Eye, ChevronDown, Code2, Zap } from "lucide-react";[m
+ import { Button } from "@/components/ui/button";[m
+ import {[m
+   DropdownMenu,[m
+[36m@@ -13,9 +13,9 @@[m [mimport { HeroBackground3D } from "./HeroBackground3D";[m
+ import { scrollToSection } from "@/components/SmoothScroll";[m
+ [m
+ const socialLinks = [[m
+[31m-  { icon: Github, href: "https://github.com/Moinkhan-cmd", label: "GitHub", color: "hover:text-[#333] dark:hover:text-[#f0f0f0]" },[m
+[31m-  { icon: Linkedin, href: "https://www.linkedin.com/in/moin-bhatti-65363a255", label: "LinkedIn", color: "hover:text-[#0077b5]" },[m
+[31m-  { icon: Mail, href: "https://mail.google.com/mail/?view=cm&fs=1&to=moinbhatti59%40gmail.com", label: "Email", color: "hover:text-[#ea4335]" },[m
+[32m+[m[32m  { icon: Github, href: "https://github.com/Moinkhan-cmd", label: "GitHub", gradient: "from-[#333] to-[#6e5494]" },[m
+[32m+[m[32m  { icon: Linkedin, href: "https://www.linkedin.com/in/moin-bhatti-65363a255", label: "LinkedIn", gradient: "from-[#0077b5] to-[#00a0dc]" },[m
+[32m+[m[32m  { icon: Mail, href: "https://mail.google.com/mail/?view=cm&fs=1&to=moinbhatti59%40gmail.com", label: "Email", gradient: "from-[#ea4335] to-[#fbbc05]" },[m
+ ] as const;[m
+ [m
+ const roles = ["Frontend Developer", "UI/UX Designer", "React Specialist", "Creative Coder"];[m
+[36m@@ -25,19 +25,18 @@[m [mexport const HeroSection = () => {[m
+   const contentRef = useRef<HTMLDivElement>(null);[m
+   const [currentRole, setCurrentRole] = useState(0);[m
+   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });[m
+[31m-  const [isHovered, setIsHovered] = useState(false);[m
+   [m
+   const mouseX = useMotionValue(0);[m
+   const mouseY = useMotionValue(0);[m
+[31m-  const springConfig = { damping: 30, stiffness: 200 };[m
+[31m-  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [6, -6]), springConfig);[m
+[31m-  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-6, 6]), springConfig);[m
+[32m+[m[32m  const springConfig = { damping: 25, stiffness: 150 };[m
+[32m+[m[32m  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [8, -8]), springConfig);[m
+[32m+[m[32m  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-8, 8]), springConfig);[m
+   const isInView = useInView(contentRef, { once: true, amount: 0.2 });[m
+ [m
+   useEffect(() => {[m
+     const interval = setInterval(() => {[m
+       setCurrentRole((prev) => (prev + 1) % roles.length);[m
+[31m-    }, 3500);[m
+[32m+[m[32m    }, 3000);[m
+     return () => clearInterval(interval);[m
+   }, []);[m
+ [m
+[36m@@ -61,50 +60,33 @@[m [mexport const HeroSection = () => {[m
+       {/* 3D Background */}[m
+       <HeroBackground3D />[m
+       [m
+[31m-      {/* Enhanced Gradient Overlays for Better Contrast */}[m
+[31m-      <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/70 to-background/90 pointer-events-none z-[1]" />[m
+[31m-      <div className="absolute inset-0 bg-gradient-to-r from-background/50 via-transparent to-background/50 pointer-events-none z-[1]" />[m
+[32m+[m[32m      {/* Layered gradient overlays */}[m
+[32m+[m[32m      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/60 to-background pointer-events-none z-[1]" />[m
+[32m+[m[32m      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,hsl(var(--primary)/0.15),transparent)] pointer-events-none z-[1]" />[m
+       [m
+[31m-      {/* Radial gradient for text contrast */}[m
+[31m-      <div [m
+[31m-        className="absolute inset-0 pointer-events-none z-[1]"[m
+[31m-        style={{[m
+[31m-          background: "radial-gradient(ellipse at center, transparent 0%, hsl(var(--background) / 0.4) 40%, hsl(var(--background) / 0.8) 100%)"[m
+[31m-        }}[m
+[31m-      />[m
+[31m-      [m
+[31m-      {/* Animated gradient mesh background */}[m
+[32m+[m[32m      {/* Mesh gradient */}[m
+       <div className="absolute inset-0 overflow-hidden z-[1]">[m
+         <motion.div[m
+[31m-          className="absolute -top-1/2 -left-1/2 w-full h-full rounded-full blur-3xl opacity-15"[m
+[32m+[m[32m          className="absolute -top-1/4 -right-1/4 w-[800px] h-[800px] rounded-full blur-[120px] opacity-20"[m
+           style={{ background: "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)" }}[m
+[31m-          animate={{ x: [0, 100, 0], y: [0, 50, 0] }}[m
+[31m-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}[m
+[32m+[m[32m          animate={{ scale: [1, 1.2, 1], rotate: [0, 180, 360] }}[m
+[32m+[m[32m          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}[m
+         />[m
+         <motion.div[m
+[31m-          className="absolute -bottom-1/2 -right-1/2 w-full h-full rounded-full blur-3xl opacity-10"[m
+[32m+[m[32m          className="absolute -bottom-1/4 -left-1/4 w-[600px] h-[600px] rounded-full blur-[100px] opacity-15"[m
+           style={{ background: "radial-gradient(circle, hsl(280 70% 50%) 0%, transparent 70%)" }}[m
+[31m-          animate={{ x: [0, -100, 0], y: [0, -50, 0] }}[m
+[32m+[m[32m          animate={{ scale: [1.2, 1, 1.2], rotate: [360, 180, 0] }}[m
+           transition={{ duration: 25, repeat: Infinity, ease: "linear" }}[m
+         />[m
+[31m-        [m
+[31m-        {/* Subtle grid overlay */}[m
+[31m-        <div [m
+[31m-          className="absolute inset-0 opacity-[0.02]"[m
+[31m-          style={{[m
+[31m-            backgroundImage: `linear-gradient(hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)`,[m
+[31m-            backgroundSize: '80px 80px'[m
+[31m-          }}[m
+[31m-        />[m
+       </div>[m
+ [m
+[31m-      {/* Enhanced cursor light */}[m
+[32m+[m[32m      {/* Interactive cursor glow */}[m
+       <motion.div[m
+         className="pointer-events-none fixed w-[500px] h-[500px] rounded-full opacity-10 blur-3xl z-30 transition-opacity duration-500"[m
+         style={{[m
+           background: "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)",[m
+[31m-          left: mousePos.x - 250,[m
+[31m-          top: mousePos.y - 250,[m
+[32m+[m[32m          left: mousePos.x - 200,[m
+[32m+[m[32m          top: mousePos.y - 200,[m
+         }}[m
+       />[m
+ [m
+[36m@@ -112,7 +94,7 @@[m [mexport const HeroSection = () => {[m
+       <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 py-8 sm:py-12 md:py-16 lg:py-20 pb-20 sm:pb-24 md:pb-28 lg:pb-20">[m
+         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 md:gap-12 lg:gap-16 xl:gap-20 items-center">[m
+           [m
+[31m-          {/* Left Column - Enhanced Typography */}[m
+[32m+[m[32m          {/* Left Column - Content */}[m
+           <motion.div[m
+             ref={contentRef}[m
+             initial={{ opacity: 0, x: -50 }}[m
+[36m@@ -120,18 +102,22 @@[m [mexport const HeroSection = () => {[m
+             transition={{ duration: 0.8, delay: 0.2 }}[m
+             className="space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-7"[m
+           >[m
+[31m-            {/* Status Badge - Enhanced - Responsive */}[m
+[32m+[m[32m            {/* Status Badge */}[m
+             <motion.div[m
+[31m-              initial={{ opacity: 0, y: 20, scale: 0.9 }}[m
+[31m-              animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}[m
+[31m-              transition={{ delay: 0.3, type: "spring" }}[m
+[31m-              className="inline-flex items-center gap-2 sm:gap-3 px-3 sm:px-4 md:px-5 py-1.5 sm:py-2 md:py-2.5 round
