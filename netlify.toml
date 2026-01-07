@@ -19,10 +19,12 @@
   force = true
 
 # SPA fallback for React Router (must be last)
+# The 200 status with no force means it only applies to non-existing files
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+  # Don't force - this ensures existing assets are served directly
 
 # Security headers
 [[headers]]
