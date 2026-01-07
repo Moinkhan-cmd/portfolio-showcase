@@ -6,15 +6,14 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid } from "recharts";
 import { Loader2, Users, Eye, MousePointerClick, TrendingUp } from "lucide-react";
 import {
-  getAnalyticsData,
-  getPageViews,
-  getActiveUsers,
-  getActiveVisitors,
+  subscribeToAnalyticsData,
+  subscribeToPageViews,
+  subscribeToActiveUsers,
+  subscribeToActiveVisitors,
 } from "@/lib/analytics";
 import { format, parseISO } from "date-fns";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-
 interface DailyStats {
   id: string;
   date: string;
@@ -60,36 +59,33 @@ export const AdminAnalytics = () => {
   const [activeVisitors, setActiveVisitors] = useState(0);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const [statsData, pageViewsData, usersData, visitorsCount] = await Promise.all([
-          getAnalyticsData(period),
-          getPageViews(100),
-          getActiveUsers(),
-          getActiveVisitors(),
-        ]);
+    setLoading(true);
 
-        setStats(statsData as DailyStats[]);
-        setPageViews(pageViewsData as PageViewData[]);
-        setActiveUsers(usersData as UserActivity[]);
-        setActiveVisitors(visitorsCount);
-      } catch (error) {
-        console.error("Error fetching analytics:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    // Set up real-time subscriptions
+    const unsubscribeStats = subscribeToAnalyticsData(period, (statsData) => {
+      setStats(statsData as DailyStats[]);
+      setLoading(false);
+    });
 
-    fetchData();
-    
-    // Refresh active visitors every 30 seconds
-    const interval = setInterval(async () => {
-      const count = await getActiveVisitors();
+    const unsubscribePageViews = subscribeToPageViews(100, (pageViewsData) => {
+      setPageViews(pageViewsData as PageViewData[]);
+    });
+
+    const unsubscribeUsers = subscribeToActiveUsers((usersData) => {
+      setActiveUsers(usersData as UserActivity[]);
+    });
+
+    const unsubscribeVisitors = subscribeToActiveVisitors((count) => {
       setActiveVisitors(count);
-    }, 30000);
+    });
 
-    return () => clearInterval(interval);
+    // Cleanup subscriptions on unmount or period change
+    return () => {
+      unsubscribeStats();
+      unsubscribePageViews();
+      unsubscribeUsers();
+      unsubscribeVisitors();
+    };
   }, [period]);
 
   // Calculate totals

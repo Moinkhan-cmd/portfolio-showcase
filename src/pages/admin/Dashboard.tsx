@@ -1,27 +1,32 @@
 // Admin dashboard with statistics
 import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, FolderKanban, Award, Briefcase, Code } from "lucide-react";
+import { Loader2, FolderKanban, Award, Briefcase, Code, User, CheckCircle, AlertCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
 
 export const AdminDashboard = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     projects: 0,
     certifications: 0,
     experience: 0,
     skills: 0,
+    personalDetailsConfigured: false,
     loading: true,
   });
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [projectsSnap, certsSnap, expSnap, skillsSnap] = await Promise.all([
+        const [projectsSnap, certsSnap, expSnap, skillsSnap, personalDetailsSnap] = await Promise.all([
           getDocs(collection(db, "projects")),
           getDocs(collection(db, "certifications")),
           getDocs(collection(db, "experience")),
           getDocs(collection(db, "skills")),
+          getDoc(doc(db, "personalDetails", "main")),
         ]);
 
         setStats({
@@ -29,6 +34,7 @@ export const AdminDashboard = () => {
           certifications: certsSnap.size,
           experience: expSnap.size,
           skills: skillsSnap.size,
+          personalDetailsConfigured: personalDetailsSnap.exists(),
           loading: false,
         });
       } catch (error) {
@@ -48,6 +54,7 @@ export const AdminDashboard = () => {
       icon: FolderKanban,
       color: "text-blue-500",
       bgColor: "bg-blue-500/10",
+      route: "/admin/projects",
     },
     {
       title: "Certifications",
@@ -56,6 +63,7 @@ export const AdminDashboard = () => {
       icon: Award,
       color: "text-yellow-500",
       bgColor: "bg-yellow-500/10",
+      route: "/admin/certifications",
     },
     {
       title: "Experience",
@@ -64,6 +72,7 @@ export const AdminDashboard = () => {
       icon: Briefcase,
       color: "text-green-500",
       bgColor: "bg-green-500/10",
+      route: "/admin/experience",
     },
     {
       title: "Skills",
@@ -72,6 +81,7 @@ export const AdminDashboard = () => {
       icon: Code,
       color: "text-purple-500",
       bgColor: "bg-purple-500/10",
+      route: "/admin/skills",
     },
   ];
 
@@ -92,11 +102,51 @@ export const AdminDashboard = () => {
         </p>
       </div>
 
+      {/* Personal Details Status Card */}
+      <Card 
+        className="cursor-pointer hover:border-primary/50 transition-colors"
+        onClick={() => navigate("/admin/personal-details")}
+      >
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <User className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <CardTitle className="text-lg">Personal Details</CardTitle>
+              <CardDescription>Your profile, social links, and branding</CardDescription>
+            </div>
+          </div>
+          {stats.personalDetailsConfigured ? (
+            <Badge variant="outline" className="gap-1 text-emerald-500 border-emerald-500/50">
+              <CheckCircle className="h-3 w-3" />
+              Configured
+            </Badge>
+          ) : (
+            <Badge variant="outline" className="gap-1 text-amber-500 border-amber-500/50">
+              <AlertCircle className="h-3 w-3" />
+              Not Set Up
+            </Badge>
+          )}
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            {stats.personalDetailsConfigured 
+              ? "Click to update your name, bio, social links, images, and SEO settings."
+              : "Set up your profile information, social media links, and branding to personalize your portfolio."}
+          </p>
+        </CardContent>
+      </Card>
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {statCards.map((stat) => {
           const Icon = stat.icon;
           return (
-            <Card key={stat.title} className="card-hover">
+            <Card 
+              key={stat.title} 
+              className="card-hover cursor-pointer"
+              onClick={() => navigate(stat.route)}
+            >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
                 <div className={`p-2 rounded-lg ${stat.bgColor}`}>
@@ -122,26 +172,29 @@ export const AdminDashboard = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+            <button
+              onClick={() => navigate("/admin/personal-details")}
+              className="flex items-center gap-3 p-4 rounded-lg border border-border hover:bg-accent transition-colors text-left"
+            >
+              <div className="p-2 rounded-lg bg-primary/10">
+                <User className="h-5 w-5 text-primary" />
+              </div>
+              <span className="font-medium">Edit Profile</span>
+            </button>
             {statCards.map((stat) => {
               const Icon = stat.icon;
-              const routes: Record<string, string> = {
-                Projects: "/admin/projects",
-                Certifications: "/admin/certifications",
-                Experience: "/admin/experience",
-                Skills: "/admin/skills",
-              };
               return (
-                <a
+                <button
                   key={stat.title}
-                  href={routes[stat.title] || "/admin"}
-                  className="flex items-center gap-3 p-4 rounded-lg border border-border hover:bg-accent transition-colors"
+                  onClick={() => navigate(stat.route)}
+                  className="flex items-center gap-3 p-4 rounded-lg border border-border hover:bg-accent transition-colors text-left"
                 >
                   <div className={`p-2 rounded-lg ${stat.bgColor}`}>
                     <Icon className={`h-5 w-5 ${stat.color}`} />
                   </div>
                   <span className="font-medium">Manage {stat.title}</span>
-                </a>
+                </button>
               );
             })}
           </div>
@@ -150,4 +203,3 @@ export const AdminDashboard = () => {
     </div>
   );
 };
-

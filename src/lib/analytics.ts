@@ -15,6 +15,8 @@ import {
   limit,
   Timestamp,
   increment,
+  onSnapshot,
+  Unsubscribe,
 } from "firebase/firestore";
 import { analytics } from "./firebase";
 import { logEvent } from "firebase/analytics";
@@ -496,3 +498,121 @@ export const getActiveVisitors = async () => {
   }
 };
 
+
+
+// ============================================
+// REAL-TIME SUBSCRIPTIONS
+// ============================================
+
+// Subscribe to real-time analytics data changes
+export const subscribeToAnalyticsData = (
+  period: "daily" | "weekly" | "monthly",
+  callback: (stats: any[]) => void
+): Unsubscribe => {
+  const now = new Date();
+  const periods: Record<string, number> = {
+    daily: 1,
+    weekly: 7,
+    monthly: 30,
+  };
+  const daysBack = periods[period] || 1;
+  const startDate = new Date(now);
+  startDate.setDate(startDate.getDate() - daysBack);
+  const startDateStr = startDate.toISOString().split("T")[0];
+
+  const statsRef = collection(db, "analytics_daily_stats");
+  const q = query(statsRef, orderBy("date", "desc"));
+
+  return onSnapshot(q, (snapshot) => {
+    const stats = snapshot.docs
+      .map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      .filter((stat: any) => stat.date >= startDateStr);
+    callback(stats);
+  }, (error) => {
+    console.error("Real-time analytics subscription error:", error);
+  });
+};
+
+// Subscribe to real-time page views
+export const subscribeToPageViews = (
+  limitCount: number,
+  callback: (pageViews: { path: string; count: number }[]) => void
+): Unsubscribe => {
+  const pageViewsRef = collection(db, "analytics_page_views");
+  const q = query(pageViewsRef, orderBy("timestamp", "desc"), limit(limitCount));
+
+  return onSnapshot(q, (snapshot) => {
+    const pageViews = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    // Aggregate by page path
+    const aggregated: Record<string, number> = {};
+    pageViews.forEach((view: any) => {
+      const path = view.pagePath || "unknown";
+      aggregated[path] = (aggregated[path] || 0) + 1;
+    });
+
+    const result = Object.entries(aggregated)
+      .map(([path, count]) => ({ path, count }))
+      .sort((a, b) => b.count - a.count);
+    
+    callback(result);
+  }, (error) => {
+    console.error("Real-time page views subscription error:", error);
+  });
+};
+
+// Subscribe to real-time active users
+export const subscribeToActiveUsers = (
+  callback: (users: any[]) => void
+): Unsubscribe => {
+  const usersRef = collection(db, "analytics_users");
+
+  return onSnapshot(usersRef, (snapshot) => {
+    const users = snapshot.docs
+      .map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      .sort((a: any, b: any) => {
+        const aTime = a.lastActive?.toDate?.() || a.lastActive || new Date(0);
+        const bTime = b.lastActive?.toDate?.() || b.lastActive || new Date(0);
+        return bTime.getTime() - aTime.getTime();
+      })
+      .slice(0, 50);
+    
+    callback(users);
+  }, (error) => {
+    console.error("Real-time active users subscription error:", error);
+  });
+};
+
+// Subscribe to real-time active visitors count
+export const subscribeToActiveVisitors = (
+  callback: (count: number) => void
+): Unsubscribe => {
+  const pageViewsRef = collection(db, "analytics_page_views");
+  const q = query(pageViewsRef, orderBy("timestamp", "desc"), limit(100));
+
+  return onSnapshot(q, (snapshot) => {
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    const sessions = new Set<string>();
+
+    snapshot.docs.forEach((doc) => {
+      const data = doc.data();
+      const timestamp = data.timestamp?.toDate?.() || data.timestamp;
+      if (timestamp && new Date(timestamp) > fiveMinutesAgo && data.sessionId) {
+        sessions.add(data.sessionId);
+      }
+    });
+
+    callback(sessions.size);
+  }, (error) => {
+    console.error("Real-time active visitors subscription error:", error);
+  });
+};

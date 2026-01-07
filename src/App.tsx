@@ -17,6 +17,7 @@ import { AdminProjects } from "@/pages/admin/Projects";
 import { AdminCertifications } from "@/pages/admin/Certifications";
 import { AdminExperience } from "@/pages/admin/Experience";
 import { AdminSkills } from "@/pages/admin/Skills";
+import { AdminPersonalDetails } from "@/pages/admin/PersonalDetails";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -47,6 +48,7 @@ const App = () => (
                   }
                 >
                   <Route index element={<AdminDashboard />} />
+                  <Route path="personal-details" element={<AdminPersonalDetails />} />
                   <Route path="analytics" element={<AdminAnalytics />} />
                   <Route path="projects" element={<AdminProjects />} />
                   <Route path="certifications" element={<AdminCertifications />} />
