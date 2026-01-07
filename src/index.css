@@ -573,6 +573,28 @@ html {
     background-position: -200% 0;
   }
 }
+/* Underline shimmer effect for name */
+@keyframes underline-shimmer {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(400%);
+    opacity: 0;
+  }
+}
+
+.animate-underline-shimmer {
+  animation: underline-shimmer 2s ease-in-out infinite;
+}
+
 
 .animate-shimmer {
   animation: shimmer 8s linear infinite;

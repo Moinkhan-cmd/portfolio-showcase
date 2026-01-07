@@ -120,7 +120,7 @@ export const HeroSection = () => {
               </div>
             </motion.div>
 
-            {/* Name in Signature Style */}
+            {/* Name in Signature Style with Fancy Underline */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -128,7 +128,37 @@ export const HeroSection = () => {
               className="pt-2"
             >
               <h2 className="font-signature text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-foreground font-medium leading-tight">
-                Moinkhan Bhatti
+                <span className="relative inline-block">
+                  Moinkhan Bhatti
+                  {/* Animated gradient underline */}
+                  <motion.span
+                    className="absolute -bottom-1 sm:-bottom-2 left-0 w-full h-[3px] sm:h-[4px] rounded-full bg-gradient-to-r from-primary via-violet-500 to-fuchsia-500 origin-left"
+                    initial={{ scaleX: 0 }}
+                    animate={isInView ? { scaleX: 1 } : { scaleX: 0 }}
+                    transition={{ delay: 0.6, duration: 0.8, ease: "easeOut" }}
+                  />
+                  {/* Glowing effect */}
+                  <motion.span
+                    className="absolute -bottom-1 sm:-bottom-2 left-0 w-full h-[3px] sm:h-[4px] rounded-full bg-gradient-to-r from-primary via-violet-500 to-fuchsia-500 blur-sm opacity-60 origin-left"
+                    initial={{ scaleX: 0 }}
+                    animate={isInView ? { scaleX: 1 } : { scaleX: 0 }}
+                    transition={{ delay: 0.6, duration: 0.8, ease: "easeOut" }}
+                  />
+                  {/* Shimmer animation */}
+                  <motion.span
+                    className="absolute -bottom-1 sm:-bottom-2 left-0 h-[3px] sm:h-[4px] w-8 sm:w-12 rounded-full bg-white/40 blur-[2px]"
+                    animate={{ 
+                      x: ['-100%', '400%'],
+                      opacity: [0, 1, 1, 0]
+                    }}
+                    transition={{ 
+                      duration: 2,
+                      repeat: Infinity,
+                      repeatDelay: 3,
+                      ease: "easeInOut"
+                    }}
+                  />
+                </span>
               </h2>
             </motion.div>
 
