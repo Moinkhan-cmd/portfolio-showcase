@@ -5,7 +5,7 @@ import { scrollToSection, scrollToTop } from "@/components/SmoothScroll";
 
 const socialLinks = [
   { icon: Github, url: "https://github.com/Moinkhan-cmd", label: "GitHub" },
-  { icon: Linkedin, url: "https://www.linkedin.com/in/moin-bhatti-65363a255", label: "LinkedIn" },
+  { icon: Linkedin, url: "https://www.linkedin.com/in/moinkhan-bhatti-65363a255", label: "LinkedIn" },
   { icon: Mail, url: "https://mail.google.com/mail/?view=cm&fs=1&to=moinbhatti59%40gmail.com", label: "Email" },
 ];
 

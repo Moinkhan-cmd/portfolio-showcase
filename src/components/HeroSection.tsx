@@ -14,7 +14,7 @@ import { scrollToSection } from "@/components/SmoothScroll";
 
 const socialLinks = [
   { icon: Github, href: "https://github.com/Moinkhan-cmd", label: "GitHub", gradient: "from-[#333] to-[#6e5494]" },
-  { icon: Linkedin, href: "https://www.linkedin.com/in/moin-bhatti-65363a255", label: "LinkedIn", gradient: "from-[#0077b5] to-[#00a0dc]" },
+  { icon: Linkedin, href: "https://www.linkedin.com/in/moinkhan-bhatti-65363a255", label: "LinkedIn", gradient: "from-[#0077b5] to-[#00a0dc]" },
   { icon: Mail, href: "https://mail.google.com/mail/?view=cm&fs=1&to=moinbhatti59%40gmail.com", label: "Email", gradient: "from-[#ea4335] to-[#fbbc05]" },
 ] as const;
 

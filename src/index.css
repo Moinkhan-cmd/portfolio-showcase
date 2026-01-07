@@ -77,43 +77,43 @@ a, button, [role="button"], input[type="submit"], input[type="button"], .cursor-
 
   .light {
     --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
+    --foreground: 222 47% 8%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 222 47% 8%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 222 47% 8%;
 
-    --primary: 175 80% 40%;
+    --primary: 175 80% 35%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 210 40% 94%;
+    --secondary-foreground: 222 47% 8%;
 
     --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted-foreground: 222 20% 35%;
 
-    --accent: 175 80% 40%;
+    --accent: 175 80% 35%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 50%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 175 80% 40%;
+    --border: 214 32% 85%;
+    --input: 214 32% 85%;
+    --ring: 175 80% 35%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(175 80% 40%) 0%, hsl(200 90% 50%) 100%);
-    --gradient-glow: linear-gradient(135deg, hsl(175 80% 40% / 0.1) 0%, hsl(200 90% 50% / 0.05) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(175 80% 35%) 0%, hsl(200 90% 45%) 100%);
+    --gradient-glow: linear-gradient(135deg, hsl(175 80% 35% / 0.15) 0%, hsl(200 90% 45% / 0.1) 100%);
     
-    --glass-bg: hsl(0 0% 100% / 0.85);
-    --glass-border: hsl(175 80% 40% / 0.15);
-    --glass-shadow: 0 8px 32px hsl(0 0% 0% / 0.08);
+    --glass-bg: hsl(0 0% 100% / 0.9);
+    --glass-border: hsl(175 80% 35% / 0.2);
+    --glass-shadow: 0 8px 32px hsl(0 0% 0% / 0.1);
     
-    --shadow-glow: 0 0 30px hsl(175 80% 40% / 0.15);
-    --shadow-card: 0 4px 20px hsl(0 0% 0% / 0.05);
-    --shadow-hover: 0 8px 30px hsl(175 80% 40% / 0.08);
+    --shadow-glow: 0 0 30px hsl(175 80% 35% / 0.2);
+    --shadow-card: 0 4px 20px hsl(0 0% 0% / 0.08);
+    --shadow-hover: 0 8px 30px hsl(175 80% 35% / 0.15);
   }
 }
 
@@ -130,11 +130,43 @@ a, button, [role="button"], input[type="submit"], input[type="button"], .cursor-
     @apply bg-background text-foreground;
     font-family: var(--font-body);
     /* Add padding-top to prevent content from being hidden behind fixed navbar */
-    padding-top: 0; 
+    padding-top: 0;
+    /* Improved typography for better readability */
+    font-weight: 400;
+    line-height: 1.6;
+    letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: hsl(var(--foreground));
+  }
+
+  /* Enhanced typography for light theme */
+  .light body {
+    font-weight: 400;
+    line-height: 1.7;
+  }
+
+  .light h1, .light h2, .light h3, .light h4, .light h5, .light h6 {
+    font-weight: 700;
+    color: hsl(var(--foreground));
+    letter-spacing: -0.03em;
+  }
+
+  .light p {
+    color: hsl(var(--foreground));
+    line-height: 1.7;
+  }
+
+  .light .text-muted-foreground {
+    color: hsl(var(--muted-foreground));
+    font-weight: 400;
   }
 }
 
@@ -152,6 +184,13 @@ a, button, [role="button"], input[type="submit"], input[type="button"], .cursor-
     border: 1px solid var(--glass-border);
     box-shadow: var(--glass-shadow);
     will-change: transform;
+  }
+
+  /* Enhanced glass card for light theme */
+  .light .glass-card {
+    background: hsl(0 0% 100% / 0.95);
+    border-color: hsl(var(--border));
+    box-shadow: 0 4px 20px hsl(0 0% 0% / 0.08), 0 0 0 1px hsl(var(--border));
   }
 
   .gradient-text {
@@ -589,6 +628,28 @@ html {
     inset 0 1px 0 hsl(255 255% 255% / 0.15);
 }
 
+/* Enhanced glass for light theme */
+.light .glass-enhanced {
+  background: linear-gradient(
+    135deg,
+    hsl(0 0% 100% / 0.95) 0%,
+    hsl(0 0% 100% / 0.9) 100%
+  );
+  border: 1px solid hsl(var(--border));
+  box-shadow: 
+    0 8px 32px hsl(0 0% 0% / 0.1),
+    0 0 0 1px hsl(var(--border));
+  color: hsl(var(--foreground));
+}
+
+.light .glass-enhanced:hover {
+  border-color: hsl(var(--primary) / 0.3);
+  box-shadow: 
+    0 12px 48px hsl(0 0% 0% / 0.12),
+    0 0 40px hsl(var(--primary) / 0.1),
+    0 0 0 1px hsl(var(--primary) / 0.2);
+}
+
 /* Link hover underline animation */
 .link-underline {
   position: relative;
@@ -621,6 +682,119 @@ select:focus {
     0 0 20px hsl(var(--primary) / 0.2);
   transform: translateY(-1px);
   transition: all 0.3s ease;
+}
+
+/* Enhanced light theme typography and contrast */
+.light {
+  /* Better text contrast */
+  --text-contrast-ratio: 1;
+}
+
+.light p,
+.light span,
+.light div {
+  color: hsl(var(--foreground));
+}
+
+.light .text-muted-foreground {
+  color: hsl(var(--muted-foreground));
+  opacity: 1;
+}
+
+/* Improve card contrast in light theme */
+.light .card,
+.light [class*="card"] {
+  border-color: hsl(var(--border));
+  background: hsl(var(--card));
+}
+
+/* Better button contrast in light theme */
+.light button:not([class*="ghost"]):not([class*="outline"]) {
+  font-weight: 500;
+}
+
+/* Enhanced link visibility in light theme */
+.light a {
+  color: hsl(var(--primary));
+  font-weight: 500;
+}
+
+.light a:hover {
+  color: hsl(var(--primary));
+  opacity: 0.8;
+}
+
+/* Better form element visibility */
+.light input,
+.light textarea,
+.light select {
+  border-color: hsl(var(--border));
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+.light input::placeholder,
+.light textarea::placeholder {
+  color: hsl(var(--muted-foreground));
+  opacity: 0.7;
+}
+
+/* Enhanced readability for light theme sections */
+.light section {
+  color: hsl(var(--foreground));
+}
+
+.light section h1,
+.light section h2,
+.light section h3 {
+  color: hsl(var(--foreground));
+  font-weight: 700;
+}
+
+/* Better badge and tag visibility */
+.light [class*="badge"],
+.light [class*="tag"] {
+  border-color: hsl(var(--border));
+  font-weight: 500;
+}
+
+/* Improved code block contrast */
+.light code,
+.light pre {
+  background: hsl(var(--muted));
+  color: hsl(var(--foreground));
+  border-color: hsl(var(--border));
+}
+
+/* Better table contrast */
+.light table {
+  border-color: hsl(var(--border));
+}
+
+.light table th {
+  color: hsl(var(--foreground));
+  font-weight: 600;
+}
+
+.light table td {
+  color: hsl(var(--foreground));
+}
+
+/* Enhanced dropdown and menu visibility */
+.light [role="menu"],
+.light [role="listbox"] {
+  background: hsl(var(--popover));
+  border-color: hsl(var(--border));
+  box-shadow: 0 4px 20px hsl(0 0% 0% / 0.1);
+}
+
+.light [role="menuitem"] {
+  color: hsl(var(--popover-foreground));
+}
+
+.light [role="menuitem"]:hover {
+  background: hsl(var(--secondary));
+  color: hsl(var(--secondary-foreground));
 }
 
 /* Smooth transitions for all interactive elements */
@@ -724,18 +898,32 @@ a:focus-visible {
     min-width: 44px;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
+    pointer-events: auto;
   }
   
   /* Fix for mobile menu overflow */
   nav .lg\\:hidden {
     position: relative;
     z-index: 10;
+    pointer-events: auto;
   }
   
   /* Ensure menu items are above background */
   nav .lg\\:hidden button {
     position: relative;
     z-index: 20;
+    pointer-events: auto;
+  }
+
+  /* Mobile menu overlay and panel */
+  nav [class*="fixed"][class*="inset-0"] {
+    pointer-events: auto;
+    z-index: 55;
+  }
+
+  nav [class*="fixed"][class*="right-0"][class*="h-full"] {
+    pointer-events: auto;
+    z-index: 60;
   }
 }
 

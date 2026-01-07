@@ -11,7 +11,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const socialLinks = [
   { name: "GitHub", icon: Github, url: "https://github.com/Moinkhan-cmd", label: "github.com/Moinkhan-cmd" },
-  { name: "LinkedIn", icon: Linkedin, url: "https://www.linkedin.com/in/moin-bhatti-65363a255", label: "linkedin.com/in/moin-bhatti-65363a255" },
+  { name: "LinkedIn", icon: Linkedin, url: "https://www.linkedin.com/in/moinkhan-bhatti-65363a255", label: "linkedin.com/in/moinkhan-bhatti-65363a255" },
   { name: "Email", icon: Mail, url: "https://mail.google.com/mail/?view=cm&fs=1&to=moinbhatti59%40gmail.com", label: "moinbhatti59@gmail.com" },
 ];
 
