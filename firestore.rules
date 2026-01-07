@@ -2,7 +2,7 @@
 // Copy these rules to Firebase Console > Firestore Database > Rules
 // 
 // SECURITY ARCHITECTURE:
-// - Public read access for portfolio data (projects, certifications, experience, skills)
+// - Public read access for portfolio data (projects, certifications, experience, skills, personalDetails)
 // - Admin write access verified SERVER-SIDE via email comparison
 // - Analytics tracking requires authentication
 // - All data protection enforced here, NOT in client-side code
@@ -21,7 +21,7 @@ service cloud.firestore {
     // Priority order:
     // 1. Custom claims (most secure - set via Firebase Admin SDK)
     // 2. Config document lookup (requires /config/admin document with adminEmail field)
-    // 3. Hardcoded fallback email (set during initial setup)
+    // 3. Authenticated user (for initial setup - remove in production for stricter security)
     function isAdmin() {
       // Check custom claims first (set via Firebase Admin SDK)
       let hasCustomClaim = request.auth.token.admin == true;
@@ -32,7 +32,11 @@ service cloud.firestore {
                                request.auth.token.email != null &&
                                request.auth.token.email == get(/databases/$(database)/documents/config/admin).data.adminEmail;
       
-      return isAuthenticated() && (hasCustomClaim || matchesConfigEmail);
+      // If no config exists yet, allow any authenticated user (for initial setup)
+      // IMPORTANT: Set up config/admin document with your adminEmail to restrict access
+      let noConfigFallback = !configExists && isAuthenticated();
+      
+      return isAuthenticated() && (hasCustomClaim || matchesConfigEmail || noConfigFallback);
     }
     
     // Config document for storing admin email
@@ -42,7 +46,9 @@ service cloud.firestore {
       // Anyone can read config (needed for initial admin check)
       allow read: if true;
       // Only existing admin can modify (prevents lockout)
-      allow write: if isAdmin();
+      // Allow create if no config exists yet (for initial setup)
+      allow create: if isAuthenticated() && !exists(/databases/$(database)/documents/config/admin);
+      allow update, delete: if isAdmin();
     }
     
     // Personal Details - public read, admin write
