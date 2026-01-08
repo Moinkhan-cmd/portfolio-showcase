@@ -78,32 +78,59 @@ export const AboutSection = () => {
               animate={isVisible ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <motion.div 
-                className="relative"
-                whileHover={{ scale: 1.05 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="aspect-square rounded-2xl glass-enhanced overflow-hidden card-hover">
-                  <motion.div 
-                    className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center"
-                    animate={{ 
-                      background: [
-                        "linear-gradient(135deg, hsl(175 80% 50% / 0.2) 0%, hsl(175 80% 50% / 0.05) 100%)",
-                        "linear-gradient(135deg, hsl(200 90% 60% / 0.2) 0%, hsl(175 80% 50% / 0.05) 100%)",
-                        "linear-gradient(135deg, hsl(175 80% 50% / 0.2) 0%, hsl(175 80% 50% / 0.05) 100%)"
-                      ]
-                    }}
-                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                  >
-                    <motion.span 
-                      className="text-6xl"
-                      animate={{ rotate: [0, 10, -10, 0] }}
-                      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              <div className="relative" style={{ perspective: "1200px" }}>
+                <motion.div
+                  className="relative"
+                  style={{ transformStyle: "preserve-3d" }}
+                  whileHover={{ scale: 1.05, rotateX: 10, rotateY: -12 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {/* Depth/shadow plane */}
+                  <div
+                    aria-hidden
+                    className="absolute inset-0 rounded-2xl bg-primary/10 blur-2xl"
+                    style={{ transform: "translateZ(-60px) translateY(22px) scale(0.94)" }}
+                  />
+
+                  <div className="aspect-square rounded-2xl glass-enhanced overflow-hidden card-hover">
+                    <motion.div
+                      className="relative w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center"
+                      style={{ transformStyle: "preserve-3d" }}
+                      animate={{
+                        background: [
+                          "linear-gradient(135deg, hsl(175 80% 50% / 0.2) 0%, hsl(175 80% 50% / 0.05) 100%)",
+                          "linear-gradient(135deg, hsl(200 90% 60% / 0.2) 0%, hsl(175 80% 50% / 0.05) 100%)",
+                          "linear-gradient(135deg, hsl(175 80% 50% / 0.2) 0%, hsl(175 80% 50% / 0.05) 100%)",
+                        ],
+                      }}
+                      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                     >
-                      👨‍💻
-                    </motion.span>
-                  </motion.div>
-                </div>
+                      {/* Sheen/highlight */}
+                      <div
+                        aria-hidden
+                        className="absolute inset-0 bg-gradient-to-tr from-background/10 via-transparent to-background/5"
+                        style={{ transform: "translateZ(20px)" }}
+                      />
+
+                      {/* Subtle rim */}
+                      <div
+                        aria-hidden
+                        className="absolute inset-0 rounded-2xl ring-1 ring-primary/25"
+                        style={{ transform: "translateZ(26px)" }}
+                      />
+
+                      {/* Foreground content pushed forward */}
+                      <div style={{ transform: "translateZ(70px)" }}>
+                        <motion.span
+                          className="text-6xl"
+                          animate={{ rotate: [0, 10, -10, 0] }}
+                          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                        >
+                          👨‍💻
+                        </motion.span>
+                      </div>
+                    </motion.div>
+                  </div>
                 {/* Decorative elements */}
                 <motion.div 
                   className="absolute -top-4 -right-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl"
@@ -121,7 +148,8 @@ export const AboutSection = () => {
                   }}
                   transition={{ duration: 4, repeat: Infinity }}
                 />
-              </motion.div>
+                </motion.div>
+              </div>
             </motion.div>
 
             {/* Text Content */}
