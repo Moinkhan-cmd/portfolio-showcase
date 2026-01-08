@@ -284,14 +284,14 @@ export const HeroSection = () => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48 z-[9999]" sideOffset={8}>
                     <DropdownMenuItem
-                      onClick={() => window.open("https://drive.google.com/file/d/1p42p9NpczSWy_-iLeVaO38ciHAMHXp9r/view?usp=sharing", "_blank")}
+                      onClick={() => window.open("https://drive.google.com/file/d/1-yfml_Sur_8c10GuIscXsF1GiceZSIOX/view?usp=sharing", "_blank")}
                       className="cursor-pointer"
                     >
                       <Eye className="w-4 h-4 mr-2" />
                       View Resume
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() => window.open("https://drive.google.com/uc?export=download&id=1p42p9NpczSWy_-iLeVaO38ciHAMHXp9r", "_blank")}
+                      onClick={() => window.open("https://drive.google.com/uc?export=download&id=1-yfml_Sur_8c10GuIscXsF1GiceZSIOX", "_blank")}
                       className="cursor-pointer"
                     >
                       <Download className="w-4 h-4 mr-2" />

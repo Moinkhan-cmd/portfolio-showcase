@@ -1,0 +1,22 @@
+diff --git a/src/components/Navigation.tsx b/src/components/Navigation.tsx
+--- a/src/components/Navigation.tsx
++++ b/src/components/Navigation.tsx
+@@
+-          <div className={cn('transition-all duration-300', isScrolled ? 'hidden xs:block' : 'block')}>
++          <div className="hidden xs:block transition-all duration-300">
+             <span className="font-display font-bold text-sm xs:text-base sm:text-lg tracking-tight">
+               Moin<span className="text-primary">.dev</span>
+             </span>
+           </div>
+@@
+-          <div className="hidden xs:block"><ThemeToggle /></div>
++          <div className="shrink-0"><ThemeToggle /></div>
+           <Button
+             onClick={() => scrollToSection('#contact')}
+             size={isScrolled ? 'sm' : 'default'}
+@@
+-              'md:hidden relative z-50 p-1.5 xs:p-2 rounded-lg xs:rounded-xl transition-colors duration-200',
++              'md:hidden relative z-50 p-1.5 xs:p-2 rounded-lg xs:rounded-xl transition-colors duration-200 glass-card',
+               'hover:bg-secondary/80 active:bg-secondary',
+               'touch-manipulation min-h-[40px] min-w-[40px] xs:min-h-[44px] xs:min-w-[44px] flex items-center justify-center'
+             )}
