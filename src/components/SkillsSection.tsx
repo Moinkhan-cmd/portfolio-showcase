@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
-import { Code2, Database, Users, Wrench, Code, Loader2, Search, TrendingUp, Star, Sparkles, Filter, X, Zap, Award, Target, Layers, Cpu, Globe, Rocket, ChevronRight, Gem, Crown, Flame, Heart, Activity } from 'lucide-react';
+import { Code2, Database, Users, Wrench, Code, Loader2, TrendingUp, Star, Sparkles, Filter, Zap, Award, Target, Layers, Cpu, Globe, Rocket, ChevronRight, Gem, Crown, Flame, Heart, Activity } from 'lucide-react';
 import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import { SkillsBackground3D } from './SkillsBackground3D';
 import { useSkills } from '@/hooks/useSkills';
@@ -331,9 +331,7 @@ const StatCard = ({ label, value, icon: Icon, gradient, delay }: { label: string
   );
 };
 export const SkillsSection = () => {
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<SkillCategory | 'all'>('all');
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const { data: skills = [], isLoading } = useSkills();
 
@@ -369,16 +367,10 @@ export const SkillsSection = () => {
     return skillCategories
       .filter((cat) => {
         if (selectedCategory !== 'all' && cat.category !== selectedCategory) return false;
-        if (searchQuery === '') return true;
-        const query = searchQuery.toLowerCase();
-        return cat.title.toLowerCase().includes(query) || cat.skills.some((skill) => skill.name.toLowerCase().includes(query));
+        return true;
       })
-      .map((cat) => ({
-        ...cat,
-        skills: searchQuery ? cat.skills.filter((skill) => skill.name.toLowerCase().includes(searchQuery.toLowerCase())) : cat.skills,
-      }))
       .filter((cat) => cat.skills.length > 0);
-  }, [skillCategories, searchQuery, selectedCategory]);
+  }, [skillCategories, selectedCategory]);
 
   const stats = useMemo(() => ({
     totalSkills: skills.length,
@@ -435,59 +427,32 @@ export const SkillsSection = () => {
           <StatCard label="Categories" value={stats.totalCategories} icon={Layers} gradient="from-purple-500 to-pink-500" delay={0.5} />
           <StatCard label="Avg per Category" value={stats.avgSkillsPerCategory} icon={Award} gradient="from-emerald-500 to-teal-500" delay={0.6} />
         </motion.div>
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.4 }} className="mb-12 max-w-4xl mx-auto">
-          <div className="grid gap-4 lg:gap-6 lg:grid-cols-[minmax(0,26rem)_1fr] lg:items-start">
-            <div className="relative w-full">
-              <motion.div className={cn('absolute -inset-1 rounded-2xl bg-gradient-to-r from-cyan-500/30 via-purple-500/30 to-pink-500/30 blur-lg transition-opacity duration-300', isSearchFocused ? 'opacity-70' : 'opacity-0')} />
-              <div className="relative bg-card/80 backdrop-blur-xl rounded-2xl border border-primary/20 p-1.5 shadow-xl">
-                <div className="relative">
-                  <Search className={cn('absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-200', isSearchFocused ? 'text-primary' : 'text-muted-foreground')} />
-                  <input
-                    type="text"
-                    placeholder="Search for any skill..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onFocus={() => setIsSearchFocused(true)}
-                    onBlur={() => setIsSearchFocused(false)}
-                    className={cn('w-full h-11 pl-11 pr-12 text-sm sm:text-base bg-background/50 rounded-xl border-2 border-transparent transition-all duration-300 placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary/40 focus:bg-background/80')}
-                  />
-                  <AnimatePresence>
-                    {searchQuery && (
-                      <motion.button initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.5 }}
-                        onClick={() => setSearchQuery('')}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-muted/80 hover:bg-muted text-muted-foreground hover:text-foreground transition-all">
-                        <X className="w-4 h-4" />
-                      </motion.button>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </div>
-            </div>
-
+                <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.4 }} className="mb-12 max-w-4xl mx-auto">
+          <div className="flex justify-center lg:justify-start">
             <div className="relative bg-card/80 backdrop-blur-xl rounded-2xl border border-primary/20 p-1.5 shadow-xl">
               <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap px-1 py-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-              <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={() => setSelectedCategory('all')}
-                className={cn('inline-flex items-center gap-2 h-11 px-3 sm:px-4 rounded-xl font-medium text-sm transition-all duration-200 whitespace-nowrap',
-                  selectedCategory === 'all' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25' : 'bg-card/80 text-foreground border border-primary/20 hover:border-primary/40 hover:bg-card')}>
-                <Filter className="w-4 h-4" />All Skills
-              </motion.button>
+                <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={() => setSelectedCategory('all')}
+                  className={cn('inline-flex items-center gap-2 h-11 px-3 sm:px-4 rounded-xl font-medium text-sm transition-all duration-200 whitespace-nowrap',
+                    selectedCategory === 'all' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25' : 'bg-card/80 text-foreground border border-primary/20 hover:border-primary/40 hover:bg-card')}>
+                  <Filter className="w-4 h-4" />All Skills
+                </motion.button>
 
-              {categoryOrder.map((category) => {
-                const categoryData = skillCategories.find((c) => c.category === category);
-                if (categoryData === undefined) return null;
-                const colors = categoryColors[category];
-                const IconComponent = categoryIcons[category];
-                return (
-                  <motion.button key={category} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-                    onClick={() => setSelectedCategory(category)}
-                    className={cn('inline-flex items-center gap-2 h-11 px-3 sm:px-4 rounded-xl font-medium text-sm transition-all duration-200 whitespace-nowrap',
-                      selectedCategory === category ? cn('bg-gradient-to-r text-white shadow-lg', colors.iconBg, colors.shadow) : 'bg-card/80 text-foreground border border-primary/20 hover:border-primary/40 hover:bg-card')}>
-                    <IconComponent className="w-4 h-4" />
-                    <span className="hidden sm:inline">{CATEGORY_LABELS[category].split(' ')[0]}</span>
-                    <span className={cn('px-2 py-0.5 rounded-md text-xs font-bold', selectedCategory === category ? 'bg-white/20' : colors.bg)}>{categoryData.skills.length}</span>
-                  </motion.button>
-                );
-              })}
+                {categoryOrder.map((category) => {
+                  const categoryData = skillCategories.find((c) => c.category === category);
+                  if (categoryData === undefined) return null;
+                  const colors = categoryColors[category];
+                  const IconComponent = categoryIcons[category];
+                  return (
+                    <motion.button key={category} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                      onClick={() => setSelectedCategory(category)}
+                      className={cn('inline-flex items-center gap-2 h-11 px-3 sm:px-4 rounded-xl font-medium text-sm transition-all duration-200 whitespace-nowrap',
+                        selectedCategory === category ? cn('bg-gradient-to-r text-white shadow-lg', colors.iconBg, colors.shadow) : 'bg-card/80 text-foreground border border-primary/20 hover:border-primary/40 hover:bg-card')}>
+                      <IconComponent className="w-4 h-4" />
+                      <span className="hidden sm:inline">{CATEGORY_LABELS[category].split(' ')[0]}</span>
+                      <span className={cn('px-2 py-0.5 rounded-md text-xs font-bold', selectedCategory === category ? 'bg-white/20' : colors.bg)}>{categoryData.skills.length}</span>
+                    </motion.button>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -513,7 +478,7 @@ export const SkillsSection = () => {
               <Code className="w-14 h-14 text-primary/40 mx-auto mb-4" />
             </motion.div>
             <p className="text-lg text-muted-foreground font-medium">No skills found</p>
-            <p className="text-sm text-muted-foreground/60 mt-2">{searchQuery ? 'Try a different search term' : 'Check back soon!'}</p>
+            <p className="text-sm text-muted-foreground/60 mt-2">Check back soon!</p>
           </motion.div>
         )}
       </div>
