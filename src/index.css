@@ -924,16 +924,10 @@ a:focus-visible {
   }
   
   /* Fix for mobile menu overflow */
-  nav .lg\\:hidden {
-    position: relative;
-    z-index: 10;
-    pointer-events: auto;
-  }
-  
-  /* Ensure menu items are above background */
-  nav .lg\\:hidden button {
-    position: relative;
-    z-index: 20;
+  nav button.lg\\:hidden {
+    /* Only the hamburger toggle needs stacking help.
+       Don't override fixed-position overlay/panel. */
+    z-index: 70;
     pointer-events: auto;
   }
 
