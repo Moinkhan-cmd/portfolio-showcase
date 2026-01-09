@@ -111,7 +111,7 @@ export const Navigation = () => {
           </div>
         </a>
 
-        <div className="hidden md:flex items-center gap-0.5 lg:gap-1 p-0.5 lg:p-1 rounded-full bg-secondary/50 border border-border/30 backdrop-blur-sm">
+        <div className="hidden lg:flex items-center gap-0.5 lg:gap-1 p-0.5 lg:p-1 rounded-full bg-secondary/50 border border-border/30 backdrop-blur-sm">
           {navLinks.map((link) => {
             const isActive = activeSection === link.href.substring(1);
             return (
@@ -154,7 +154,7 @@ export const Navigation = () => {
           <motion.button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className={cn(
-              'md:hidden relative z-50 p-1.5 xs:p-2 rounded-lg xs:rounded-xl transition-colors duration-200 glass-card',
+              'lg:hidden relative z-50 p-1.5 xs:p-2 rounded-lg xs:rounded-xl transition-colors duration-200 glass-card',
               'hover:bg-secondary/80 active:bg-secondary',
               'touch-manipulation min-h-[40px] min-w-[40px] xs:min-h-[44px] xs:min-w-[44px] flex items-center justify-center'
             )}
@@ -181,14 +181,14 @@ export const Navigation = () => {
         {isMobileMenuOpen && (
           <>
             <motion.div
-              className="md:hidden fixed inset-0 bg-background/80 backdrop-blur-sm z-40"
+              className="lg:hidden fixed inset-0 bg-background/80 backdrop-blur-sm z-40"
               onClick={() => setIsMobileMenuOpen(false)}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             />
             <motion.div
-              className="md:hidden fixed top-0 right-0 h-full w-full xs:w-[85%] xs:max-w-sm z-50 bg-background/98 backdrop-blur-xl border-l border-border/50 shadow-2xl"
+              className="lg:hidden fixed top-0 right-0 h-full w-full xs:w-[85%] xs:max-w-sm z-50 bg-background/98 backdrop-blur-xl border-l border-border/50 shadow-2xl"
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
