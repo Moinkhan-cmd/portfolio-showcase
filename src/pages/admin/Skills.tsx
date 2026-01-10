@@ -37,6 +37,83 @@ import { skillSchema, formatZodError } from "@/lib/admin/validation";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
+// Category configuration with icons, colors, and gradients
+const categoryConfig: Record<string, { icon: any; color: string; gradient: string }> = {
+  "Frontend": {
+    icon: Code,
+    color: "text-blue-500",
+    gradient: "from-blue-500/20 via-blue-400/10 to-cyan-500/20",
+  },
+  "Backend": {
+    icon: Database,
+    color: "text-green-500",
+    gradient: "from-green-500/20 via-green-400/10 to-emerald-500/20",
+  },
+  "Database": {
+    icon: Database,
+    color: "text-purple-500",
+    gradient: "from-purple-500/20 via-purple-400/10 to-violet-500/20",
+  },
+  "DevOps": {
+    icon: Wrench,
+    color: "text-orange-500",
+    gradient: "from-orange-500/20 via-orange-400/10 to-amber-500/20",
+  },
+  "Tools": {
+    icon: Wrench,
+    color: "text-yellow-500",
+    gradient: "from-yellow-500/20 via-yellow-400/10 to-amber-500/20",
+  },
+  "Soft Skills": {
+    icon: Users,
+    color: "text-pink-500",
+    gradient: "from-pink-500/20 via-pink-400/10 to-rose-500/20",
+  },
+  "Languages": {
+    icon: Code2,
+    color: "text-indigo-500",
+    gradient: "from-indigo-500/20 via-indigo-400/10 to-blue-500/20",
+  },
+  "Frameworks": {
+    icon: Code,
+    color: "text-cyan-500",
+    gradient: "from-cyan-500/20 via-cyan-400/10 to-teal-500/20",
+  },
+  "Other": {
+    icon: Sparkles,
+    color: "text-gray-500",
+    gradient: "from-gray-500/20 via-gray-400/10 to-slate-500/20",
+  },
+};
+
+// Level configuration with labels, values, colors, and gradients
+const levelConfig: Record<string, { label: string; value: number; color: string; gradient: string }> = {
+  beginner: {
+    label: "Beginner",
+    value: 25,
+    color: "text-blue-500",
+    gradient: "from-blue-400 to-blue-600",
+  },
+  intermediate: {
+    label: "Intermediate",
+    value: 50,
+    color: "text-yellow-500",
+    gradient: "from-yellow-400 to-yellow-600",
+  },
+  advanced: {
+    label: "Advanced",
+    value: 75,
+    color: "text-orange-500",
+    gradient: "from-orange-400 to-orange-600",
+  },
+  expert: {
+    label: "Expert",
+    value: 100,
+    color: "text-green-500",
+    gradient: "from-green-400 to-green-600",
+  },
+};
+
 export const AdminSkills = () => {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [loading, setLoading] = useState(true);
