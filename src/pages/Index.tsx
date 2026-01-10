@@ -3,6 +3,8 @@ import { HeroSection } from "@/components/HeroSection";
 import { SectionDivider } from "@/components/SectionDivider";
 import { SectionTransition } from "@/components/SectionTransition";
 import { SectionProgressIndicator } from "@/components/SectionProgressIndicator";
+import { KeyboardHint, KeyboardHintTrigger } from "@/components/KeyboardHint";
+import { useKeyboardNavigation } from "@/hooks/useKeyboardNavigation";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -37,6 +39,7 @@ const Footer = lazy(async () => {
 
 const Index = () => {
   const [navigatingSection, setNavigatingSection] = useState<string | null>(null);
+  const { showHint, setShowHint } = useKeyboardNavigation();
 
   useEffect(() => {
     const handleSectionNavigate = (e: CustomEvent<{ sectionId: string }>) => {
@@ -83,6 +86,8 @@ const Index = () => {
       <div className="relative z-10">
         <Navigation />
         <SectionProgressIndicator />
+        <KeyboardHint isVisible={showHint} onClose={() => setShowHint(false)} />
+        <KeyboardHintTrigger onClick={() => setShowHint(true)} />
         <HeroSection />
 
         <SectionDivider />
