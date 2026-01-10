@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { playNavigationSound, playHoverSound, initSoundSystem } from "@/lib/sounds";
 
 const SECTIONS = [
   { id: "hero", name: "Home" },
@@ -57,6 +58,9 @@ export const SectionProgressIndicator = () => {
   }, []);
 
   const scrollToSection = (sectionId: string) => {
+    initSoundSystem();
+    playNavigationSound();
+    
     if (sectionId === "hero") {
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
@@ -67,6 +71,11 @@ export const SectionProgressIndicator = () => {
       const top = element.getBoundingClientRect().top + window.scrollY - offset;
       window.scrollTo({ top, behavior: "smooth" });
     }
+  };
+
+  const handleHover = () => {
+    initSoundSystem();
+    playHoverSound();
   };
 
   const progress = (viewedSections.size / SECTIONS.length) * 100;
@@ -98,6 +107,7 @@ export const SectionProgressIndicator = () => {
           <motion.button
             key={id}
             onClick={() => scrollToSection(id)}
+            onMouseEnter={handleHover}
             className="relative group py-2"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}

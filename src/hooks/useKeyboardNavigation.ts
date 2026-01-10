@@ -1,5 +1,6 @@
 import { useEffect, useCallback, useState } from "react";
 import { scrollToSection } from "@/components/SmoothScroll";
+import { playNavigationSound, initSoundSystem } from "@/lib/sounds";
 
 const SECTIONS = [
   { id: "hero", key: "0" },
@@ -15,11 +16,27 @@ export const useKeyboardNavigation = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showHint, setShowHint] = useState(false);
 
+  // Initialize sound system on first interaction
+  useEffect(() => {
+    const handleInteraction = () => {
+      initSoundSystem();
+      window.removeEventListener("click", handleInteraction);
+      window.removeEventListener("keydown", handleInteraction);
+    };
+    window.addEventListener("click", handleInteraction);
+    window.addEventListener("keydown", handleInteraction);
+    return () => {
+      window.removeEventListener("click", handleInteraction);
+      window.removeEventListener("keydown", handleInteraction);
+    };
+  }, []);
+
   const navigateToSection = useCallback((index: number) => {
     const section = SECTIONS[index];
     if (!section) return;
 
     setCurrentIndex(index);
+    playNavigationSound();
     
     if (section.id === "hero") {
       window.scrollTo({ top: 0, behavior: "smooth" });

@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { scrollToSection as smoothScrollToSection, scrollToTop } from '@/components/SmoothScroll';
+import { playSectionTransitionSound, initSoundSystem } from '@/lib/sounds';
 
 const navLinks = [
   { name: 'About', href: '#about' },
@@ -189,7 +190,10 @@ export const Navigation = () => {
   const scrollToSection = useCallback((href: string) => {
     const sectionId = href.substring(1);
     
-    // Dispatch custom event for section transition
+    // Play sound and dispatch navigation event
+    initSoundSystem();
+    playSectionTransitionSound();
+    
     window.dispatchEvent(new CustomEvent('sectionNavigate', { 
       detail: { sectionId } 
     }));
