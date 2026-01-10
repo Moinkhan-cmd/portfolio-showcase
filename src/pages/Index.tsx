@@ -54,14 +54,14 @@ const Index = () => {
 
   return (
     <main className="min-h-screen bg-background overflow-x-hidden relative">
-      {/* Cursor particle trail - only in Full Effects mode */}
+      {/* Cursor particle trail - only in Full Effects mode on desktop */}
       <CursorParticleTrail />
       
-      {/* Background elements */}
-      <div className="fixed top-1/4 left-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none z-0" />
-      <div className="fixed bottom-1/4 right-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl pointer-events-none z-0" />
+      {/* Background elements - hidden on mobile for performance */}
+      <div className="hidden md:block fixed top-1/4 left-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none z-0" />
+      <div className="hidden md:block fixed bottom-1/4 right-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl pointer-events-none z-0" />
       <div
-        className="fixed top-1/2 left-1/2 w-72 h-72 bg-primary/3 rounded-full blur-3xl pointer-events-none z-0"
+        className="hidden md:block fixed top-1/2 left-1/2 w-72 h-72 bg-primary/3 rounded-full blur-3xl pointer-events-none z-0"
         style={{ marginLeft: "-9rem" }}
       />
 

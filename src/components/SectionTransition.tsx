@@ -1,5 +1,5 @@
-import { motion, useInView } from "framer-motion";
-import { useRef, ReactNode } from "react";
+import { motion, useInView, useReducedMotion } from "framer-motion";
+import { useRef, ReactNode, useMemo } from "react";
 
 interface SectionTransitionProps {
   children: ReactNode;
@@ -9,11 +9,28 @@ interface SectionTransitionProps {
 
 export const SectionTransition = ({ children, className = "", id }: SectionTransitionProps) => {
   const ref = useRef<HTMLDivElement>(null);
+  const reduceMotion = useReducedMotion();
+  
+  // Detect touch/mobile devices
+  const isMobile = useMemo(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia?.("(pointer: coarse)")?.matches ?? false;
+  }, []);
+
   const isInView = useInView(ref, { 
-    once: false, 
-    amount: 0.15,
-    margin: "-50px 0px -50px 0px"
+    once: true, // Changed to once for better performance
+    amount: 0.1,
+    margin: "-30px 0px -30px 0px"
   });
+
+  // Skip animations entirely on mobile for smooth scrolling
+  if (isMobile || reduceMotion) {
+    return (
+      <section ref={ref} id={id} className={className}>
+        {children}
+      </section>
+    );
+  }
 
   return (
     <motion.section
@@ -22,26 +39,23 @@ export const SectionTransition = ({ children, className = "", id }: SectionTrans
       className={className}
       initial={{ opacity: 0 }}
       animate={{ 
-        opacity: isInView ? 1 : 0.3,
+        opacity: isInView ? 1 : 0,
       }}
       transition={{ 
-        duration: 0.5, 
-        ease: [0.25, 0.46, 0.45, 0.94]
-      }}
-      style={{
-        willChange: "opacity",
+        duration: 0.4, 
+        ease: "easeOut"
       }}
     >
       <motion.div
-        initial={{ y: 30, opacity: 0 }}
+        initial={{ y: 20, opacity: 0 }}
         animate={{ 
-          y: isInView ? 0 : 30, 
+          y: isInView ? 0 : 20, 
           opacity: isInView ? 1 : 0 
         }}
         transition={{ 
-          duration: 0.6, 
-          delay: 0.1,
-          ease: [0.25, 0.46, 0.45, 0.94]
+          duration: 0.5, 
+          delay: 0.05,
+          ease: "easeOut"
         }}
       >
         {children}
