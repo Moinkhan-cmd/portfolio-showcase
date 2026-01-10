@@ -465,6 +465,39 @@ const CertificateDetailDialog = ({ cert, open, onOpenChange }: CertificateDetail
   const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
 
+  // Keep particle animation inputs stable across re-renders.
+  // Random values created during render can cause Framer Motion to restart animations
+  // and look like the whole dialog is blinking/flickering.
+  const particleSeeds = useMemo(() => {
+    const seedKey = cert?.id ?? "__no_cert__";
+    const count = 8;
+    return Array.from({ length: count }, (_, i) => {
+      const startX = Math.random() * 100;
+      const startY = Math.random() * 100;
+      const endX = Math.random() * 100;
+      return {
+        key: `${seedKey}:${i}`,
+        startX,
+        startY,
+        endX,
+        duration: 4 + Math.random() * 2,
+        delay: Math.random() * 2,
+      };
+    });
+  }, [cert?.id]);
+
+  useEffect(() => {
+    if (!open) return;
+    const prevBodyOverflow = document.body.style.overflow;
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prevBodyOverflow;
+      document.documentElement.style.overflow = prevHtmlOverflow;
+    };
+  }, [open]);
+
   if (!cert) return null;
 
   const skills = Array.isArray(cert.skills) ? cert.skills : [];
@@ -498,14 +531,15 @@ const CertificateDetailDialog = ({ cert, open, onOpenChange }: CertificateDetail
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl w-full max-h-[95vh] overflow-y-auto p-0 border-0 bg-transparent shadow-none">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9, y: 30 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.9, y: 30 }}
-          transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
-          className="relative"
-        >
+      <DialogContent className="max-w-5xl w-full h-[95vh] overflow-hidden p-0 border-0 bg-transparent shadow-none">
+        <div className="h-full overflow-y-auto overscroll-contain touch-pan-y">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 30 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 30 }}
+            transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+            className="relative"
+          >
           {/* Enhanced Animated Background with Multiple Layers */}
           <motion.div
             className="absolute -inset-6 rounded-3xl bg-gradient-to-br from-primary/30 via-purple-500/20 to-cyan-500/20 blur-3xl opacity-60"
@@ -593,24 +627,24 @@ const CertificateDetailDialog = ({ cert, open, onOpenChange }: CertificateDetail
 
               {/* Floating particles in header */}
               <div className="absolute inset-0 overflow-hidden">
-                {[...Array(8)].map((_, i) => (
+                {particleSeeds.map((p) => (
                   <motion.div
-                    key={i}
+                    key={p.key}
                     className="absolute w-1.5 h-1.5 bg-primary/60 rounded-full"
                     initial={{
-                      x: `${Math.random() * 100}%`,
-                      y: `${Math.random() * 100}%`,
+                      x: `${p.startX}%`,
+                      y: `${p.startY}%`,
                       opacity: 0,
                     }}
                     animate={{
-                      y: ["-20%", "120%"],
+                      y: [`${p.startY}%`, "120%"],
                       opacity: [0, 1, 0],
-                      x: [`${Math.random() * 100}%`, `${Math.random() * 100}%`],
+                      x: [`${p.startX}%`, `${p.endX}%`],
                     }}
                     transition={{
-                      duration: 4 + Math.random() * 2,
+                      duration: p.duration,
                       repeat: Infinity,
-                      delay: Math.random() * 2,
+                      delay: p.delay,
                       ease: "linear",
                     }}
                   />
@@ -934,7 +968,8 @@ const CertificateDetailDialog = ({ cert, open, onOpenChange }: CertificateDetail
               </motion.div>
             </div>
           </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </DialogContent>
     </Dialog>
   );
@@ -947,6 +982,8 @@ export const CertificationsSection = () => {
   const [showAll, setShowAll] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const { data: certifications = [], isLoading } = useCertifications();
+
+  const clearSelectedCertTimeoutRef = useRef<ReturnType<typeof window.setTimeout> | null>(null);
 
   // Filter and sort state
   const [searchQuery, setSearchQuery] = useState("");
@@ -1025,11 +1062,31 @@ export const CertificationsSection = () => {
 
   const handleDialogOpenChange = (open: boolean) => {
     setDialogOpen(open);
+
+    // Prevent stale timeouts from a previous close from firing after reopening,
+    // which can cause the dialog content to unmount/remount (visible blinking).
+    if (clearSelectedCertTimeoutRef.current) {
+      clearTimeout(clearSelectedCertTimeoutRef.current);
+      clearSelectedCertTimeoutRef.current = null;
+    }
+
     if (!open) {
       // Reset selected cert when dialog closes (after animation)
-      setTimeout(() => setSelectedCert(null), 300);
+      clearSelectedCertTimeoutRef.current = window.setTimeout(() => {
+        setSelectedCert(null);
+        clearSelectedCertTimeoutRef.current = null;
+      }, 300);
     }
   };
+
+  useEffect(() => {
+    return () => {
+      if (clearSelectedCertTimeoutRef.current) {
+        clearTimeout(clearSelectedCertTimeoutRef.current);
+        clearSelectedCertTimeoutRef.current = null;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(

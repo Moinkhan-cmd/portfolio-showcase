@@ -12,12 +12,12 @@ import { scrollToSection as smoothScrollToSection, scrollToTop } from '@/compone
 import { playSectionTransitionSound, initSoundSystem } from '@/lib/sounds';
 
 const navLinks = [
-  { name: 'About', href: '#about' },
   { name: 'Skills', href: '#skills' },
   { name: 'Projects', href: '#projects' },
   { name: 'Experience', href: '#experience' },
   { name: 'Certifications', href: '#certifications' },
   { name: 'Contact', href: '#contact' },
+  { name: 'About', href: '#about' },
 ] as const;
 
 // Mobile Menu Component - rendered via Portal to escape all parent CSS

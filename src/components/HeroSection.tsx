@@ -1,5 +1,6 @@
-import { ArrowDown, Download, Github, Linkedin, Mail, Sparkles, ExternalLink, Code2, Zap } from "lucide-react";
+import { ArrowDown, Download, Eye, Github, Linkedin, Loader2, Mail, Sparkles, ExternalLink, Code2, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { motion, useMotionValue, useSpring, useTransform, useInView, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import photo800Webp from "@/images/my-photo-800.webp";
@@ -26,6 +27,8 @@ export const HeroSection = () => {
   const reduceMotion = useReducedMotion();
   const { data: personalDetails } = usePersonalDetails();
   const resumeUrl = personalDetails?.resumeUrl?.trim();
+  const resumeFileName = personalDetails?.resumeFileName?.trim();
+  const [isDownloadingResume, setIsDownloadingResume] = useState(false);
   const [cursorGlowEnabled, setCursorGlowEnabled] = useState(false);
   const cursorRafRef = useRef<number | null>(null);
   const cursorPendingRef = useRef<{ x: number; y: number }>({ x: -1000, y: -1000 });
@@ -85,6 +88,46 @@ export const HeroSection = () => {
     mouseX.set(x);
     mouseY.set(y);
     if (cursorGlowEnabled) scheduleCursorUpdate(e.clientX, e.clientY);
+  };
+
+  const getResumeDownloadFileName = () => {
+    if (resumeFileName) return resumeFileName;
+    if (!resumeUrl) return "Resume.pdf";
+    try {
+      const url = new URL(resumeUrl);
+      const last = url.pathname.split("/").filter(Boolean).pop();
+      if (!last) return "Resume.pdf";
+      // Basic cleanup for common URL encodings
+      const decoded = decodeURIComponent(last);
+      return decoded.includes(".") ? decoded : `${decoded}.pdf`;
+    } catch {
+      return "Resume.pdf";
+    }
+  };
+
+  const downloadResume = async () => {
+    if (!resumeUrl || isDownloadingResume) return;
+    setIsDownloadingResume(true);
+
+    try {
+      const response = await fetch(resumeUrl, { mode: "cors" });
+      if (!response.ok) throw new Error(`Failed to fetch resume: ${response.status}`);
+
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = objectUrl;
+      a.download = getResumeDownloadFileName();
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+    } catch {
+      // Fallback for hosts that block cross-origin downloads (CORS). Open in a new tab.
+      window.open(resumeUrl, "_blank", "noopener,noreferrer");
+    } finally {
+      setIsDownloadingResume(false);
+    }
   };
 
   return (
@@ -232,7 +275,7 @@ export const HeroSection = () => {
                     animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.1, 1] }}
                     transition={{ duration: 2, repeat: Infinity }}
                   >
-                    <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+                    <Sparkles className="w-6 h-6 text-primary" />
                   </motion.span>
                 </motion.span>
                 <motion.span 
@@ -311,15 +354,46 @@ export const HeroSection = () => {
               
               {resumeUrl ? (
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    onClick={() => window.open(resumeUrl, "_blank", "noopener,noreferrer")}
-                    className="group border-2 border-border hover:border-primary/50 hover:bg-primary/5 px-8 py-6 text-base font-semibold backdrop-blur-sm"
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    Resume
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        size="lg"
+                        variant="outline"
+                        className="group border-2 border-border hover:border-primary/50 hover:bg-primary/5 px-8 py-6 text-base font-semibold backdrop-blur-sm"
+                        aria-label="Resume options"
+                      >
+                        <Download className="mr-2 h-4 w-4" />
+                        Resume
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-48">
+                      <DropdownMenuItem
+                        onSelect={(e) => {
+                          e.preventDefault();
+                          window.open(resumeUrl, "_blank", "noopener,noreferrer");
+                        }}
+                        className="gap-2"
+                      >
+                        <Eye className="h-4 w-4" />
+                        View
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        disabled={isDownloadingResume}
+                        onSelect={(e) => {
+                          e.preventDefault();
+                          void downloadResume();
+                        }}
+                        className="gap-2"
+                      >
+                        {isDownloadingResume ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Download className="h-4 w-4" />
+                        )}
+                        {isDownloadingResume ? "Downloading…" : "Download"}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </motion.div>
               ) : null}
             </motion.div>
@@ -460,7 +534,7 @@ export const HeroSection = () => {
                       animate={{ rotate: 360, scale: [1, 1.3, 1] }}
                       transition={{ duration: 4 + i, repeat: Infinity }}
                     >
-                      <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+                      <Sparkles className="w-6 h-6 text-primary" />
                     </motion.div>
                   </motion.div>
                 ))}
