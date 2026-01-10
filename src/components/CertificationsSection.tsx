@@ -383,11 +383,10 @@ const CertificationCard = ({ cert, index, onViewDetails }: CertificationCardProp
           {/* Enhanced Description - Responsive */}
           {cert.description && (
             <motion.p
-              className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-2 sm:line-clamp-3 mb-3 sm:mb-4"
-              animate={{
-                color: isHovered ? "hsl(var(--foreground) / 0.9)" : "hsl(var(--muted-foreground))",
-              }}
-              transition={{ duration: 0.3 }}
+              className={cn(
+                "text-xs sm:text-sm leading-relaxed line-clamp-2 sm:line-clamp-3 mb-3 sm:mb-4 transition-colors duration-300",
+                isHovered ? "text-foreground/90" : "text-muted-foreground"
+              )}
             >
               {cert.description}
             </motion.p>
@@ -1315,12 +1314,13 @@ export const CertificationsSection = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 lg:gap-8 max-w-7xl mx-auto">
                   <AnimatePresence mode="popLayout">
                     {(showAll ? filteredCertifications : filteredCertifications.slice(0, 3)).map((cert, index) => (
-                      <CertificationCard 
-                        key={cert.id || index} 
-                        cert={cert} 
-                        index={index}
-                        onViewDetails={handleViewDetails}
-                      />
+                      <motion.div key={cert.id || index} layout>
+                        <CertificationCard 
+                          cert={cert} 
+                          index={index}
+                          onViewDetails={handleViewDetails}
+                        />
+                      </motion.div>
                     ))}
                   </AnimatePresence>
                 </div>

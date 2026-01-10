@@ -298,7 +298,9 @@ export const trackPageView = async (pagePath: string, pageTitle?: string) => {
     }
   } catch (error) {
     // Silent fail for analytics - don't expose internal errors
-    console.error("Analytics error");
+    if (import.meta.env.DEV && import.meta.env.VITE_DEBUG_ANALYTICS === "true") {
+      console.warn("Analytics error", error);
+    }
   }
 };
 
@@ -385,7 +387,9 @@ export const trackUserActivity = async (userId: string, pagePath: string, pageTi
     }
   } catch (error) {
     // Silent fail for analytics - don't expose internal errors
-    console.error("Analytics error");
+    if (import.meta.env.DEV && import.meta.env.VITE_DEBUG_ANALYTICS === "true") {
+      console.warn("Analytics error", error);
+    }
   }
 };
 

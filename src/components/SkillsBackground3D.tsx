@@ -1,8 +1,28 @@
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera, Float, MeshDistortMaterial, Sphere, Text3D, Center } from "@react-three/drei";
-import { Suspense, useRef, useMemo } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useScrollPause } from "@/hooks/useScrollPause";
 import * as THREE from "three";
+
+const WebGLContextGuard = () => {
+  const { gl } = useThree();
+
+  useEffect(() => {
+    const canvas = gl.domElement;
+    const handleContextLost = (event: Event) => {
+      // Allow the browser to restore the context when possible.
+      // Without preventDefault(), context restoration can be blocked.
+      event.preventDefault();
+    };
+
+    canvas.addEventListener("webglcontextlost", handleContextLost, false);
+    return () => {
+      canvas.removeEventListener("webglcontextlost", handleContextLost, false);
+    };
+  }, [gl]);
+
+  return null;
+};
 
 // Glowing Orb Component
 const GlowingOrb = ({ position, color, size = 0.5, speed = 1 }: { position: [number, number, number]; color: string; size?: number; speed?: number }) => {
@@ -203,6 +223,22 @@ const FloatingTorus = () => {
 export const SkillsBackground3D = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const isScrolling = useScrollPause(200);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1, rootMargin: "50px" }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div 
@@ -210,44 +246,47 @@ export const SkillsBackground3D = () => {
       className="w-full h-full absolute inset-0 pointer-events-none"
       style={{ willChange: 'opacity', transform: 'translateZ(0)', zIndex: 1 }}
     >
-      <Canvas
-        dpr={[1, 1.5]}
-        performance={{ min: 0.5, max: 1 }}
-        frameloop={!isScrolling ? "always" : "demand"}
-        gl={{ 
-          antialias: true,
-          alpha: true,
-          powerPreference: "high-performance"
-        }}
-        style={{ opacity: 0.4 }}
-      >
-        <PerspectiveCamera makeDefault position={[0, 0, 15]} fov={50} />
-        <Suspense fallback={null}>
-          <ambientLight intensity={0.4} />
-          <pointLight position={[10, 10, 10]} intensity={1.5} color="#06b6d4" />
-          <pointLight position={[-10, -10, -10]} intensity={1.2} color="#8b5cf6" />
-          <pointLight position={[0, 10, 0]} intensity={1} color="#ec4899" />
-          <spotLight position={[0, 20, 0]} angle={0.3} penumbra={1} intensity={0.5} color="#10b981" />
-          
-          <GlowingOrb position={[3, 2, -1]} color="#06b6d4" size={0.6} speed={0.8} />
-          <GlowingOrb position={[-4, -1, 1]} color="#8b5cf6" size={0.5} speed={1.2} />
-          <GlowingOrb position={[0, -3, -2]} color="#ec4899" size={0.4} speed={1} />
-          
-          <TechCubes />
-          <DNAHelix />
-          <ParticleRing radius={5} count={50} />
-          <FloatingTorus />
-          
-          <OrbitControls 
-            enableZoom={false} 
-            enablePan={false}
-            autoRotate
-            autoRotateSpeed={0.3}
-            enableDamping
-            dampingFactor={0.05}
-          />
-        </Suspense>
-      </Canvas>
+      {isVisible && (
+        <Canvas
+          dpr={[1, 1.5]}
+          performance={{ min: 0.5, max: 1 }}
+          frameloop={isVisible && !isScrolling ? "always" : "never"}
+          gl={{ 
+            antialias: true,
+            alpha: true,
+            powerPreference: "high-performance"
+          }}
+          style={{ opacity: 0.4 }}
+        >
+          <WebGLContextGuard />
+          <PerspectiveCamera makeDefault position={[0, 0, 15]} fov={50} />
+          <Suspense fallback={null}>
+            <ambientLight intensity={0.4} />
+            <pointLight position={[10, 10, 10]} intensity={1.5} color="#06b6d4" />
+            <pointLight position={[-10, -10, -10]} intensity={1.2} color="#8b5cf6" />
+            <pointLight position={[0, 10, 0]} intensity={1} color="#ec4899" />
+            <spotLight position={[0, 20, 0]} angle={0.3} penumbra={1} intensity={0.5} color="#10b981" />
+            
+            <GlowingOrb position={[3, 2, -1]} color="#06b6d4" size={0.6} speed={0.8} />
+            <GlowingOrb position={[-4, -1, 1]} color="#8b5cf6" size={0.5} speed={1.2} />
+            <GlowingOrb position={[0, -3, -2]} color="#ec4899" size={0.4} speed={1} />
+            
+            <TechCubes />
+            <DNAHelix />
+            <ParticleRing radius={5} count={50} />
+            <FloatingTorus />
+            
+            <OrbitControls 
+              enableZoom={false} 
+              enablePan={false}
+              autoRotate
+              autoRotateSpeed={0.3}
+              enableDamping
+              dampingFactor={0.05}
+            />
+          </Suspense>
+        </Canvas>
+      )}
     </div>
   );
 };

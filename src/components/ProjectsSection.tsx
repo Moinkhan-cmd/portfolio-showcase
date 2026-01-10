@@ -79,7 +79,7 @@ const ProjectCard = ({ project, index, isFeatured = false }: ProjectCardProps) =
         rotateX,
         rotateY,
       }}
-      className={`group relative ${isFeatured ? 'md:col-span-2 lg:col-span-1' : ''}`}
+      className="group relative"
     >
       {/* Glow effect */}
       <motion.div
@@ -223,12 +223,11 @@ const ProjectCard = ({ project, index, isFeatured = false }: ProjectCardProps) =
           </div>
 
           {/* Description - Responsive */}
-          <motion.div 
-            className="mb-3 sm:mb-4 leading-relaxed min-h-[2.5rem] sm:min-h-[3rem]"
-            animate={{
-              color: isHovered ? "hsl(var(--foreground) / 0.9)" : "hsl(var(--muted-foreground))",
-            }}
-            transition={{ duration: 0.3 }}
+          <div
+            className={cn(
+              "mb-3 sm:mb-4 leading-relaxed min-h-[2.5rem] sm:min-h-[3rem] transition-colors duration-300",
+              isHovered ? "text-foreground/90" : "text-muted-foreground"
+            )}
           >
             <AnimatePresence mode="wait">
               {isHovered && project.fullDescription ? (
@@ -255,7 +254,7 @@ const ProjectCard = ({ project, index, isFeatured = false }: ProjectCardProps) =
                 </motion.p>
               )}
             </AnimatePresence>
-          </motion.div>
+          </div>
 
           {/* Category and Status - Show on hover */}
           <AnimatePresence>
@@ -341,13 +340,7 @@ const ProjectCard = ({ project, index, isFeatured = false }: ProjectCardProps) =
 
           {/* Skills (optional) - Responsive */}
           {Array.isArray(project.skills) && project.skills.length > 0 && (
-            <motion.div 
-              className="flex flex-wrap gap-1 sm:gap-1.5 mb-3 sm:mb-4"
-              animate={{
-                minHeight: isHovered ? "auto" : "1.5rem",
-              }}
-              transition={{ duration: 0.3 }}
-            >
+            <div className="flex flex-wrap gap-1 sm:gap-1.5 mb-3 sm:mb-4 min-h-[1.5rem]">
               <AnimatePresence mode="popLayout">
                 {(isHovered ? project.skills : project.skills.slice(0, 4)).map((skill, skillIndex) => (
                   <motion.div
@@ -379,7 +372,7 @@ const ProjectCard = ({ project, index, isFeatured = false }: ProjectCardProps) =
                   </Badge>
                 </motion.div>
               )}
-            </motion.div>
+            </div>
           )}
 
           {/* Spacer to push buttons to bottom */}
@@ -854,12 +847,17 @@ export const ProjectsSection = () => {
           <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 lg:gap-8 max-w-7xl mx-auto">
             <AnimatePresence mode="popLayout">
               {displayProjects.map((project, index) => (
-                <ProjectCard 
-                  key={project.id || `${project.title}-${index}`} 
-                  project={project} 
-                  index={index}
-                  isFeatured={project.featured}
-                />
+                <motion.div
+                  key={project.id || `${project.title}-${index}`}
+                  layout
+                  className={project.featured ? "md:col-span-2 lg:col-span-1" : undefined}
+                >
+                  <ProjectCard
+                    project={project}
+                    index={index}
+                    isFeatured={project.featured}
+                  />
+                </motion.div>
               ))}
             </AnimatePresence>
           </div>

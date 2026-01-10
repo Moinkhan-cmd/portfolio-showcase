@@ -27,18 +27,6 @@ export const ContactSection = () => {
   const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
   const isEmailJSConfigured = !!(serviceId && templateId && publicKey);
 
-  // Debug: Log configuration status (remove in production if needed)
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('EmailJS Config Check:', {
-        serviceId: serviceId ? '✓ Set' : '✗ Missing',
-        templateId: templateId ? '✓ Set' : '✗ Missing',
-        publicKey: publicKey ? '✓ Set' : '✗ Missing',
-        isConfigured: isEmailJSConfigured
-      });
-    }
-  }, [serviceId, templateId, publicKey, isEmailJSConfigured]);
-
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {

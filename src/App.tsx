@@ -34,7 +34,14 @@ const App = () => (
             <ScrollProgress />
             <Toaster />
             <Sonner />
-            <BrowserRouter>
+            <BrowserRouter
+              // Opt-in to upcoming React Router v7 behaviors to remove v6 warning noise.
+              // Some react-router-dom v6 versions don't type this prop yet.
+              future={{
+                v7_startTransition: true,
+                v7_relativeSplatPath: true,
+              } as any}
+            >
               <AnalyticsTracker />
               <Routes>
                 <Route path="/" element={<Index />} />

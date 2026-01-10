@@ -469,7 +469,9 @@ export const SkillsSection = () => {
           <motion.div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8 max-w-7xl mx-auto" layout>
             <AnimatePresence mode="popLayout">
               {filteredCategories.map((category, index) => (
-                <SkillCard key={category.title} title={category.title} icon={category.icon} skills={category.skills} index={index} category={category.category} />
+                <motion.div key={category.title} layout>
+                  <SkillCard title={category.title} icon={category.icon} skills={category.skills} index={index} category={category.category} />
+                </motion.div>
               ))}
             </AnimatePresence>
           </motion.div>
