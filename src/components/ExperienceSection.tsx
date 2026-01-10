@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import { Briefcase, Calendar, Loader2, MapPin, Laptop, Building2, Award, Sparkles, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ExperienceBackground3D } from "./ExperienceBackground3D";
+import { MobileGradientBackground } from "./MobileGradientBackground";
 import { useExperience } from "@/hooks/useExperience";
 import type { Experience } from "@/lib/admin/experience";
 import { Badge } from "@/components/ui/badge";
@@ -77,7 +78,7 @@ export const ExperienceSection = () => {
       className="section-padding relative overflow-hidden bg-gradient-to-b from-background via-secondary/10 to-background"
     >
       <ExperienceBackground3D />
-
+      <MobileGradientBackground variant="experience" />
       {/* Enhanced Background Overlays */}
       <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/90 to-background/80 pointer-events-none z-10" />
       <div

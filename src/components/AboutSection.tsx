@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { AboutBackground3D } from "./AboutBackground3D";
+import { MobileGradientBackground } from "./MobileGradientBackground";
 
 const techStack = [
   "HTML",
@@ -44,6 +45,7 @@ export const AboutSection = () => {
       className="section-padding relative overflow-hidden min-h-screen"
     >
       <AboutBackground3D />
+      <MobileGradientBackground variant="about" />
       
       {/* Enhanced dark overlay for better text contrast with gradient - lighter to show 3D */}
       <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/65 to-background/50 pointer-events-none z-10" />

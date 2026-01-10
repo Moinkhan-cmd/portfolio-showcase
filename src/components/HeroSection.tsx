@@ -13,6 +13,7 @@ import photo1200Webp from "@/images/my-photo-1200.webp";
 import photo800Jpg from "@/images/my-photo-800.jpg";
 import photo1200Jpg from "@/images/my-photo-1200.jpg";
 import { HeroBackground3D } from "./HeroBackground3D";
+import { MobileGradientBackground } from "./MobileGradientBackground";
 import { scrollToSection } from "@/components/SmoothScroll";
 
 const socialLinks = [
@@ -98,6 +99,7 @@ export const HeroSection = () => {
     >
       {/* 3D Background */}
       <HeroBackground3D />
+      <MobileGradientBackground variant="hero" />
       
       {/* Layered gradient overlays */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background/60 to-background pointer-events-none z-[1]" />

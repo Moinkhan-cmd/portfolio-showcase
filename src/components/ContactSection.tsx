@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import emailjs from "@emailjs/browser";
 import { ContactBackground3D } from "./ContactBackground3D";
+import { MobileGradientBackground } from "./MobileGradientBackground";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const socialLinks = [
@@ -125,6 +126,7 @@ export const ContactSection = () => {
       className="section-padding relative overflow-hidden"
     >
       <ContactBackground3D />
+      <MobileGradientBackground variant="contact" />
       
       {/* Overlay for text contrast */}
       <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/65 to-background/50 pointer-events-none z-10" />
