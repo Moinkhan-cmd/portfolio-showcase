@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { playNavigationSound, playHoverSound, initSoundSystem } from "@/lib/sounds";
 
@@ -17,7 +17,9 @@ export const SectionProgressIndicator = () => {
   const [viewedSections, setViewedSections] = useState<Set<string>>(new Set(["hero"]));
   const [activeSection, setActiveSection] = useState("hero");
   const [isVisible, setIsVisible] = useState(false);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
+  // Show/hide based on scroll position
   useEffect(() => {
     const handleScroll = () => {
       setIsVisible(window.scrollY > 300);
@@ -28,33 +30,59 @@ export const SectionProgressIndicator = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Observe sections for active tracking
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const sectionId = entry.target.id || "hero";
-            setActiveSection(sectionId);
-            setViewedSections((prev) => new Set([...prev, sectionId]));
+    // Small delay to ensure DOM is ready (especially for lazy-loaded sections)
+    const timeoutId = setTimeout(() => {
+      observerRef.current = new IntersectionObserver(
+        (entries) => {
+          // Find the most visible section
+          let maxRatio = 0;
+          let mostVisibleSection = activeSection;
+          
+          entries.forEach((entry) => {
+            if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
+              maxRatio = entry.intersectionRatio;
+              mostVisibleSection = entry.target.id || "hero";
+            }
+          });
+          
+          if (maxRatio > 0) {
+            setActiveSection(mostVisibleSection);
+            setViewedSections((prev) => new Set([...prev, mostVisibleSection]));
           }
-        });
-      },
-      { rootMargin: "-40% 0px -40% 0px", threshold: 0.1 }
-    );
+        },
+        { 
+          rootMargin: "-20% 0px -20% 0px", 
+          threshold: [0, 0.1, 0.25, 0.5, 0.75, 1] 
+        }
+      );
 
-    // Observe hero section (main element or first section)
-    const heroElement = document.querySelector("main > div.relative > section:first-of-type") || 
-                        document.getElementById("hero");
-    if (heroElement) {
-      observer.observe(heroElement);
-    }
+      // Observe all sections by ID
+      SECTIONS.forEach(({ id }) => {
+        const element = document.getElementById(id);
+        if (element && observerRef.current) {
+          observerRef.current.observe(element);
+        }
+      });
+    }, 500);
 
-    SECTIONS.slice(1).forEach(({ id }) => {
-      const element = document.getElementById(id);
-      if (element) observer.observe(element);
-    });
+    return () => {
+      clearTimeout(timeoutId);
+      observerRef.current?.disconnect();
+    };
+  }, []);
 
-    return () => observer.disconnect();
+  // Also track scroll position for hero section (when at top)
+  useEffect(() => {
+    const handleScrollForHero = () => {
+      if (window.scrollY < 200) {
+        setActiveSection("hero");
+      }
+    };
+
+    window.addEventListener("scroll", handleScrollForHero, { passive: true });
+    return () => window.removeEventListener("scroll", handleScrollForHero);
   }, []);
 
   const scrollToSection = (sectionId: string) => {
@@ -99,7 +127,7 @@ export const SectionProgressIndicator = () => {
         style={{ height: "100%" }}
       />
 
-      {SECTIONS.map(({ id, name }, index) => {
+      {SECTIONS.map(({ id, name }) => {
         const isViewed = viewedSections.has(id);
         const isActive = activeSection === id;
 
