@@ -64,7 +64,7 @@ export const ScrollReveal = ({
   const isInView = useInView(ref, { once, amount: threshold });
 
   const reduceMotion = useReducedMotion();
-  const isScrolling = useScrollPause(200);
+  const isScrolling = useScrollPause(100);
   const isCoarsePointer = useMemo(() => {
     if (typeof window === "undefined") return false;
     return window.matchMedia?.("(pointer: coarse)")?.matches ?? false;
@@ -132,7 +132,7 @@ export const StaggerReveal = ({
   const isInView = useInView(ref, { once, amount: 0.2 });
 
   const reduceMotion = useReducedMotion();
-  const isScrolling = useScrollPause(200);
+  const isScrolling = useScrollPause(100);
   const isCoarsePointer = useMemo(() => {
     if (typeof window === "undefined") return false;
     return window.matchMedia?.("(pointer: coarse)")?.matches ?? false;

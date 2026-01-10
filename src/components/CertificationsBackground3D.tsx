@@ -132,7 +132,7 @@ CertificationsScene.displayName = "CertificationsScene";
 export const CertificationsBackground3D = () => {
   const [isVisible, setIsVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const isScrolling = useScrollPause(200);
+  const isScrolling = useScrollPause(100);
   const { shouldRender3D, isMobile } = use3DPerformance();
 
   useEffect(() => {

@@ -165,7 +165,7 @@ SkillsScene.displayName = "SkillsScene";
 
 export const SkillsBackground3D = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const isScrolling = useScrollPause(200);
+  const isScrolling = useScrollPause(100);
   const [isVisible, setIsVisible] = useState(false);
   const { shouldRender3D, isMobile } = use3DPerformance();
 

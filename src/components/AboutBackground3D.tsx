@@ -46,7 +46,7 @@ AboutScene.displayName = "AboutScene";
 export const AboutBackground3D = () => {
   const [isVisible, setIsVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const isScrolling = useScrollPause(200);
+  const isScrolling = useScrollPause(100);
   const { shouldRender3D, isMobile } = use3DPerformance();
 
   useEffect(() => {
@@ -86,7 +86,7 @@ export const AboutBackground3D = () => {
         <Canvas
           dpr={[1, 1]}
           performance={{ min: 0.3, max: 0.6 }}
-          frameloop={isScrolling ? "never" : "always"}
+          frameloop={isVisible && !isScrolling ? "always" : "never"}
           gl={{ 
             antialias: false,
             alpha: true,

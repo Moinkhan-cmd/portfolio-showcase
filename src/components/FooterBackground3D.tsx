@@ -139,7 +139,7 @@ const HeartElements = () => {
 export const FooterBackground3D = () => {
   const [isVisible, setIsVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const isScrolling = useScrollPause(200);
+  const isScrolling = useScrollPause(100);
 
   useEffect(() => {
     const observer = new IntersectionObserver(

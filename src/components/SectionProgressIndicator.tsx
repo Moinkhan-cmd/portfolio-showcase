@@ -32,33 +32,23 @@ export const SectionProgressIndicator = () => {
 
   // Observe sections for active tracking
   useEffect(() => {
-    // Small delay to ensure DOM is ready (especially for lazy-loaded sections)
     const timeoutId = setTimeout(() => {
       observerRef.current = new IntersectionObserver(
         (entries) => {
-          // Find the most visible section
-          let maxRatio = 0;
-          let mostVisibleSection = activeSection;
-          
           entries.forEach((entry) => {
-            if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
-              maxRatio = entry.intersectionRatio;
-              mostVisibleSection = entry.target.id || "hero";
+            if (entry.isIntersecting) {
+              const sectionId = entry.target.id;
+              setActiveSection(sectionId);
+              setViewedSections((prev) => new Set([...prev, sectionId]));
             }
           });
-          
-          if (maxRatio > 0) {
-            setActiveSection(mostVisibleSection);
-            setViewedSections((prev) => new Set([...prev, mostVisibleSection]));
-          }
         },
         { 
-          rootMargin: "-20% 0px -20% 0px", 
-          threshold: [0, 0.1, 0.25, 0.5, 0.75, 1] 
+          rootMargin: "-30% 0px -30% 0px", 
+          threshold: 0.1
         }
       );
 
-      // Observe all sections by ID
       SECTIONS.forEach(({ id }) => {
         const element = document.getElementById(id);
         if (element && observerRef.current) {
