@@ -39,16 +39,23 @@ const Footer = lazy(async () => {
   return { default: mod.Footer };
 });
 
+const VISITED_KEY = "portfolio_visited";
+
 const Index = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [loadProgress, setLoadProgress] = useState(0);
+  // Check if returning visitor - skip loader
+  const isReturningVisitor = typeof window !== "undefined" && localStorage.getItem(VISITED_KEY) === "true";
+  
+  const [isLoading, setIsLoading] = useState(!isReturningVisitor);
+  const [loadProgress, setLoadProgress] = useState(isReturningVisitor ? 100 : 0);
   const [navigatingSection, setNavigatingSection] = useState<string | null>(null);
   const { showHint, setShowHint } = useKeyboardNavigation();
 
-  // Simulate loading progress
+  // Loading logic - only for first-time visitors
   useEffect(() => {
+    if (isReturningVisitor) return;
+    
     const startTime = Date.now();
-    const minLoadTime = 1500; // Minimum 1.5s to show loader
+    const minLoadTime = 1500;
     
     const progressInterval = setInterval(() => {
       setLoadProgress((prev) => {
@@ -57,38 +64,28 @@ const Index = () => {
       });
     }, 100);
 
-    // Wait for DOM to be ready and minimum time
-    const checkReady = () => {
-      const elapsed = Date.now() - startTime;
-      
-      if (document.readyState === "complete" && elapsed >= minLoadTime) {
-        setLoadProgress(100);
-        setTimeout(() => setIsLoading(false), 300);
-        clearInterval(progressInterval);
-      } else {
-        requestAnimationFrame(checkReady);
-      }
+    const finishLoading = () => {
+      setLoadProgress(100);
+      setTimeout(() => {
+        setIsLoading(false);
+        // Mark as visited for next time
+        localStorage.setItem(VISITED_KEY, "true");
+      }, 300);
+      clearInterval(progressInterval);
     };
 
     if (document.readyState === "complete") {
-      setTimeout(() => {
-        setLoadProgress(100);
-        setTimeout(() => setIsLoading(false), 300);
-      }, minLoadTime);
+      setTimeout(finishLoading, minLoadTime);
     } else {
       window.addEventListener("load", () => {
         const elapsed = Date.now() - startTime;
         const remaining = Math.max(0, minLoadTime - elapsed);
-        setTimeout(() => {
-          setLoadProgress(100);
-          setTimeout(() => setIsLoading(false), 300);
-        }, remaining);
+        setTimeout(finishLoading, remaining);
       });
-      checkReady();
     }
 
     return () => clearInterval(progressInterval);
-  }, []);
+  }, [isReturningVisitor]);
 
   useEffect(() => {
     const handleSectionNavigate = (e: CustomEvent<{ sectionId: string }>) => {
