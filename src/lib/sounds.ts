@@ -4,6 +4,19 @@
 let audioContext: AudioContext | null = null;
 let soundEnabled = true;
 
+// Event emitter for visualizer
+type SoundEventCallback = (type: 'navigation' | 'transition' | 'success' | 'hover', intensity: number) => void;
+const listeners: Set<SoundEventCallback> = new Set();
+
+export const onSoundPlay = (callback: SoundEventCallback) => {
+  listeners.add(callback);
+  return () => listeners.delete(callback);
+};
+
+const emitSoundEvent = (type: 'navigation' | 'transition' | 'success' | 'hover', intensity: number) => {
+  listeners.forEach(callback => callback(type, intensity));
+};
+
 const getAudioContext = (): AudioContext | null => {
   if (typeof window === "undefined") return null;
   
@@ -35,6 +48,9 @@ export const isSoundEnabled = () => soundEnabled;
 export const playNavigationSound = () => {
   if (!soundEnabled) return;
   
+  // Emit event for visualizer even before playing
+  emitSoundEvent('navigation', 0.6);
+  
   const ctx = getAudioContext();
   if (!ctx) return;
 
@@ -64,6 +80,9 @@ export const playNavigationSound = () => {
 // Gentle whoosh for section transitions
 export const playSectionTransitionSound = () => {
   if (!soundEnabled) return;
+  
+  // Emit event for visualizer
+  emitSoundEvent('transition', 0.8);
   
   const ctx = getAudioContext();
   if (!ctx) return;
@@ -106,6 +125,9 @@ export const playSectionTransitionSound = () => {
 export const playSuccessSound = () => {
   if (!soundEnabled) return;
   
+  // Emit event for visualizer
+  emitSoundEvent('success', 1.0);
+  
   const ctx = getAudioContext();
   if (!ctx) return;
 
@@ -134,6 +156,9 @@ export const playSuccessSound = () => {
 // Hover sound (very subtle)
 export const playHoverSound = () => {
   if (!soundEnabled) return;
+  
+  // Emit event for visualizer
+  emitSoundEvent('hover', 0.3);
   
   const ctx = getAudioContext();
   if (!ctx) return;
