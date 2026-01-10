@@ -127,6 +127,13 @@ export const useKeyboardNavigation = () => {
         if (newValue) {
           setTimeout(() => playSuccessSound(), 50);
         }
+        return;
+      }
+
+      // Toggle performance mode with P
+      if (e.key === "p" || e.key === "P") {
+        e.preventDefault();
+        window.dispatchEvent(new CustomEvent("togglePerformanceMode"));
       }
     };
 

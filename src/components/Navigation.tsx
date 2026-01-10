@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { Menu, X, ArrowUpRight } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { SoundToggle } from '@/components/SoundToggle';
+import { PerformanceToggle } from '@/components/PerformanceToggle';
 import { AudioVisualizer } from '@/components/AudioVisualizer';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -290,6 +291,7 @@ export const Navigation = () => {
             <div className="shrink-0 hidden sm:flex items-center gap-1">
               <AudioVisualizer />
               <SoundToggle />
+              <PerformanceToggle />
             </div>
             <div className="shrink-0"><ThemeToggle /></div>
             <Button
