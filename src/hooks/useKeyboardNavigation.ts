@@ -1,6 +1,7 @@
 import { useEffect, useCallback, useState } from "react";
 import { scrollToSection } from "@/components/SmoothScroll";
 import { playNavigationSound, initSoundSystem, isSoundEnabled, setSoundEnabled, playSuccessSound } from "@/lib/sounds";
+import { toast } from "@/hooks/use-toast";
 
 const SECTIONS = [
   { id: "hero", key: "0" },
@@ -115,6 +116,14 @@ export const useKeyboardNavigation = () => {
         localStorage.setItem("soundEnabled", String(newValue));
         // Dispatch custom event so SoundToggle can update its state
         window.dispatchEvent(new CustomEvent("soundToggled", { detail: { enabled: newValue } }));
+        
+        // Show toast notification
+        toast({
+          title: newValue ? "🔊 Sound enabled" : "🔇 Sound muted",
+          description: newValue ? "Navigation sounds are now on" : "Navigation sounds are now off",
+          duration: 2000,
+        });
+        
         if (newValue) {
           setTimeout(() => playSuccessSound(), 50);
         }
