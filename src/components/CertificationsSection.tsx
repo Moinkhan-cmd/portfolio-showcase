@@ -983,7 +983,7 @@ export const CertificationsSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const { data: certifications = [], isLoading } = useCertifications();
 
-  const clearSelectedCertTimeoutRef = useRef<ReturnType<typeof window.setTimeout> | null>(null);
+  const clearSelectedCertTimeoutRef = useRef<number | null>(null);
 
   // Filter and sort state
   const [searchQuery, setSearchQuery] = useState("");

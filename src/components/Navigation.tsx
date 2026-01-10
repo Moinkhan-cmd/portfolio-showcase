@@ -89,7 +89,7 @@ const MobileMenu = ({ isOpen, onClose, activeSection, scrollToSection }: MobileM
 
   const transition = shouldReduceMotion
     ? { duration: 0 }
-    : { type: 'spring', stiffness: 420, damping: 42 };
+    : { type: 'spring' as const, stiffness: 420, damping: 42 };
 
   const backdropTransition = shouldReduceMotion ? { duration: 0 } : { duration: 0.25 };
 
