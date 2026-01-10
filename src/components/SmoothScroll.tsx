@@ -1,9 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import Lenis from "lenis";
 
-const easingFunctions = {
-  smooth: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-};
+// Simpler, faster easing
+const easeOutQuart = (t: number) => 1 - Math.pow(1 - t, 4);
 
 let lenisInstance: Lenis | null = null;
 
@@ -11,30 +10,32 @@ const shouldEnableLenis = () => {
   if (typeof window === "undefined") return false;
   if (window.location.pathname.startsWith("/admin")) return false;
   if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return false;
-  // On touch / coarse pointer devices, Lenis can introduce noticeable input latency.
-  if (window.matchMedia?.("(pointer: coarse)").matches) return false;
+  // Disable on touch devices for native scrolling (much smoother)
+  if ("ontouchstart" in window || navigator.maxTouchPoints > 0) return false;
   return true;
 };
 
 export const SmoothScroll = () => {
   const rafIdRef = useRef<number | null>(null);
+  const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
     if (!shouldEnableLenis()) return;
 
     const lenis = new Lenis({
-      duration: 1.1,
-      easing: easingFunctions.smooth,
+      duration: 0.8, // Shorter duration for snappier feel
+      easing: easeOutQuart,
       orientation: "vertical",
       gestureOrientation: "vertical",
       smoothWheel: true,
-      wheelMultiplier: 1,
-      touchMultiplier: 1.5,
+      wheelMultiplier: 0.8, // Slightly reduced for smoother feel
+      touchMultiplier: 1,
       infinite: false,
-      lerp: 0.08,
+      autoResize: true,
     });
 
     lenisInstance = lenis;
+    lenisRef.current = lenis;
 
     const raf = (time: number) => {
       lenis.raf(time);
@@ -43,9 +44,9 @@ export const SmoothScroll = () => {
 
     rafIdRef.current = requestAnimationFrame(raf);
 
-    const handleAnchorClickCapture = (e: MouseEvent) => {
+    const handleAnchorClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement | null;
-      const anchor = (target?.closest?.("a") as HTMLAnchorElement | null) ?? null;
+      const anchor = target?.closest?.("a") as HTMLAnchorElement | null;
       if (!anchor) return;
 
       const href = anchor.getAttribute("href");
@@ -55,23 +56,22 @@ export const SmoothScroll = () => {
       if (!element) return;
 
       e.preventDefault();
-
       const offset = 80;
       const top = element.getBoundingClientRect().top + window.scrollY - offset;
-
-      lenis.scrollTo(top, { duration: 1.3, easing: easingFunctions.smooth });
+      lenis.scrollTo(top, { duration: 0.8, easing: easeOutQuart });
     };
 
-    document.addEventListener("click", handleAnchorClickCapture, true);
+    document.addEventListener("click", handleAnchorClick, { passive: false, capture: true });
 
-    // Ensure we start at top for the portfolio page
+    // Start at top
     lenis.scrollTo(0, { immediate: true });
 
     return () => {
-      document.removeEventListener("click", handleAnchorClickCapture, true);
+      document.removeEventListener("click", handleAnchorClick, true);
       if (rafIdRef.current != null) cancelAnimationFrame(rafIdRef.current);
       lenis.destroy();
       lenisInstance = null;
+      lenisRef.current = null;
     };
   }, []);
 
@@ -86,15 +86,15 @@ export const scrollToSection = (selector: string, offset: number = 80) => {
   const top = element.getBoundingClientRect().top + window.scrollY - offset;
 
   if (lenisInstance) {
-    lenisInstance.scrollTo(top, { duration: 1.3, easing: easingFunctions.smooth });
+    lenisInstance.scrollTo(top, { duration: 0.8, easing: easeOutQuart });
   } else {
     window.scrollTo({ top, behavior: "smooth" });
   }
 };
 
-export const scrollToTop = (duration: number = 1.2) => {
+export const scrollToTop = (duration: number = 0.8) => {
   if (lenisInstance) {
-    lenisInstance.scrollTo(0, { duration, easing: easingFunctions.smooth });
+    lenisInstance.scrollTo(0, { duration, easing: easeOutQuart });
   } else {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
