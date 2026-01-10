@@ -11,6 +11,8 @@ const shouldEnableLenis = () => {
   if (typeof window === "undefined") return false;
   if (window.location.pathname.startsWith("/admin")) return false;
   if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return false;
+  // On touch / coarse pointer devices, Lenis can introduce noticeable input latency.
+  if (window.matchMedia?.("(pointer: coarse)").matches) return false;
   return true;
 };
 

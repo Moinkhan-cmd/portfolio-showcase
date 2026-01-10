@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { lazy, Suspense } from "react";
 import { ScrollProgress } from "@/components/ScrollProgress";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { ThemeProvider } from "next-themes";
@@ -10,17 +11,43 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { AnalyticsTracker } from "@/components/AnalyticsTracker";
-import { AdminLogin } from "@/pages/admin/Login";
-import { AdminDashboard } from "@/pages/admin/Dashboard";
-import { AdminAnalytics } from "@/pages/admin/Analytics";
-import { AdminProjects } from "@/pages/admin/Projects";
-import { AdminCertifications } from "@/pages/admin/Certifications";
-import { AdminExperience } from "@/pages/admin/Experience";
-import { AdminSkills } from "@/pages/admin/Skills";
-import { AdminPersonalDetails } from "@/pages/admin/PersonalDetails";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
+
+const Index = lazy(() => import("./pages/Index"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+
+const AdminLogin = lazy(async () => {
+  const mod = await import("@/pages/admin/Login");
+  return { default: mod.AdminLogin };
+});
+const AdminDashboard = lazy(async () => {
+  const mod = await import("@/pages/admin/Dashboard");
+  return { default: mod.AdminDashboard };
+});
+const AdminAnalytics = lazy(async () => {
+  const mod = await import("@/pages/admin/Analytics");
+  return { default: mod.AdminAnalytics };
+});
+const AdminProjects = lazy(async () => {
+  const mod = await import("@/pages/admin/Projects");
+  return { default: mod.AdminProjects };
+});
+const AdminCertifications = lazy(async () => {
+  const mod = await import("@/pages/admin/Certifications");
+  return { default: mod.AdminCertifications };
+});
+const AdminExperience = lazy(async () => {
+  const mod = await import("@/pages/admin/Experience");
+  return { default: mod.AdminExperience };
+});
+const AdminSkills = lazy(async () => {
+  const mod = await import("@/pages/admin/Skills");
+  return { default: mod.AdminSkills };
+});
+const AdminPersonalDetails = lazy(async () => {
+  const mod = await import("@/pages/admin/PersonalDetails");
+  return { default: mod.AdminPersonalDetails };
+});
 
 const queryClient = new QueryClient();
 
@@ -43,27 +70,29 @@ const App = () => (
               } as any}
             >
               <AnalyticsTracker />
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/admin/login" element={<AdminLogin />} />
-                <Route
-                  path="/admin"
-                  element={
-                    <ProtectedRoute>
-                      <AdminLayout />
-                    </ProtectedRoute>
-                  }
-                >
-                  <Route index element={<AdminDashboard />} />
-                  <Route path="personal-details" element={<AdminPersonalDetails />} />
-                  <Route path="analytics" element={<AdminAnalytics />} />
-                  <Route path="projects" element={<AdminProjects />} />
-                  <Route path="certifications" element={<AdminCertifications />} />
-                  <Route path="experience" element={<AdminExperience />} />
-                  <Route path="skills" element={<AdminSkills />} />
-                </Route>
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+              <Suspense fallback={null}>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/admin/login" element={<AdminLogin />} />
+                  <Route
+                    path="/admin"
+                    element={
+                      <ProtectedRoute>
+                        <AdminLayout />
+                      </ProtectedRoute>
+                    }
+                  >
+                    <Route index element={<AdminDashboard />} />
+                    <Route path="personal-details" element={<AdminPersonalDetails />} />
+                    <Route path="analytics" element={<AdminAnalytics />} />
+                    <Route path="projects" element={<AdminProjects />} />
+                    <Route path="certifications" element={<AdminCertifications />} />
+                    <Route path="experience" element={<AdminExperience />} />
+                    <Route path="skills" element={<AdminSkills />} />
+                  </Route>
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
             </BrowserRouter>
           </AuthProvider>
         </TooltipProvider>

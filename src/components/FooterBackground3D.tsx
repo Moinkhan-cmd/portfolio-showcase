@@ -137,7 +137,7 @@ const HeartElements = () => {
 };
 
 export const FooterBackground3D = () => {
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const isScrolling = useScrollPause(200);
 
@@ -146,12 +146,11 @@ export const FooterBackground3D = () => {
       ([entry]) => {
         setIsVisible(entry.isIntersecting);
       },
-      { threshold: 0.1, rootMargin: '50px' }
+      { threshold: 0.01, rootMargin: '200px' }
     );
 
     if (containerRef.current) {
       observer.observe(containerRef.current);
-      setIsVisible(true);
     }
 
     return () => observer.disconnect();

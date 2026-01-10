@@ -248,13 +248,13 @@ export const SkillsBackground3D = () => {
     >
       {isVisible && (
         <Canvas
-          dpr={[1, 1.5]}
-          performance={{ min: 0.5, max: 1 }}
+          dpr={[1, 1]}
+          performance={{ min: 0.3, max: 0.8 }}
           frameloop={isVisible && !isScrolling ? "always" : "never"}
           gl={{ 
-            antialias: true,
+            antialias: false,
             alpha: true,
-            powerPreference: "high-performance"
+            powerPreference: "low-power"
           }}
           style={{ opacity: 0.4 }}
         >

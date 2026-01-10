@@ -6,9 +6,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { motion, useMotionValue, useSpring, useTransform, useInView, AnimatePresence } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform, useInView, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
-import myPhoto from "@/images/my photo.jpg";
+import photo800Webp from "@/images/my-photo-800.webp";
+import photo1200Webp from "@/images/my-photo-1200.webp";
+import photo800Jpg from "@/images/my-photo-800.jpg";
+import photo1200Jpg from "@/images/my-photo-1200.jpg";
 import { HeroBackground3D } from "./HeroBackground3D";
 import { scrollToSection } from "@/components/SmoothScroll";
 
@@ -24,7 +27,10 @@ export const HeroSection = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [currentRole, setCurrentRole] = useState(0);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const reduceMotion = useReducedMotion();
+  const [cursorGlowEnabled, setCursorGlowEnabled] = useState(false);
+  const cursorRafRef = useRef<number | null>(null);
+  const cursorPendingRef = useRef<{ x: number; y: number }>({ x: -1000, y: -1000 });
   
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -33,12 +39,45 @@ export const HeroSection = () => {
   const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-8, 8]), springConfig);
   const isInView = useInView(contentRef, { once: true, amount: 0.2 });
 
+  const cursorX = useMotionValue(-1000);
+  const cursorY = useMotionValue(-1000);
+  const cursorXSpring = useSpring(cursorX, { damping: 35, stiffness: 240 });
+  const cursorYSpring = useSpring(cursorY, { damping: 35, stiffness: 240 });
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentRole((prev) => (prev + 1) % roles.length);
     }, 3000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (reduceMotion) {
+      setCursorGlowEnabled(false);
+      return;
+    }
+
+    const coarsePointer = window.matchMedia?.("(pointer: coarse)")?.matches ?? false;
+    setCursorGlowEnabled(!coarsePointer);
+
+    return () => {
+      if (cursorRafRef.current != null) cancelAnimationFrame(cursorRafRef.current);
+      cursorRafRef.current = null;
+    };
+  }, [reduceMotion]);
+
+  const scheduleCursorUpdate = (clientX: number, clientY: number) => {
+    cursorPendingRef.current = { x: clientX, y: clientY };
+    if (cursorRafRef.current != null) return;
+
+    cursorRafRef.current = requestAnimationFrame(() => {
+      cursorRafRef.current = null;
+      const { x, y } = cursorPendingRef.current;
+      // Center a 500x500 glow on the pointer
+      cursorX.set(x - 250);
+      cursorY.set(y - 250);
+    });
+  };
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!containerRef.current) return;
@@ -47,7 +86,7 @@ export const HeroSection = () => {
     const y = (e.clientY - rect.top) / rect.height - 0.5;
     mouseX.set(x);
     mouseY.set(y);
-    setMousePos({ x: e.clientX, y: e.clientY });
+    if (cursorGlowEnabled) scheduleCursorUpdate(e.clientX, e.clientY);
   };
 
   return (
@@ -81,14 +120,16 @@ export const HeroSection = () => {
       </div>
 
       {/* Interactive cursor glow */}
-      <motion.div
-        className="pointer-events-none fixed w-[500px] h-[500px] rounded-full opacity-10 blur-3xl z-30 transition-opacity duration-500"
-        style={{
-          background: "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)",
-          left: mousePos.x - 200,
-          top: mousePos.y - 200,
-        }}
-      />
+      {cursorGlowEnabled && (
+        <motion.div
+          className="pointer-events-none fixed left-0 top-0 w-[500px] h-[500px] rounded-full opacity-10 blur-3xl z-30 transition-opacity duration-500"
+          style={{
+            background: "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)",
+            x: cursorXSpring,
+            y: cursorYSpring,
+          }}
+        />
+      )}
 
       {/* Main Content Container - Enhanced Responsive */}
       <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 py-8 sm:py-12 md:py-16 lg:py-20 pb-20 sm:pb-24 md:pb-28 lg:pb-20">
@@ -340,7 +381,7 @@ export const HeroSection = () => {
             initial={{ opacity: 0, scale: 0.8, x: 50 }}
             animate={isInView ? { opacity: 1, scale: 1, x: 0 } : {}}
             transition={{ duration: 1, delay: 0.3 }}
-            className="relative flex items-center justify-center lg:justify-end pt-8 lg:pt-0"
+            className="relative flex items-center justify-center pt-8 lg:pt-0"
           >
             <motion.div
               className="relative"
@@ -369,7 +410,7 @@ export const HeroSection = () => {
               </motion.div>
 
               {/* Main image container - Enhanced - Responsive */}
-              <div className="relative w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-[420px] lg:h-[420px] xl:w-[480px] xl:h-[480px] mx-auto lg:mx-0">
+              <div className="relative w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-[420px] lg:h-[420px] xl:w-[480px] xl:h-[480px] mx-auto">
                 {/* Enhanced gradient glow */}
                 <motion.div
                   className="absolute inset-0 rounded-3xl blur-3xl opacity-30"
@@ -391,12 +432,23 @@ export const HeroSection = () => {
                     <div className="w-full h-full rounded-[21px] bg-background" />
                   </motion.div>
 
-                  <img
-                    src={myPhoto}
-                    alt="Moinkhan Bhatti"
-                    className="absolute inset-[4px] w-[calc(100%-8px)] h-[calc(100%-8px)] object-cover rounded-[19px]"
-                    style={{ objectPosition: "center 10%" }}
-                  />
+                  <picture>
+                    <source
+                      type="image/webp"
+                      srcSet={`${photo800Webp} 800w, ${photo1200Webp} 1200w`}
+                      sizes="(min-width: 1024px) 480px, (min-width: 768px) 320px, 288px"
+                    />
+                    <img
+                      src={photo1200Jpg}
+                      srcSet={`${photo800Jpg} 800w, ${photo1200Jpg} 1200w`}
+                      sizes="(min-width: 1024px) 480px, (min-width: 768px) 320px, 288px"
+                      alt="Moinkhan Bhatti"
+                      decoding="async"
+                      fetchPriority="high"
+                      className="absolute inset-[4px] w-[calc(100%-8px)] h-[calc(100%-8px)] object-cover rounded-[19px]"
+                      style={{ objectPosition: "center 10%" }}
+                    />
+                  </picture>
 
                   {/* Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent rounded-3xl" />

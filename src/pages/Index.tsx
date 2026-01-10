@@ -1,14 +1,37 @@
 import { Navigation } from "@/components/Navigation";
 import { HeroSection } from "@/components/HeroSection";
-import { AboutSection } from "@/components/AboutSection";
-import { SkillsSection } from "@/components/SkillsSection";
-import { ProjectsSection } from "@/components/ProjectsSection";
-import { ExperienceSection } from "@/components/ExperienceSection";
-import { CertificationsSection } from "@/components/CertificationsSection";
-import { ContactSection } from "@/components/ContactSection";
-import { Footer } from "@/components/Footer";
 import { SectionDivider } from "@/components/SectionDivider";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import { lazy, Suspense } from "react";
+
+const AboutSection = lazy(async () => {
+  const mod = await import("@/components/AboutSection");
+  return { default: mod.AboutSection };
+});
+const SkillsSection = lazy(async () => {
+  const mod = await import("@/components/SkillsSection");
+  return { default: mod.SkillsSection };
+});
+const ProjectsSection = lazy(async () => {
+  const mod = await import("@/components/ProjectsSection");
+  return { default: mod.ProjectsSection };
+});
+const ExperienceSection = lazy(async () => {
+  const mod = await import("@/components/ExperienceSection");
+  return { default: mod.ExperienceSection };
+});
+const CertificationsSection = lazy(async () => {
+  const mod = await import("@/components/CertificationsSection");
+  return { default: mod.CertificationsSection };
+});
+const ContactSection = lazy(async () => {
+  const mod = await import("@/components/ContactSection");
+  return { default: mod.ContactSection };
+});
+const Footer = lazy(async () => {
+  const mod = await import("@/components/Footer");
+  return { default: mod.Footer };
+});
 
 const Index = () => {
   return (
@@ -27,37 +50,51 @@ const Index = () => {
 
         <SectionDivider />
         <ScrollReveal variant="fadeUp" delay={0.1}>
-          <AboutSection />
+          <Suspense fallback={null}>
+            <AboutSection />
+          </Suspense>
         </ScrollReveal>
 
         <SectionDivider />
         <ScrollReveal variant="fadeUp" delay={0.1}>
-          <SkillsSection />
+          <Suspense fallback={null}>
+            <SkillsSection />
+          </Suspense>
         </ScrollReveal>
 
         <SectionDivider />
         <ScrollReveal variant="fadeUp" delay={0.1}>
-          <ProjectsSection />
+          <Suspense fallback={null}>
+            <ProjectsSection />
+          </Suspense>
         </ScrollReveal>
 
         <SectionDivider />
         <ScrollReveal variant="fadeUp" delay={0.1}>
-          <ExperienceSection />
+          <Suspense fallback={null}>
+            <ExperienceSection />
+          </Suspense>
         </ScrollReveal>
 
         <SectionDivider />
         <ScrollReveal variant="fadeUp" delay={0.1}>
-          <CertificationsSection />
+          <Suspense fallback={null}>
+            <CertificationsSection />
+          </Suspense>
         </ScrollReveal>
 
         <SectionDivider />
         <ScrollReveal variant="fadeUp" delay={0.1}>
-          <ContactSection />
+          <Suspense fallback={null}>
+            <ContactSection />
+          </Suspense>
         </ScrollReveal>
 
         <SectionDivider />
         <ScrollReveal variant="fadeUp" delay={0.1}>
-          <Footer />
+          <Suspense fallback={null}>
+            <Footer />
+          </Suspense>
         </ScrollReveal>
       </div>
     </main>

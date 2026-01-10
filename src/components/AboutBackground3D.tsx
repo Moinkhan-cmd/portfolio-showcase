@@ -7,7 +7,7 @@ import { GeometricShapes } from "./GeometricShapes";
 import { useScrollPause } from "@/hooks/useScrollPause";
 
 export const AboutBackground3D = () => {
-  const [isVisible, setIsVisible] = useState(true); // Start as true to show immediately
+  const [isVisible, setIsVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const isScrolling = useScrollPause(200);
 
@@ -16,13 +16,12 @@ export const AboutBackground3D = () => {
       ([entry]) => {
         setIsVisible(entry.isIntersecting);
       },
-      { threshold: 0.1, rootMargin: '50px' } // Only render when actually visible
+      // Preload a bit before it scrolls into view, but don't render offscreen.
+      { threshold: 0.01, rootMargin: '200px' }
     );
 
     if (containerRef.current) {
       observer.observe(containerRef.current);
-      // Set visible immediately
-      setIsVisible(true);
     }
 
     return () => observer.disconnect();
