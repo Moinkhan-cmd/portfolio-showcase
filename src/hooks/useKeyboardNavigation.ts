@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useState } from "react";
 import { scrollToSection } from "@/components/SmoothScroll";
-import { playNavigationSound, initSoundSystem } from "@/lib/sounds";
+import { playNavigationSound, initSoundSystem, isSoundEnabled, setSoundEnabled, playSuccessSound } from "@/lib/sounds";
 
 const SECTIONS = [
   { id: "hero", key: "0" },
@@ -104,6 +104,20 @@ export const useKeyboardNavigation = () => {
       if (e.key === "?") {
         e.preventDefault();
         setShowHint((prev) => !prev);
+        return;
+      }
+
+      // Toggle sound with M
+      if (e.key === "m" || e.key === "M") {
+        e.preventDefault();
+        const newValue = !isSoundEnabled();
+        setSoundEnabled(newValue);
+        localStorage.setItem("soundEnabled", String(newValue));
+        // Dispatch custom event so SoundToggle can update its state
+        window.dispatchEvent(new CustomEvent("soundToggled", { detail: { enabled: newValue } }));
+        if (newValue) {
+          setTimeout(() => playSuccessSound(), 50);
+        }
       }
     };
 
