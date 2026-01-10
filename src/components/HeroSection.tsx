@@ -1,11 +1,5 @@
-import { ArrowDown, Download, Github, Linkedin, Mail, Sparkles, ExternalLink, Eye, ChevronDown, Code2, Zap } from "lucide-react";
+import { ArrowDown, Download, Github, Linkedin, Mail, Sparkles, ExternalLink, Code2, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { motion, useMotionValue, useSpring, useTransform, useInView, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import photo800Webp from "@/images/my-photo-800.webp";
@@ -14,6 +8,7 @@ import photo800Jpg from "@/images/my-photo-800.jpg";
 import photo1200Jpg from "@/images/my-photo-1200.jpg";
 import { HeroBackground3D } from "./HeroBackground3D";
 import { scrollToSection } from "@/components/SmoothScroll";
+import { usePersonalDetails } from "@/hooks/usePersonalDetails";
 
 const socialLinks = [
   { icon: Github, href: "https://github.com/Moinkhan-cmd", label: "GitHub", gradient: "from-[#333] to-[#6e5494]" },
@@ -28,6 +23,8 @@ export const HeroSection = () => {
   const contentRef = useRef<HTMLDivElement>(null);
   const [currentRole, setCurrentRole] = useState(0);
   const reduceMotion = useReducedMotion();
+  const { data: personalDetails } = usePersonalDetails();
+  const resumeUrl = personalDetails?.resumeUrl?.trim();
   const [cursorGlowEnabled, setCursorGlowEnabled] = useState(false);
   const cursorRafRef = useRef<number | null>(null);
   const cursorPendingRef = useRef<{ x: number; y: number }>({ x: -1000, y: -1000 });
@@ -310,37 +307,19 @@ export const HeroSection = () => {
                 </Button>
               </motion.div>
               
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="group border-2 border-border hover:border-primary/50 hover:bg-primary/5 px-8 py-6 text-base font-semibold backdrop-blur-sm"
-                    >
-                      <Download className="mr-2 h-4 w-4" />
-                      Resume
-                      <ChevronDown className="ml-2 h-4 w-4 group-hover:rotate-180 transition-transform duration-300" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48 z-[9999]" sideOffset={8}>
-                    <DropdownMenuItem
-                      onClick={() => window.open("https://drive.google.com/file/d/1-yfml_Sur_8c10GuIscXsF1GiceZSIOX/view?usp=sharing", "_blank")}
-                      className="cursor-pointer"
-                    >
-                      <Eye className="w-4 h-4 mr-2" />
-                      View Resume
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => window.open("https://drive.google.com/uc?export=download&id=1-yfml_Sur_8c10GuIscXsF1GiceZSIOX", "_blank")}
-                      className="cursor-pointer"
-                    >
-                      <Download className="w-4 h-4 mr-2" />
-                      Download PDF
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </motion.div>
+              {resumeUrl ? (
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    onClick={() => window.open(resumeUrl, "_blank", "noopener,noreferrer")}
+                    className="group border-2 border-border hover:border-primary/50 hover:bg-primary/5 px-8 py-6 text-base font-semibold backdrop-blur-sm"
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Resume
+                  </Button>
+                </motion.div>
+              ) : null}
             </motion.div>
 
             {/* Social Links */}
