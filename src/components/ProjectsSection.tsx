@@ -3,6 +3,7 @@ import { ExternalLink, Github, Folder, Sparkles, ArrowRight, Loader2, Star, Zap,
 import { Button } from "@/components/ui/button";
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from "framer-motion";
 import { ProjectsBackground3D } from "./ProjectsBackground3D";
+import { MobileGradientBackground } from "./MobileGradientBackground";
 import { useProjects } from "@/hooks/useProjects";
 import type { Project } from "@/lib/admin/projects";
 import { Badge } from "@/components/ui/badge";
@@ -545,7 +546,7 @@ export const ProjectsSection = () => {
       className="section-padding relative overflow-hidden bg-secondary/20"
     >
       <ProjectsBackground3D />
-      
+      <MobileGradientBackground variant="projects" />
       {/* Background overlays */}
       <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/80 to-background/70 pointer-events-none z-10" />
       <div 

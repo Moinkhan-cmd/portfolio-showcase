@@ -7,6 +7,7 @@ import {
   TrendingUp, Eye, Download, Share2, Copy, Check
 } from "lucide-react";
 import { CertificationsBackground3D } from "./CertificationsBackground3D";
+import { MobileGradientBackground } from "./MobileGradientBackground";
 import { useCertifications } from "@/hooks/useCertifications";
 import type { Certification } from "@/lib/admin/certifications";
 import { Badge } from "@/components/ui/badge";
@@ -1048,7 +1049,7 @@ export const CertificationsSection = () => {
       className="section-padding relative overflow-hidden bg-gradient-to-b from-background via-secondary/10 to-background"
     >
       <CertificationsBackground3D />
-
+      <MobileGradientBackground variant="certifications" />
       {/* Enhanced Background Overlays */}
       <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/90 to-background/80 pointer-events-none z-10" />
       <div
