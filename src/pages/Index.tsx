@@ -2,6 +2,7 @@ import { Navigation } from "@/components/Navigation";
 import { HeroSection } from "@/components/HeroSection";
 import { SectionDivider } from "@/components/SectionDivider";
 import { SectionTransition } from "@/components/SectionTransition";
+import { SectionProgressIndicator } from "@/components/SectionProgressIndicator";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -81,6 +82,7 @@ const Index = () => {
 
       <div className="relative z-10">
         <Navigation />
+        <SectionProgressIndicator />
         <HeroSection />
 
         <SectionDivider />
