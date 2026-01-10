@@ -2,6 +2,8 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera, Stars } from "@react-three/drei";
 import { Suspense, useState, useEffect, useRef } from "react";
 import { useScrollPause } from "@/hooks/useScrollPause";
+import { use3DPerformance } from "@/hooks/use3DPerformance";
+import { Fade3DWrapper } from "./Fade3DWrapper";
 import * as THREE from "three";
 
 // Footer-themed celebration elements
@@ -162,7 +164,11 @@ export const FooterBackground3D = () => {
       className="w-full h-full absolute inset-0 pointer-events-none"
       style={{ willChange: 'opacity', transform: 'translateZ(0)', zIndex: 1 }}
     >
-      {isVisible && (
+      <Fade3DWrapper
+        isVisible={isVisible}
+        className="w-full h-full"
+        style={{ opacity: 0.35 }}
+      >
         <Canvas
           dpr={[1, 1]}
           performance={{ min: 0.3, max: 0.8 }}
@@ -172,7 +178,7 @@ export const FooterBackground3D = () => {
             alpha: true,
             powerPreference: "low-power"
           }}
-          style={{ opacity: 0.35 }}
+          className="w-full h-full"
         >
           <PerspectiveCamera makeDefault position={[0, 0, 12]} fov={50} />
           <Suspense fallback={null}>
@@ -192,15 +198,7 @@ export const FooterBackground3D = () => {
             <CelebrationParticles />
             <HeartElements />
             
-            <Stars 
-              radius={15} 
-              depth={5} 
-              count={50} 
-              factor={2} 
-              saturation={0.6} 
-              fade 
-              speed={0.3}
-            />
+            <Stars radius={15} depth={5} count={50} factor={2} saturation={0.6} fade speed={0.3} />
             
             <OrbitControls 
               enableZoom={false} 
@@ -211,7 +209,7 @@ export const FooterBackground3D = () => {
             />
           </Suspense>
         </Canvas>
-      )}
+      </Fade3DWrapper>
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { OrbitControls, PerspectiveCamera, Stars } from "@react-three/drei";
 import { Suspense, useState, useEffect, useRef, memo } from "react";
 import { useScrollPause } from "@/hooks/useScrollPause";
 import { use3DPerformance } from "@/hooks/use3DPerformance";
+import { Fade3DWrapper } from "./Fade3DWrapper";
 import * as THREE from "three";
 
 // Simplified award elements - reduced count
@@ -152,10 +153,6 @@ export const CertificationsBackground3D = () => {
     return () => observer.disconnect();
   }, [shouldRender3D, isMobile]);
 
-  if (!shouldRender3D || isMobile) {
-    return null;
-  }
-
   return (
     <div 
       ref={containerRef}
@@ -167,7 +164,11 @@ export const CertificationsBackground3D = () => {
         contain: 'layout style paint',
       }}
     >
-      {isVisible && (
+      <Fade3DWrapper
+        isVisible={isVisible}
+        className="w-full h-full"
+        style={{ opacity: 0.25 }}
+      >
         <Canvas
           dpr={[1, 1]}
           performance={{ min: 0.3, max: 0.6 }}
@@ -178,13 +179,13 @@ export const CertificationsBackground3D = () => {
             powerPreference: "low-power",
             stencil: false,
           }}
-          style={{ opacity: 0.25 }}
+          className="w-full h-full"
         >
           <Suspense fallback={null}>
             <CertificationsScene />
           </Suspense>
         </Canvas>
-      )}
+      </Fade3DWrapper>
     </div>
   );
 };
