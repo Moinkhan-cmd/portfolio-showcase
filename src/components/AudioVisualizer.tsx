@@ -44,8 +44,10 @@ export const AudioVisualizer = () => {
     return () => { unsubscribe(); };
   }, [triggerVisualization]);
 
-  // Animation loop for smooth decay
+  // Animation loop for smooth decay - only runs when active
   useEffect(() => {
+    if (!isActive) return;
+    
     const interval = setInterval(() => {
       setBars(prev => {
         const allSettled = prev.every(bar => bar.height < 0.15 && bar.targetHeight < 0.15);
@@ -56,7 +58,6 @@ export const AudioVisualizer = () => {
         }
         
         return prev.map(bar => {
-          // Move towards target, then decay
           const diff = bar.targetHeight - bar.height;
           const newHeight = bar.height + diff * 0.3;
           const decayedTarget = bar.targetHeight * DECAY_RATE;
@@ -67,10 +68,10 @@ export const AudioVisualizer = () => {
           };
         });
       });
-    }, 30);
+    }, 50); // Slower interval for better performance
     
     return () => clearInterval(interval);
-  }, []);
+  }, [isActive]);
 
   return (
     <AnimatePresence>
