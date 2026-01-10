@@ -1,8 +1,9 @@
 import { Navigation } from "@/components/Navigation";
 import { HeroSection } from "@/components/HeroSection";
 import { SectionDivider } from "@/components/SectionDivider";
-import { ScrollReveal } from "@/components/ScrollReveal";
-import { lazy, Suspense } from "react";
+import { SectionTransition } from "@/components/SectionTransition";
+import { lazy, Suspense, useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const AboutSection = lazy(async () => {
   const mod = await import("@/components/AboutSection");
@@ -34,6 +35,18 @@ const Footer = lazy(async () => {
 });
 
 const Index = () => {
+  const [navigatingSection, setNavigatingSection] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleSectionNavigate = (e: CustomEvent<{ sectionId: string }>) => {
+      setNavigatingSection(e.detail.sectionId);
+      setTimeout(() => setNavigatingSection(null), 800);
+    };
+
+    window.addEventListener('sectionNavigate', handleSectionNavigate as EventListener);
+    return () => window.removeEventListener('sectionNavigate', handleSectionNavigate as EventListener);
+  }, []);
+
   return (
     <main className="min-h-screen bg-background overflow-x-hidden relative">
       {/* Background elements */}
@@ -44,58 +57,80 @@ const Index = () => {
         style={{ marginLeft: "-9rem" }}
       />
 
+      {/* Navigation transition overlay */}
+      <AnimatePresence>
+        {navigatingSection && (
+          <motion.div
+            className="fixed inset-0 z-40 pointer-events-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-primary/5"
+              initial={{ scaleY: 0 }}
+              animate={{ scaleY: 1 }}
+              exit={{ scaleY: 0 }}
+              transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+              style={{ transformOrigin: "center" }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="relative z-10">
         <Navigation />
         <HeroSection />
 
         <SectionDivider />
-        <ScrollReveal variant="fadeUp" delay={0.1}>
+        <SectionTransition>
           <Suspense fallback={null}>
             <AboutSection />
           </Suspense>
-        </ScrollReveal>
+        </SectionTransition>
 
         <SectionDivider />
-        <ScrollReveal variant="fadeUp" delay={0.1}>
+        <SectionTransition>
           <Suspense fallback={null}>
             <SkillsSection />
           </Suspense>
-        </ScrollReveal>
+        </SectionTransition>
 
         <SectionDivider />
-        <ScrollReveal variant="fadeUp" delay={0.1}>
+        <SectionTransition>
           <Suspense fallback={null}>
             <ProjectsSection />
           </Suspense>
-        </ScrollReveal>
+        </SectionTransition>
 
         <SectionDivider />
-        <ScrollReveal variant="fadeUp" delay={0.1}>
+        <SectionTransition>
           <Suspense fallback={null}>
             <ExperienceSection />
           </Suspense>
-        </ScrollReveal>
+        </SectionTransition>
 
         <SectionDivider />
-        <ScrollReveal variant="fadeUp" delay={0.1}>
+        <SectionTransition>
           <Suspense fallback={null}>
             <CertificationsSection />
           </Suspense>
-        </ScrollReveal>
+        </SectionTransition>
 
         <SectionDivider />
-        <ScrollReveal variant="fadeUp" delay={0.1}>
+        <SectionTransition>
           <Suspense fallback={null}>
             <ContactSection />
           </Suspense>
-        </ScrollReveal>
+        </SectionTransition>
 
         <SectionDivider />
-        <ScrollReveal variant="fadeUp" delay={0.1}>
+        <SectionTransition>
           <Suspense fallback={null}>
             <Footer />
           </Suspense>
-        </ScrollReveal>
+        </SectionTransition>
       </div>
     </main>
   );

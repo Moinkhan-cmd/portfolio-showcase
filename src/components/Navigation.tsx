@@ -187,6 +187,13 @@ export const Navigation = () => {
   }, []);
 
   const scrollToSection = useCallback((href: string) => {
+    const sectionId = href.substring(1);
+    
+    // Dispatch custom event for section transition
+    window.dispatchEvent(new CustomEvent('sectionNavigate', { 
+      detail: { sectionId } 
+    }));
+    
     smoothScrollToSection(href, 80);
     setIsMobileMenuOpen(false);
   }, []);
