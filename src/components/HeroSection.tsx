@@ -105,28 +105,87 @@ export const HeroSection = () => {
     }
   };
 
-  const downloadResume = async () => {
-    if (!resumeUrl || isDownloadingResume) return;
-    setIsDownloadingResume(true);
+  const getResumeDirectDownloadUrl = () => {
+    if (!resumeUrl) return null;
 
     try {
-      const response = await fetch(resumeUrl, { mode: "cors" });
-      if (!response.ok) throw new Error(`Failed to fetch resume: ${response.status}`);
+      const url = new URL(resumeUrl);
+      const hostname = url.hostname.toLowerCase();
 
-      const blob = await response.blob();
-      const objectUrl = URL.createObjectURL(blob);
+      // Google Drive
+      if (hostname === "drive.google.com") {
+        // https://drive.google.com/file/d/<id>/view
+        const parts = url.pathname.split("/").filter(Boolean);
+        const fileIndex = parts.indexOf("file");
+        if (fileIndex !== -1 && parts[fileIndex + 1] === "d" && parts[fileIndex + 2]) {
+          const id = parts[fileIndex + 2];
+          return `https://drive.google.com/uc?export=download&id=${encodeURIComponent(id)}`;
+        }
+
+        // https://drive.google.com/open?id=<id>
+        const id = url.searchParams.get("id");
+        if (id) {
+          return `https://drive.google.com/uc?export=download&id=${encodeURIComponent(id)}`;
+        }
+
+        // https://drive.google.com/uc?export=download&id=<id>
+        if (url.pathname.startsWith("/uc")) {
+          url.searchParams.set("export", "download");
+          return url.toString();
+        }
+      }
+
+      // Dropbox: force download
+      if (hostname.endsWith("dropbox.com")) {
+        url.searchParams.set("dl", "1");
+        url.searchParams.delete("raw");
+        return url.toString();
+      }
+
+      // GitHub blob -> raw
+      if (hostname === "github.com") {
+        // https://github.com/<org>/<repo>/blob/<branch>/path
+        const parts = url.pathname.split("/").filter(Boolean);
+        const blobIndex = parts.indexOf("blob");
+        if (parts.length >= 5 && blobIndex === 2) {
+          const owner = parts[0];
+          const repo = parts[1];
+          const branch = parts[3];
+          const rest = parts.slice(4).join("/");
+          return `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${rest}`;
+        }
+      }
+
+      // Firebase Storage: prefer direct media
+      if (hostname === "firebasestorage.googleapis.com") {
+        url.searchParams.set("alt", "media");
+        return url.toString();
+      }
+
+      return resumeUrl;
+    } catch {
+      return resumeUrl;
+    }
+  };
+
+  const downloadResume = () => {
+    if (!resumeUrl || isDownloadingResume) return;
+    const downloadUrl = getResumeDirectDownloadUrl();
+    if (!downloadUrl) return;
+
+    // Keep the action within the user gesture (avoids popup/download blockers and CORS fetch issues).
+    setIsDownloadingResume(true);
+    try {
       const a = document.createElement("a");
-      a.href = objectUrl;
+      a.href = downloadUrl;
       a.download = getResumeDownloadFileName();
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
       document.body.appendChild(a);
       a.click();
       a.remove();
-      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
-    } catch {
-      // Fallback for hosts that block cross-origin downloads (CORS). Open in a new tab.
-      window.open(resumeUrl, "_blank", "noopener,noreferrer");
     } finally {
-      setIsDownloadingResume(false);
+      window.setTimeout(() => setIsDownloadingResume(false), 400);
     }
   };
 
@@ -275,7 +334,7 @@ export const HeroSection = () => {
                     animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.1, 1] }}
                     transition={{ duration: 2, repeat: Infinity }}
                   >
-                    <Sparkles className="w-6 h-6 text-primary" />
+                    <Sparkles className="hidden sm:block w-6 h-6 text-primary" />
                   </motion.span>
                 </motion.span>
                 <motion.span 
@@ -534,7 +593,7 @@ export const HeroSection = () => {
                       animate={{ rotate: 360, scale: [1, 1.3, 1] }}
                       transition={{ duration: 4 + i, repeat: Infinity }}
                     >
-                      <Sparkles className="w-6 h-6 text-primary" />
+                      <Sparkles className="hidden sm:block w-6 h-6 text-primary" />
                     </motion.div>
                   </motion.div>
                 ))}
