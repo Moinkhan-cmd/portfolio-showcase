@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useMemo } from 'react';
 import { Code2, Database, Users, Wrench, Code, Loader2, TrendingUp, Star, Sparkles, Filter, Zap, Award, Target, Layers, Cpu, Globe, Rocket, ChevronRight, Gem, Crown, Flame, Heart, Activity } from 'lucide-react';
 import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import { SkillsBackground3D } from './SkillsBackground3D';
+import { MobileGradientBackground } from './MobileGradientBackground';
 import { useSkills } from '@/hooks/useSkills';
 import type { Skill } from '@/lib/admin/skills';
 import { cn } from '@/lib/utils';
@@ -380,6 +381,7 @@ export const SkillsSection = () => {
   return (
     <section id="skills" ref={sectionRef} className="section-padding relative overflow-hidden bg-gradient-to-b from-background via-secondary/5 to-background min-h-screen">
       <SkillsBackground3D />
+      <MobileGradientBackground variant="skills" />
       <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/80 to-background/60 pointer-events-none z-10" />
       
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
