@@ -4,6 +4,7 @@ import { SectionDivider } from "@/components/SectionDivider";
 import { SectionTransition } from "@/components/SectionTransition";
 import { SectionProgressIndicator } from "@/components/SectionProgressIndicator";
 import { KeyboardHint, KeyboardHintTrigger } from "@/components/KeyboardHint";
+import { CursorParticleTrail } from "@/components/CursorParticleTrail";
 import { useKeyboardNavigation } from "@/hooks/useKeyboardNavigation";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -53,6 +54,9 @@ const Index = () => {
 
   return (
     <main className="min-h-screen bg-background overflow-x-hidden relative">
+      {/* Cursor particle trail - only in Full Effects mode */}
+      <CursorParticleTrail />
+      
       {/* Background elements */}
       <div className="fixed top-1/4 left-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none z-0" />
       <div className="fixed bottom-1/4 right-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl pointer-events-none z-0" />
