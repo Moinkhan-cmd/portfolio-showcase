@@ -427,14 +427,16 @@ export const SkillsSection = () => {
           <StatCard label="Categories" value={stats.totalCategories} icon={Layers} gradient="from-purple-500 to-pink-500" delay={0.5} />
           <StatCard label="Avg per Category" value={stats.avgSkillsPerCategory} icon={Award} gradient="from-emerald-500 to-teal-500" delay={0.6} />
         </motion.div>
-                <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.4 }} className="mb-12 max-w-4xl mx-auto">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.4 }} className="mb-12 max-w-4xl mx-auto">
           <div className="flex justify-center lg:justify-start">
-            <div className="relative bg-card/80 backdrop-blur-xl rounded-2xl border border-primary/20 p-1.5 shadow-xl">
-              <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap px-1 py-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+            <div className="relative w-full sm:w-auto bg-card/80 backdrop-blur-xl rounded-2xl border border-primary/20 p-1.5 shadow-xl">
+              <div className="flex w-full sm:w-auto flex-wrap sm:flex-nowrap items-center justify-center sm:justify-start gap-2 max-w-full overflow-visible sm:overflow-x-auto sm:whitespace-nowrap px-1 py-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                 <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={() => setSelectedCategory('all')}
                   className={cn('inline-flex items-center gap-2 h-11 px-3 sm:px-4 rounded-xl font-medium text-sm transition-all duration-200 whitespace-nowrap',
                     selectedCategory === 'all' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25' : 'bg-card/80 text-foreground border border-primary/20 hover:border-primary/40 hover:bg-card')}>
-                  <Filter className="w-4 h-4" />All Skills
+                  <Filter className="w-4 h-4" />
+                  <span className="sm:hidden">All</span>
+                  <span className="hidden sm:inline">All Skills</span>
                 </motion.button>
 
                 {categoryOrder.map((category) => {

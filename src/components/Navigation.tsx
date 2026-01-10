@@ -5,6 +5,7 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { scrollToSection as smoothScrollToSection, scrollToTop } from '@/components/SmoothScroll';
 
 const navLinks = [
   { name: 'About', href: '#about' },
@@ -186,12 +187,7 @@ export const Navigation = () => {
   }, []);
 
   const scrollToSection = useCallback((href: string) => {
-    const element = document.querySelector(href);
-    if (element) {
-      const offset = 80;
-      const elementPosition = element.getBoundingClientRect().top + window.scrollY;
-      window.scrollTo({ top: elementPosition - offset, behavior: 'smooth' });
-    }
+    smoothScrollToSection(href, 80);
     setIsMobileMenuOpen(false);
   }, []);
 
@@ -231,7 +227,7 @@ export const Navigation = () => {
             className="relative flex items-center gap-1.5 xs:gap-2 group shrink-0"
             onClick={(e) => {
               e.preventDefault();
-              window.scrollTo({ top: 0, behavior: 'smooth' });
+              scrollToTop();
             }}
             aria-label="Go to top"
           >
