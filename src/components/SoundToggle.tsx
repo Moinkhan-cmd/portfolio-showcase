@@ -17,6 +17,15 @@ export const SoundToggle = () => {
       setEnabled(isEnabled);
       setSoundEnabled(isEnabled);
     }
+
+    // Listen for keyboard shortcut toggle
+    const handleSoundToggled = (e: CustomEvent<{ enabled: boolean }>) => {
+      setEnabled(e.detail.enabled);
+    };
+    window.addEventListener("soundToggled", handleSoundToggled as EventListener);
+    return () => {
+      window.removeEventListener("soundToggled", handleSoundToggled as EventListener);
+    };
   }, []);
 
   if (!mounted) {

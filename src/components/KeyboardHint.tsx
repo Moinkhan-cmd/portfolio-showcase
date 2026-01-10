@@ -12,6 +12,7 @@ const shortcuts = [
   { keys: ["0-6"], description: "Jump to section" },
   { keys: ["Home"], description: "Go to top" },
   { keys: ["End"], description: "Go to bottom" },
+  { keys: ["M"], description: "Toggle sound" },
   { keys: ["?"], description: "Toggle this help" },
 ];
 
