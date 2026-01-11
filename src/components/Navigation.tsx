@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Menu, X, ArrowUpRight } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { AudioToggle } from '@/components/AudioToggle';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -280,7 +281,8 @@ export const Navigation = () => {
           </div>
 
           {/* Right side buttons */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <AudioToggle />
             <div className="shrink-0"><ThemeToggle /></div>
             <Button
               onClick={() => scrollToSection('#contact')}

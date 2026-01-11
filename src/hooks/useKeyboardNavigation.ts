@@ -21,6 +21,11 @@ export const useKeyboardNavigation = () => {
 
     setCurrentIndex(index);
     
+    // Dispatch custom event for audio feedback
+    window.dispatchEvent(new CustomEvent('sectionNavigate', { 
+      detail: { sectionId: section.id } 
+    }));
+    
     if (section.id === "hero") {
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {

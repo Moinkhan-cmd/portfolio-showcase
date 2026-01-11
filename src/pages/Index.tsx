@@ -5,6 +5,7 @@ import { SectionTransition } from "@/components/SectionTransition";
 import { SectionProgressIndicator } from "@/components/SectionProgressIndicator";
 import { KeyboardHint, KeyboardHintTrigger } from "@/components/KeyboardHint";
 import { WelcomeBackMessage } from "@/components/WelcomeBackMessage";
+import { AudioFeedbackProvider } from "@/components/AudioFeedbackProvider";
 import { useKeyboardNavigation } from "@/hooks/useKeyboardNavigation";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -71,6 +72,7 @@ const Index = () => {
   }, []);
 
   return (
+    <AudioFeedbackProvider>
     <motion.main 
       className="min-h-screen bg-background overflow-x-hidden relative"
       initial={isReturningVisitor ? { opacity: 0, y: 10 } : false}
@@ -166,6 +168,7 @@ const Index = () => {
         </SectionTransition>
       </div>
     </motion.main>
+    </AudioFeedbackProvider>
   );
 };
 
