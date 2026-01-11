@@ -39,7 +39,25 @@ const Footer = lazy(async () => {
 
 const Index = () => {
   const [navigatingSection, setNavigatingSection] = useState<string | null>(null);
+  const [isReturningVisitor, setIsReturningVisitor] = useState(false);
+  const [showContent, setShowContent] = useState(false);
   const { showHint, setShowHint } = useKeyboardNavigation();
+
+  // Check if returning visitor (loader was skipped)
+  useEffect(() => {
+    const hasVisited = localStorage.getItem("portfolio_visited");
+    if (hasVisited) {
+      setIsReturningVisitor(true);
+      // Trigger entrance animation after a tiny delay
+      requestAnimationFrame(() => {
+        setShowContent(true);
+      });
+    } else {
+      // First-time visitor - show content immediately (loader handles transition)
+      setShowContent(true);
+      localStorage.setItem("portfolio_visited", "true");
+    }
+  }, []);
 
   useEffect(() => {
     const handleSectionNavigate = (e: CustomEvent<{ sectionId: string }>) => {
@@ -52,7 +70,12 @@ const Index = () => {
   }, []);
 
   return (
-    <main className="min-h-screen bg-background overflow-x-hidden relative">
+    <motion.main 
+      className="min-h-screen bg-background overflow-x-hidden relative"
+      initial={isReturningVisitor ? { opacity: 0, y: 10 } : false}
+      animate={showContent ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+    >
       {/* Background elements */}
       <div className="fixed top-1/4 left-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none z-0" />
       <div className="fixed bottom-1/4 right-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl pointer-events-none z-0" />
@@ -139,7 +162,7 @@ const Index = () => {
           </Suspense>
         </SectionTransition>
       </div>
-    </main>
+    </motion.main>
   );
 };
 
