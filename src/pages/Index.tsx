@@ -4,6 +4,7 @@ import { SectionDivider } from "@/components/SectionDivider";
 import { SectionTransition } from "@/components/SectionTransition";
 import { SectionProgressIndicator } from "@/components/SectionProgressIndicator";
 import { KeyboardHint, KeyboardHintTrigger } from "@/components/KeyboardHint";
+import { WelcomeBackMessage } from "@/components/WelcomeBackMessage";
 import { useKeyboardNavigation } from "@/hooks/useKeyboardNavigation";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -106,6 +107,8 @@ const Index = () => {
         )}
       </AnimatePresence>
 
+      <WelcomeBackMessage isReturningVisitor={isReturningVisitor} />
+      
       <div className="relative z-10">
         <Navigation />
         <SectionProgressIndicator />
