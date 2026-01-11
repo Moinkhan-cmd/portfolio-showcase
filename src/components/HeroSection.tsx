@@ -1,6 +1,11 @@
-import { ArrowDown, Download, Eye, Github, Linkedin, Loader2, Mail, Sparkles, ExternalLink, Code2, Zap } from "lucide-react";
+import { ArrowDown, Download, Github, Linkedin, Mail, Sparkles, ExternalLink, Eye, ChevronDown, Code2, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { motion, useMotionValue, useSpring, useTransform, useInView, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import photo800Webp from "@/images/my-photo-800.webp";
@@ -10,7 +15,6 @@ import photo1200Jpg from "@/images/my-photo-1200.jpg";
 import { HeroBackground3D } from "./HeroBackground3D";
 import { MobileGradientBackground } from "./MobileGradientBackground";
 import { scrollToSection } from "@/components/SmoothScroll";
-import { usePersonalDetails } from "@/hooks/usePersonalDetails";
 
 const socialLinks = [
   { icon: Github, href: "https://github.com/Moinkhan-cmd", label: "GitHub", gradient: "from-[#333] to-[#6e5494]" },
@@ -25,10 +29,6 @@ export const HeroSection = () => {
   const contentRef = useRef<HTMLDivElement>(null);
   const [currentRole, setCurrentRole] = useState(0);
   const reduceMotion = useReducedMotion();
-  const { data: personalDetails } = usePersonalDetails();
-  const resumeUrl = personalDetails?.resumeUrl?.trim();
-  const resumeFileName = personalDetails?.resumeFileName?.trim();
-  const [isDownloadingResume, setIsDownloadingResume] = useState(false);
   const [cursorGlowEnabled, setCursorGlowEnabled] = useState(false);
   const cursorRafRef = useRef<number | null>(null);
   const cursorPendingRef = useRef<{ x: number; y: number }>({ x: -1000, y: -1000 });
@@ -88,105 +88,6 @@ export const HeroSection = () => {
     mouseX.set(x);
     mouseY.set(y);
     if (cursorGlowEnabled) scheduleCursorUpdate(e.clientX, e.clientY);
-  };
-
-  const getResumeDownloadFileName = () => {
-    if (resumeFileName) return resumeFileName;
-    if (!resumeUrl) return "Resume.pdf";
-    try {
-      const url = new URL(resumeUrl);
-      const last = url.pathname.split("/").filter(Boolean).pop();
-      if (!last) return "Resume.pdf";
-      // Basic cleanup for common URL encodings
-      const decoded = decodeURIComponent(last);
-      return decoded.includes(".") ? decoded : `${decoded}.pdf`;
-    } catch {
-      return "Resume.pdf";
-    }
-  };
-
-  const getResumeDirectDownloadUrl = () => {
-    if (!resumeUrl) return null;
-
-    try {
-      const url = new URL(resumeUrl);
-      const hostname = url.hostname.toLowerCase();
-
-      // Google Drive
-      if (hostname === "drive.google.com") {
-        // https://drive.google.com/file/d/<id>/view
-        const parts = url.pathname.split("/").filter(Boolean);
-        const fileIndex = parts.indexOf("file");
-        if (fileIndex !== -1 && parts[fileIndex + 1] === "d" && parts[fileIndex + 2]) {
-          const id = parts[fileIndex + 2];
-          return `https://drive.google.com/uc?export=download&id=${encodeURIComponent(id)}`;
-        }
-
-        // https://drive.google.com/open?id=<id>
-        const id = url.searchParams.get("id");
-        if (id) {
-          return `https://drive.google.com/uc?export=download&id=${encodeURIComponent(id)}`;
-        }
-
-        // https://drive.google.com/uc?export=download&id=<id>
-        if (url.pathname.startsWith("/uc")) {
-          url.searchParams.set("export", "download");
-          return url.toString();
-        }
-      }
-
-      // Dropbox: force download
-      if (hostname.endsWith("dropbox.com")) {
-        url.searchParams.set("dl", "1");
-        url.searchParams.delete("raw");
-        return url.toString();
-      }
-
-      // GitHub blob -> raw
-      if (hostname === "github.com") {
-        // https://github.com/<org>/<repo>/blob/<branch>/path
-        const parts = url.pathname.split("/").filter(Boolean);
-        const blobIndex = parts.indexOf("blob");
-        if (parts.length >= 5 && blobIndex === 2) {
-          const owner = parts[0];
-          const repo = parts[1];
-          const branch = parts[3];
-          const rest = parts.slice(4).join("/");
-          return `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${rest}`;
-        }
-      }
-
-      // Firebase Storage: prefer direct media
-      if (hostname === "firebasestorage.googleapis.com") {
-        url.searchParams.set("alt", "media");
-        return url.toString();
-      }
-
-      return resumeUrl;
-    } catch {
-      return resumeUrl;
-    }
-  };
-
-  const downloadResume = () => {
-    if (!resumeUrl || isDownloadingResume) return;
-    const downloadUrl = getResumeDirectDownloadUrl();
-    if (!downloadUrl) return;
-
-    // Keep the action within the user gesture (avoids popup/download blockers and CORS fetch issues).
-    setIsDownloadingResume(true);
-    try {
-      const a = document.createElement("a");
-      a.href = downloadUrl;
-      a.download = getResumeDownloadFileName();
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    } finally {
-      window.setTimeout(() => setIsDownloadingResume(false), 400);
-    }
   };
 
   return (
@@ -334,7 +235,7 @@ export const HeroSection = () => {
                     animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.1, 1] }}
                     transition={{ duration: 2, repeat: Infinity }}
                   >
-                    <Sparkles className="hidden sm:block w-6 h-6 text-primary" />
+                    <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
                   </motion.span>
                 </motion.span>
                 <motion.span 
@@ -411,50 +312,37 @@ export const HeroSection = () => {
                 </Button>
               </motion.div>
               
-              {resumeUrl ? (
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        size="lg"
-                        variant="outline"
-                        className="group border-2 border-border hover:border-primary/50 hover:bg-primary/5 px-8 py-6 text-base font-semibold backdrop-blur-sm"
-                        aria-label="Resume options"
-                      >
-                        <Download className="mr-2 h-4 w-4" />
-                        Resume
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-48">
-                      <DropdownMenuItem
-                        onSelect={(e) => {
-                          e.preventDefault();
-                          window.open(resumeUrl, "_blank", "noopener,noreferrer");
-                        }}
-                        className="gap-2"
-                      >
-                        <Eye className="h-4 w-4" />
-                        View
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        disabled={isDownloadingResume}
-                        onSelect={(e) => {
-                          e.preventDefault();
-                          void downloadResume();
-                        }}
-                        className="gap-2"
-                      >
-                        {isDownloadingResume ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Download className="h-4 w-4" />
-                        )}
-                        {isDownloadingResume ? "Downloading…" : "Download"}
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </motion.div>
-              ) : null}
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="group border-2 border-border hover:border-primary/50 hover:bg-primary/5 px-8 py-6 text-base font-semibold backdrop-blur-sm"
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Resume
+                      <ChevronDown className="ml-2 h-4 w-4 group-hover:rotate-180 transition-transform duration-300" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48 z-[9999]" sideOffset={8}>
+                    <DropdownMenuItem
+                      onClick={() => window.open("https://drive.google.com/file/d/1-yfml_Sur_8c10GuIscXsF1GiceZSIOX/view?usp=sharing", "_blank")}
+                      className="cursor-pointer"
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      View Resume
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => window.open("https://drive.google.com/uc?export=download&id=1-yfml_Sur_8c10GuIscXsF1GiceZSIOX", "_blank")}
+                      className="cursor-pointer"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Download PDF
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </motion.div>
             </motion.div>
 
             {/* Social Links */}
@@ -593,7 +481,7 @@ export const HeroSection = () => {
                       animate={{ rotate: 360, scale: [1, 1.3, 1] }}
                       transition={{ duration: 4 + i, repeat: Infinity }}
                     >
-                      <Sparkles className="hidden sm:block w-6 h-6 text-primary" />
+                      <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
                     </motion.div>
                   </motion.div>
                 ))}

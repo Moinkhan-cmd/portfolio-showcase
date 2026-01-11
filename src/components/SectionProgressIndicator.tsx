@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { playNavigationSound, playHoverSound, initSoundSystem } from "@/lib/sounds";
 
 const SECTIONS = [
   { id: "hero", name: "Home" },
@@ -17,9 +16,7 @@ export const SectionProgressIndicator = () => {
   const [viewedSections, setViewedSections] = useState<Set<string>>(new Set(["hero"]));
   const [activeSection, setActiveSection] = useState("hero");
   const [isVisible, setIsVisible] = useState(false);
-  const observerRef = useRef<IntersectionObserver | null>(null);
 
-  // Show/hide based on scroll position
   useEffect(() => {
     const handleScroll = () => {
       setIsVisible(window.scrollY > 300);
@@ -30,55 +27,36 @@ export const SectionProgressIndicator = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Observe sections for active tracking
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      observerRef.current = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              const sectionId = entry.target.id;
-              setActiveSection(sectionId);
-              setViewedSections((prev) => new Set([...prev, sectionId]));
-            }
-          });
-        },
-        { 
-          rootMargin: "-30% 0px -30% 0px", 
-          threshold: 0.1
-        }
-      );
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const sectionId = entry.target.id || "hero";
+            setActiveSection(sectionId);
+            setViewedSections((prev) => new Set([...prev, sectionId]));
+          }
+        });
+      },
+      { rootMargin: "-40% 0px -40% 0px", threshold: 0.1 }
+    );
 
-      SECTIONS.forEach(({ id }) => {
-        const element = document.getElementById(id);
-        if (element && observerRef.current) {
-          observerRef.current.observe(element);
-        }
-      });
-    }, 500);
+    // Observe hero section (main element or first section)
+    const heroElement = document.querySelector("main > div.relative > section:first-of-type") || 
+                        document.getElementById("hero");
+    if (heroElement) {
+      observer.observe(heroElement);
+    }
 
-    return () => {
-      clearTimeout(timeoutId);
-      observerRef.current?.disconnect();
-    };
-  }, []);
+    SECTIONS.slice(1).forEach(({ id }) => {
+      const element = document.getElementById(id);
+      if (element) observer.observe(element);
+    });
 
-  // Also track scroll position for hero section (when at top)
-  useEffect(() => {
-    const handleScrollForHero = () => {
-      if (window.scrollY < 200) {
-        setActiveSection("hero");
-      }
-    };
-
-    window.addEventListener("scroll", handleScrollForHero, { passive: true });
-    return () => window.removeEventListener("scroll", handleScrollForHero);
+    return () => observer.disconnect();
   }, []);
 
   const scrollToSection = (sectionId: string) => {
-    initSoundSystem();
-    playNavigationSound();
-    
     if (sectionId === "hero") {
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
@@ -89,11 +67,6 @@ export const SectionProgressIndicator = () => {
       const top = element.getBoundingClientRect().top + window.scrollY - offset;
       window.scrollTo({ top, behavior: "smooth" });
     }
-  };
-
-  const handleHover = () => {
-    initSoundSystem();
-    playHoverSound();
   };
 
   const progress = (viewedSections.size / SECTIONS.length) * 100;
@@ -117,7 +90,7 @@ export const SectionProgressIndicator = () => {
         style={{ height: "100%" }}
       />
 
-      {SECTIONS.map(({ id, name }) => {
+      {SECTIONS.map(({ id, name }, index) => {
         const isViewed = viewedSections.has(id);
         const isActive = activeSection === id;
 
@@ -125,7 +98,6 @@ export const SectionProgressIndicator = () => {
           <motion.button
             key={id}
             onClick={() => scrollToSection(id)}
-            onMouseEnter={handleHover}
             className="relative group py-2"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}

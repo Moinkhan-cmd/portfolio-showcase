@@ -1,7 +1,5 @@
 import { useEffect, useCallback, useState } from "react";
 import { scrollToSection } from "@/components/SmoothScroll";
-import { playNavigationSound, initSoundSystem, isSoundEnabled, setSoundEnabled, playSuccessSound } from "@/lib/sounds";
-import { toast } from "@/hooks/use-toast";
 
 const SECTIONS = [
   { id: "hero", key: "0" },
@@ -17,27 +15,11 @@ export const useKeyboardNavigation = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showHint, setShowHint] = useState(false);
 
-  // Initialize sound system on first interaction
-  useEffect(() => {
-    const handleInteraction = () => {
-      initSoundSystem();
-      window.removeEventListener("click", handleInteraction);
-      window.removeEventListener("keydown", handleInteraction);
-    };
-    window.addEventListener("click", handleInteraction);
-    window.addEventListener("keydown", handleInteraction);
-    return () => {
-      window.removeEventListener("click", handleInteraction);
-      window.removeEventListener("keydown", handleInteraction);
-    };
-  }, []);
-
   const navigateToSection = useCallback((index: number) => {
     const section = SECTIONS[index];
     if (!section) return;
 
     setCurrentIndex(index);
-    playNavigationSound();
     
     if (section.id === "hero") {
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -105,35 +87,6 @@ export const useKeyboardNavigation = () => {
       if (e.key === "?") {
         e.preventDefault();
         setShowHint((prev) => !prev);
-        return;
-      }
-
-      // Toggle sound with M
-      if (e.key === "m" || e.key === "M") {
-        e.preventDefault();
-        const newValue = !isSoundEnabled();
-        setSoundEnabled(newValue);
-        localStorage.setItem("soundEnabled", String(newValue));
-        // Dispatch custom event so SoundToggle can update its state
-        window.dispatchEvent(new CustomEvent("soundToggled", { detail: { enabled: newValue } }));
-        
-        // Show toast notification
-        toast({
-          title: newValue ? "🔊 Sound enabled" : "🔇 Sound muted",
-          description: newValue ? "Navigation sounds are now on" : "Navigation sounds are now off",
-          duration: 2000,
-        });
-        
-        if (newValue) {
-          setTimeout(() => playSuccessSound(), 50);
-        }
-        return;
-      }
-
-      // Toggle performance mode with P
-      if (e.key === "p" || e.key === "P") {
-        e.preventDefault();
-        window.dispatchEvent(new CustomEvent("togglePerformanceMode"));
       }
     };
 
