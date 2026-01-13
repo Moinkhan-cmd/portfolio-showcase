@@ -7,6 +7,21 @@ import { useSkills } from '@/hooks/useSkills';
 import type { Skill } from '@/lib/admin/skills';
 import { cn } from '@/lib/utils';
 
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+      const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      setIsMobile(isTouchDevice || isMobileUA);
+    };
+    checkMobile();
+  }, []);
+  
+  return isMobile;
+};
+
 type SkillCategory =
   | 'frontend_development'
   | 'backend_database'
@@ -332,6 +347,7 @@ const StatCard = ({ label, value, icon: Icon, gradient, delay }: { label: string
   );
 };
 export const SkillsSection = () => {
+  const isMobile = useIsMobile();
   const [selectedCategory, setSelectedCategory] = useState<SkillCategory | 'all'>('all');
   const sectionRef = useRef<HTMLElement>(null);
   const { data: skills = [], isLoading } = useSkills();
@@ -384,20 +400,23 @@ export const SkillsSection = () => {
       <MobileGradientBackground variant="skills" />
       <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/80 to-background/60 pointer-events-none z-10" />
       
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
-        <motion.div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[80px]"
-          animate={{ x: [0, 40, 0], y: [0, 20, 0], scale: [1, 1.1, 1] }}
-          transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <motion.div className="absolute top-1/2 right-1/4 w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-[80px]"
-          animate={{ x: [0, -30, 0], y: [0, -15, 0], scale: [1, 1.15, 1] }}
-          transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <motion.div className="absolute bottom-1/4 left-1/2 w-[350px] h-[350px] bg-pink-500/8 rounded-full blur-[70px]"
-          animate={{ x: [0, -25, 0], y: [0, 30, 0] }}
-          transition={{ duration: 16, repeat: Infinity, ease: 'easeInOut' }}
-        />
-      </div>
+      {/* Animated background blobs - only on desktop */}
+      {!isMobile && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
+          <motion.div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[80px]"
+            animate={{ x: [0, 40, 0], y: [0, 20, 0], scale: [1, 1.1, 1] }}
+            transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <motion.div className="absolute top-1/2 right-1/4 w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-[80px]"
+            animate={{ x: [0, -30, 0], y: [0, -15, 0], scale: [1, 1.15, 1] }}
+            transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <motion.div className="absolute bottom-1/4 left-1/2 w-[350px] h-[350px] bg-pink-500/8 rounded-full blur-[70px]"
+            animate={{ x: [0, -25, 0], y: [0, 30, 0] }}
+            transition={{ duration: 16, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        </div>
+      )}
 
       <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border)/0.05)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.05)_1px,transparent_1px)] bg-[size:50px_50px] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_70%)] pointer-events-none z-10" />
 

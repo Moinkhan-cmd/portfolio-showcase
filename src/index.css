@@ -950,41 +950,72 @@ a:focus-visible {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Reduce layout shifts during scroll */
-section,
-.section-padding {
-  contain: layout style paint;
-  transform: translateZ(0);
-}
-
-/* Optimize images during scroll */
-img {
-  will-change: transform;
-  transform: translateZ(0);
-  image-rendering: -webkit-optimize-contrast;
-}
-
-/* Optimize backdrop filters - use sparingly */
-.backdrop-blur-xl {
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-}
-
-.backdrop-blur-md {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-/* Reduce blur on lower-end devices */
-@media (max-width: 768px) {
-  .backdrop-blur-xl {
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+/* Reduce layout shifts during scroll - desktop only */
+@media (min-width: 769px) {
+  section,
+  .section-padding {
+    contain: layout style paint;
+    transform: translateZ(0);
   }
   
+  /* Optimize images during scroll - desktop only */
+  img {
+    will-change: transform;
+    transform: translateZ(0);
+    image-rendering: -webkit-optimize-contrast;
+  }
+}
+
+/* Mobile: Remove heavy transforms and will-change */
+@media (max-width: 768px), (pointer: coarse) {
+  section,
+  .section-padding {
+    contain: none;
+    transform: none !important;
+  }
+  
+  img {
+    will-change: auto !important;
+    transform: none !important;
+  }
+  
+  .parallax-layer {
+    will-change: auto !important;
+    transform: none !important;
+  }
+  
+  /* Disable backdrop blur on mobile for performance */
+  .backdrop-blur-xl,
+  .backdrop-blur-md,
+  .backdrop-blur-sm {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  
+  /* Disable 3D transforms on mobile */
+  .transform-3d,
+  [style*="preserve-3d"],
+  [style*="translateZ"] {
+    transform-style: flat !important;
+    transform: none !important;
+  }
+  
+  /* Disable will-change globally on mobile */
+  * {
+    will-change: auto !important;
+  }
+}
+
+/* Optimize backdrop filters - desktop only */
+@media (min-width: 769px) {
+  .backdrop-blur-xl {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
   .backdrop-blur-md {
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 }
 

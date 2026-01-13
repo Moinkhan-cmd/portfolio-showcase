@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ReactNode, useRef, MouseEvent } from "react";
+import { ReactNode, useRef, MouseEvent, useEffect, useState } from "react";
 
 interface Card3DProps {
   children: ReactNode;
@@ -7,11 +7,27 @@ interface Card3DProps {
   intensity?: number;
 }
 
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+      const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      setIsMobile(isTouchDevice || isMobileUA);
+    };
+    checkMobile();
+  }, []);
+  
+  return isMobile;
+};
+
 export const Card3D = ({ children, className = "", intensity = 15 }: Card3DProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
+    if (!cardRef.current || isMobile) return;
 
     const card = cardRef.current;
     const rect = card.getBoundingClientRect();
@@ -28,9 +44,18 @@ export const Card3D = ({ children, className = "", intensity = 15 }: Card3DProps
   };
 
   const handleMouseLeave = () => {
-    if (!cardRef.current) return;
+    if (!cardRef.current || isMobile) return;
     cardRef.current.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)";
   };
+
+  // On mobile, render without 3D transforms
+  if (isMobile) {
+    return (
+      <div ref={cardRef} className={className}>
+        {children}
+      </div>
+    );
+  }
 
   return (
     <motion.div
