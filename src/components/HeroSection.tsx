@@ -498,7 +498,7 @@ export const HeroSection = () => {
                 ].map((pos, i) => (
                   <motion.div
                     key={i}
-                    className="absolute hidden sm:block"
+                    className="absolute"
                     style={{ top: pos.top, bottom: pos.bottom, right: pos.right, left: pos.left }}
                     initial={{ opacity: 0, scale: 0 }}
                     animate={isInView ? { opacity: 1, scale: 1 } : {}}
