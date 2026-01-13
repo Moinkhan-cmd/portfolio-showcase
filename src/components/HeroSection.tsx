@@ -15,6 +15,7 @@ import photo1200Jpg from "@/images/my-photo-1200.jpg";
 import { HeroBackground3D } from "./HeroBackground3D";
 import { MobileGradientBackground } from "./MobileGradientBackground";
 import { scrollToSection } from "@/components/SmoothScroll";
+import { useAudioContext } from "@/hooks/useAudioFeedback";
 
 const socialLinks = [
   { icon: Github, href: "https://github.com/Moinkhan-cmd", label: "GitHub", gradient: "from-[#333] to-[#6e5494]" },
@@ -32,6 +33,15 @@ export const HeroSection = () => {
   const [cursorGlowEnabled, setCursorGlowEnabled] = useState(false);
   const cursorRafRef = useRef<number | null>(null);
   const cursorPendingRef = useRef<{ x: number; y: number }>({ x: -1000, y: -1000 });
+  
+  // Audio feedback
+  let playClickSound = () => {};
+  try {
+    const audio = useAudioContext();
+    playClickSound = () => audio.playSound("click");
+  } catch {
+    // Audio context not available
+  }
   
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -294,7 +304,7 @@ export const HeroSection = () => {
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Button
                   size="lg"
-                  onClick={() => scrollToSection("#projects")}
+                  onClick={() => { playClickSound(); scrollToSection("#projects"); }}
                   className="group relative overflow-hidden bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-6 text-base shadow-2xl shadow-primary/25 hover:shadow-primary/40 transition-all duration-300"
                 >
                   <span className="relative z-10 flex items-center gap-2">
@@ -318,6 +328,7 @@ export const HeroSection = () => {
                     <Button
                       size="lg"
                       variant="outline"
+                      onClick={playClickSound}
                       className="group border-2 border-border hover:border-primary/50 hover:bg-primary/5 px-8 py-6 text-base font-semibold backdrop-blur-sm"
                     >
                       <Download className="mr-2 h-4 w-4" />
@@ -327,14 +338,14 @@ export const HeroSection = () => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48 z-[9999]" sideOffset={8}>
                     <DropdownMenuItem
-                      onClick={() => window.open("https://drive.google.com/file/d/1-yfml_Sur_8c10GuIscXsF1GiceZSIOX/view?usp=sharing", "_blank")}
+                      onClick={() => { playClickSound(); window.open("https://drive.google.com/file/d/1-yfml_Sur_8c10GuIscXsF1GiceZSIOX/view?usp=sharing", "_blank"); }}
                       className="cursor-pointer"
                     >
                       <Eye className="w-4 h-4 mr-2" />
                       View Resume
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() => window.open("https://drive.google.com/uc?export=download&id=1-yfml_Sur_8c10GuIscXsF1GiceZSIOX", "_blank")}
+                      onClick={() => { playClickSound(); window.open("https://drive.google.com/uc?export=download&id=1-yfml_Sur_8c10GuIscXsF1GiceZSIOX", "_blank"); }}
                       className="cursor-pointer"
                     >
                       <Download className="w-4 h-4 mr-2" />
@@ -360,6 +371,7 @@ export const HeroSection = () => {
                     href={link.href}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={playClickSound}
                     className="group relative p-3 rounded-xl border border-border bg-background/50 backdrop-blur-sm hover:border-primary/50 transition-all duration-300 overflow-hidden"
                     initial={{ opacity: 0, scale: 0 }}
                     animate={isInView ? { opacity: 1, scale: 1 } : {}}

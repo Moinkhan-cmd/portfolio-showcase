@@ -26,12 +26,14 @@ const MobileMenu = ({
   activeSection,
   scrollToSection,
   playHoverSound,
+  playClickSound,
 }: { 
   isOpen: boolean; 
   onClose: () => void;
   activeSection: string;
   scrollToSection: (href: string) => void;
   playHoverSound: () => void;
+  playClickSound: () => void;
 }) => {
   if (!isOpen) return null;
 
@@ -115,7 +117,7 @@ const MobileMenu = ({
             return (
               <button
                 key={link.name}
-                onClick={() => scrollToSection(link.href)}
+                onClick={() => { playClickSound(); scrollToSection(link.href); }}
                 onMouseEnter={playHoverSound}
                 style={{
                   width: '100%',
@@ -144,7 +146,7 @@ const MobileMenu = ({
           }}
         >
           <Button 
-            onClick={() => scrollToSection('#contact')} 
+            onClick={() => { playClickSound(); scrollToSection('#contact'); }} 
             onMouseEnter={playHoverSound}
             className="w-full rounded-xl font-semibold py-6 text-lg gap-2" 
             size="lg"
@@ -166,9 +168,11 @@ export const Navigation = () => {
   
   // Audio feedback - wrapped in try/catch for when used outside provider
   let playHoverSound = () => {};
+  let playClickSound = () => {};
   try {
     const audio = useAudioContext();
     playHoverSound = () => audio.playSound("hover");
+    playClickSound = () => audio.playSound("click");
   } catch {
     // Audio context not available
   }
@@ -275,7 +279,7 @@ export const Navigation = () => {
               return (
                 <button
                   key={link.name}
-                  onClick={() => scrollToSection(link.href)}
+                  onClick={() => { playClickSound(); scrollToSection(link.href); }}
                   onMouseEnter={playHoverSound}
                   className={cn(
                     'relative px-2.5 lg:px-4 py-1.5 lg:py-2 text-xs lg:text-sm font-medium transition-all duration-300 rounded-full whitespace-nowrap',
@@ -302,7 +306,7 @@ export const Navigation = () => {
             <AudioToggle />
             <div className="shrink-0"><ThemeToggle /></div>
             <Button
-              onClick={() => scrollToSection('#contact')}
+              onClick={() => { playClickSound(); scrollToSection('#contact'); }}
               onMouseEnter={playHoverSound}
               size={isScrolled ? 'sm' : 'default'}
               className={cn(
@@ -317,7 +321,7 @@ export const Navigation = () => {
             
             {/* Hamburger Button - Only visible on mobile/tablet */}
             <button
-              onClick={() => setIsMobileMenuOpen(true)}
+              onClick={() => { playClickSound(); setIsMobileMenuOpen(true); }}
               className="lg:hidden flex items-center justify-center min-h-[44px] min-w-[44px] p-2 rounded-xl glass-card hover:bg-secondary/80"
               aria-label="Open menu"
             >
@@ -334,6 +338,7 @@ export const Navigation = () => {
         activeSection={activeSection}
         scrollToSection={scrollToSection}
         playHoverSound={playHoverSound}
+        playClickSound={playClickSound}
       />
     </>
   );

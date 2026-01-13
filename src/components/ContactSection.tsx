@@ -9,6 +9,7 @@ import emailjs from "@emailjs/browser";
 import { ContactBackground3D } from "./ContactBackground3D";
 import { MobileGradientBackground } from "./MobileGradientBackground";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useAudioContext } from "@/hooks/useAudioFeedback";
 
 const socialLinks = [
   { name: "GitHub", icon: Github, url: "https://github.com/Moinkhan-cmd", label: "github.com/Moinkhan-cmd" },
@@ -21,6 +22,17 @@ export const ContactSection = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const { toast } = useToast();
+
+  // Audio feedback
+  let playClickSound = () => {};
+  let playSuccessSound = () => {};
+  try {
+    const audio = useAudioContext();
+    playClickSound = () => audio.playSound("click");
+    playSuccessSound = () => audio.playSound("success");
+  } catch {
+    // Audio context not available
+  }
 
   // Check EmailJS configuration
   const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
@@ -89,6 +101,7 @@ export const ContactSection = () => {
         to_name: "Moinkhan Bhatti",
       }, publicKey);
 
+      playSuccessSound();
       toast({
         title: "Message sent successfully!",
         description: "Thank you for reaching out. I'll get back to you soon!",
@@ -184,6 +197,7 @@ export const ContactSection = () => {
                   href={link.url}
                   target={link.url === "#" ? undefined : "_blank"}
                   rel={link.url === "#" ? undefined : "noopener noreferrer"}
+                  onClick={playClickSound}
                   initial={{ opacity: 0, x: -20 }}
                   animate={isVisible ? { opacity: 1, x: 0 } : {}}
                   transition={{ duration: 0.4, delay: 0.2 + index * 0.1 }}
@@ -287,6 +301,7 @@ export const ContactSection = () => {
                     type="submit"
                     variant="hero"
                     size="lg"
+                    onClick={playClickSound}
                     className="w-full glow-on-hover btn-lift"
                     disabled={isSubmitting}
                   >
