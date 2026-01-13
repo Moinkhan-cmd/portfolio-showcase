@@ -36,14 +36,22 @@ try {
     auth = getAuth(app);
     db = getFirestore(app);
 
-    // Initialize Analytics (only in browser environment)
-if (typeof window !== "undefined") {
-  try {
-    analytics = getAnalytics(app);
-  } catch (error) {
-    console.warn("Analytics initialization failed:", error);
-  }
-}
+    // Initialize Analytics (browser-only). Guard against offline/mobile failures.
+    if (typeof window !== "undefined") {
+      const initAnalytics = () => {
+        try {
+          // Avoid triggering Firebase Installations while offline.
+          if (typeof navigator !== "undefined" && navigator.onLine === false) return;
+          analytics = getAnalytics(app);
+        } catch (error) {
+          analytics = null;
+          console.warn("Analytics initialization failed:", error);
+        }
+      };
+
+      initAnalytics();
+      window.addEventListener("online", initAnalytics, { passive: true });
+    }
   } else {
     console.error("Firebase configuration is missing. Please check your environment variables.");
     console.error("Required variables: VITE_FIREBASE_API_KEY, VITE_FIREBASE_AUTH_DOMAIN, VITE_FIREBASE_PROJECT_ID, VITE_FIREBASE_MESSAGING_SENDER_ID, VITE_FIREBASE_APP_ID");

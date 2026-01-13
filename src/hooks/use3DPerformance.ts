@@ -26,31 +26,40 @@ export const use3DPerformance = (): PerformanceSettings => {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent
-    );
-    const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
-    const prefersReducedMotion = window.matchMedia?.(
-      "(prefers-reduced-motion: reduce)"
-    )?.matches ?? false;
-    
-    // Check for low-power mode hints
-    const isLowPower = window.matchMedia?.("(prefers-reduced-data: reduce)")?.matches || false;
-    
-    // Device memory (in GB) - available in Chrome
-    const deviceMemory = (navigator as any).deviceMemory || 8;
-    
-    // Number of logical processors
-    const hardwareConcurrency = navigator.hardwareConcurrency || 4;
+    const update = () => {
+      const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      );
+      const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+      // Treat small viewports as mobile to avoid WebGL/3D issues in responsive mode.
+      const isSmallScreen =
+        window.matchMedia?.("(max-width: 1023px)")?.matches ?? window.innerWidth < 1024;
 
-    setDeviceInfo({
-      isMobile,
-      isTouch,
-      prefersReducedMotion,
-      isLowPower,
-      deviceMemory,
-      hardwareConcurrency,
-    });
+      const prefersReducedMotion =
+        window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
+
+      // Check for low-power mode hints
+      const isLowPower = window.matchMedia?.("(prefers-reduced-data: reduce)")?.matches || false;
+
+      // Device memory (in GB) - available in Chrome
+      const deviceMemory = (navigator as any).deviceMemory || 8;
+
+      // Number of logical processors
+      const hardwareConcurrency = navigator.hardwareConcurrency || 4;
+
+      setDeviceInfo({
+        isMobile: isMobileUA || isSmallScreen,
+        isTouch,
+        prefersReducedMotion,
+        isLowPower,
+        deviceMemory,
+        hardwareConcurrency,
+      });
+    };
+
+    update();
+    window.addEventListener("resize", update, { passive: true });
+    return () => window.removeEventListener("resize", update);
   }, []);
 
   return useMemo(() => {
@@ -96,13 +105,15 @@ export const use3DPerformance = (): PerformanceSettings => {
 export const shouldEnable3D = (): boolean => {
   if (typeof window === "undefined") return false;
   
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+  const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
     navigator.userAgent
   );
   const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+  const isSmallScreen =
+    window.matchMedia?.("(max-width: 1023px)")?.matches ?? window.innerWidth < 1024;
   const prefersReducedMotion = window.matchMedia?.(
     "(prefers-reduced-motion: reduce)"
   )?.matches ?? false;
 
-  return !isMobile && !isTouch && !prefersReducedMotion;
+  return !isMobileUA && !isSmallScreen && !isTouch && !prefersReducedMotion;
 };
