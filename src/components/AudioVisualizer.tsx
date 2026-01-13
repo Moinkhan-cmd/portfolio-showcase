@@ -15,32 +15,52 @@ export const AudioVisualizer = () => {
 
   if (!isEnabled) return null;
 
-  const bars = [0, 1, 2, 3];
+  const bars = [0, 1, 2, 3, 4];
   
   return (
-    <div className="flex items-center gap-[2px] h-4 px-1">
+    <motion.div 
+      className="flex items-center gap-[3px] h-6 px-2 rounded-lg"
+      animate={isPlaying ? {
+        boxShadow: [
+          '0 0 8px hsl(var(--primary) / 0.3)',
+          '0 0 16px hsl(var(--primary) / 0.5)',
+          '0 0 8px hsl(var(--primary) / 0.3)',
+        ],
+      } : {
+        boxShadow: '0 0 0px transparent',
+      }}
+      transition={{
+        duration: 0.4,
+        repeat: isPlaying ? Infinity : 0,
+        ease: "easeInOut",
+      }}
+    >
       {bars.map((i) => (
         <motion.div
           key={i}
-          className="w-[3px] rounded-full bg-primary/60"
-          initial={{ height: 4 }}
+          className="w-[4px] rounded-full bg-primary"
+          style={{
+            filter: isPlaying ? 'drop-shadow(0 0 4px hsl(var(--primary)))' : 'none',
+          }}
+          initial={{ height: 6 }}
           animate={isPlaying ? {
-            height: [4, 12 + Math.random() * 4, 6, 14 + Math.random() * 2, 4],
-            opacity: [0.6, 1, 0.8, 1, 0.6],
+            height: [6, 18 + Math.random() * 6, 10, 22 + Math.random() * 4, 6],
+            opacity: [0.7, 1, 0.85, 1, 0.7],
           } : {
-            height: 4,
-            opacity: 0.4,
+            height: 6,
+            opacity: 0.5,
           }}
           transition={isPlaying ? {
-            duration: 0.3,
+            duration: 0.35,
             ease: "easeInOut",
-            delay: i * 0.05,
-            repeat: 0,
+            delay: i * 0.06,
+            repeat: Infinity,
+            repeatType: "reverse",
           } : {
             duration: 0.2,
           }}
         />
       ))}
-    </div>
+    </motion.div>
   );
 };
