@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { scrollToSection as smoothScrollToSection, scrollToTop } from '@/components/SmoothScroll';
+import { useAudioContext } from '@/hooks/useAudioFeedback';
 
 const navLinks = [
   { name: 'About', href: '#about' },
@@ -22,12 +23,14 @@ const MobileMenu = ({
   isOpen, 
   onClose, 
   activeSection,
-  scrollToSection 
+  scrollToSection,
+  playHoverSound,
 }: { 
   isOpen: boolean; 
   onClose: () => void;
   activeSection: string;
   scrollToSection: (href: string) => void;
+  playHoverSound: () => void;
 }) => {
   if (!isOpen) return null;
 
@@ -112,6 +115,7 @@ const MobileMenu = ({
               <button
                 key={link.name}
                 onClick={() => scrollToSection(link.href)}
+                onMouseEnter={playHoverSound}
                 style={{
                   width: '100%',
                   textAlign: 'left',
@@ -140,6 +144,7 @@ const MobileMenu = ({
         >
           <Button 
             onClick={() => scrollToSection('#contact')} 
+            onMouseEnter={playHoverSound}
             className="w-full rounded-xl font-semibold py-6 text-lg gap-2" 
             size="lg"
           >
@@ -157,6 +162,15 @@ export const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('');
+  
+  // Audio feedback - wrapped in try/catch for when used outside provider
+  let playHoverSound = () => {};
+  try {
+    const audio = useAudioContext();
+    playHoverSound = () => audio.playSound("hover");
+  } catch {
+    // Audio context not available
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -261,6 +275,7 @@ export const Navigation = () => {
                 <button
                   key={link.name}
                   onClick={() => scrollToSection(link.href)}
+                  onMouseEnter={playHoverSound}
                   className={cn(
                     'relative px-2.5 lg:px-4 py-1.5 lg:py-2 text-xs lg:text-sm font-medium transition-all duration-300 rounded-full whitespace-nowrap',
                     isActive ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
@@ -286,6 +301,7 @@ export const Navigation = () => {
             <div className="shrink-0"><ThemeToggle /></div>
             <Button
               onClick={() => scrollToSection('#contact')}
+              onMouseEnter={playHoverSound}
               size={isScrolled ? 'sm' : 'default'}
               className={cn(
                 'hidden sm:flex rounded-full font-semibold gap-1.5 lg:gap-2 transition-all duration-300 text-xs lg:text-sm',
@@ -315,6 +331,7 @@ export const Navigation = () => {
         onClose={() => setIsMobileMenuOpen(false)}
         activeSection={activeSection}
         scrollToSection={scrollToSection}
+        playHoverSound={playHoverSound}
       />
     </>
   );
