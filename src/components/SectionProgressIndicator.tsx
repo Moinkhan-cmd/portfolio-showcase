@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { playNavigationSound, playHoverSound, initSoundSystem } from "@/lib/sounds";
 
@@ -17,63 +17,68 @@ export const SectionProgressIndicator = () => {
   const [viewedSections, setViewedSections] = useState<Set<string>>(new Set(["hero"]));
   const [activeSection, setActiveSection] = useState("hero");
   const [isVisible, setIsVisible] = useState(false);
-  const observerRef = useRef<IntersectionObserver | null>(null);
+  const [isReady, setIsReady] = useState(false);
 
-  // Show/hide based on scroll position
+  // Determine active section based on scroll position
+  const updateActiveSection = useCallback(() => {
+    const scrollY = window.scrollY;
+    const windowHeight = window.innerHeight;
+    
+    // Check from bottom to top to find the current section
+    for (let i = SECTIONS.length - 1; i >= 0; i--) {
+      const section = SECTIONS[i];
+      const element = document.getElementById(section.id);
+      
+      if (element) {
+        const rect = element.getBoundingClientRect();
+        const elementTop = rect.top + scrollY;
+        
+        // Section is active if we've scrolled past its top (with some offset)
+        if (scrollY >= elementTop - windowHeight * 0.4) {
+          if (activeSection !== section.id) {
+            setActiveSection(section.id);
+            setViewedSections(prev => {
+              const newSet = new Set(prev);
+              newSet.add(section.id);
+              return newSet;
+            });
+          }
+          break;
+        }
+      }
+    }
+    
+    // Special case: at very top, always show hero
+    if (scrollY < 100) {
+      setActiveSection("hero");
+    }
+  }, [activeSection]);
+
+  // Show/hide based on scroll position and track active section
   useEffect(() => {
     const handleScroll = () => {
-      setIsVisible(window.scrollY > 300);
+      setIsVisible(window.scrollY > 200);
+      updateActiveSection();
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
+    
+    // Initial check
     handleScroll();
+    
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [updateActiveSection]);
 
-  // Observe sections for active tracking
+  // Mark as ready after initial mount delay
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      observerRef.current = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              const sectionId = entry.target.id;
-              setActiveSection(sectionId);
-              setViewedSections((prev) => new Set([...prev, sectionId]));
-            }
-          });
-        },
-        { 
-          rootMargin: "-30% 0px -30% 0px", 
-          threshold: 0.1
-        }
-      );
-
-      SECTIONS.forEach(({ id }) => {
-        const element = document.getElementById(id);
-        if (element && observerRef.current) {
-          observerRef.current.observe(element);
-        }
-      });
-    }, 500);
-
-    return () => {
-      clearTimeout(timeoutId);
-      observerRef.current?.disconnect();
-    };
-  }, []);
-
-  // Also track scroll position for hero section (when at top)
-  useEffect(() => {
-    const handleScrollForHero = () => {
-      if (window.scrollY < 200) {
-        setActiveSection("hero");
-      }
-    };
-
-    window.addEventListener("scroll", handleScrollForHero, { passive: true });
-    return () => window.removeEventListener("scroll", handleScrollForHero);
-  }, []);
+    const timer = setTimeout(() => {
+      setIsReady(true);
+      // Do initial section detection
+      updateActiveSection();
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, [updateActiveSection]);
 
   const scrollToSection = (sectionId: string) => {
     initSoundSystem();
@@ -96,25 +101,30 @@ export const SectionProgressIndicator = () => {
     playHoverSound();
   };
 
-  const progress = (viewedSections.size / SECTIONS.length) * 100;
+  // Calculate progress based on current active section index
+  const activeIndex = SECTIONS.findIndex(s => s.id === activeSection);
+  const lineProgress = activeIndex >= 0 ? ((activeIndex + 1) / SECTIONS.length) * 100 : 0;
+
+  if (!isReady) return null;
 
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: isVisible ? 1 : 0, x: isVisible ? 0 : 20 }}
       transition={{ duration: 0.3 }}
-      className="fixed right-4 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col items-center gap-1"
+      className="fixed right-6 top-1/2 -translate-y-1/2 z-50 hidden lg:flex flex-col items-center gap-1"
+      style={{ pointerEvents: isVisible ? 'auto' : 'none' }}
     >
       {/* Progress bar background */}
-      <div className="absolute left-1/2 -translate-x-1/2 w-0.5 h-full bg-border/30 rounded-full" />
+      <div className="absolute left-1/2 -translate-x-1/2 w-0.5 h-full bg-border/40 rounded-full" />
       
-      {/* Progress bar fill */}
+      {/* Progress bar fill - based on sections viewed */}
       <motion.div
-        className="absolute left-1/2 -translate-x-1/2 w-0.5 bg-gradient-to-b from-primary to-primary/50 rounded-full origin-top"
+        className="absolute left-1/2 -translate-x-1/2 w-1 bg-gradient-to-b from-primary via-primary to-primary/60 rounded-full origin-top"
         initial={{ scaleY: 0 }}
-        animate={{ scaleY: progress / 100 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        style={{ height: "100%" }}
+        animate={{ scaleY: lineProgress / 100 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+        style={{ height: "100%", marginLeft: "-1px" }}
       />
 
       {SECTIONS.map(({ id, name }) => {
@@ -126,7 +136,7 @@ export const SectionProgressIndicator = () => {
             key={id}
             onClick={() => scrollToSection(id)}
             onMouseEnter={handleHover}
-            className="relative group py-2"
+            className="relative group py-2.5 px-2"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             aria-label={`Go to ${name} section`}
@@ -134,19 +144,26 @@ export const SectionProgressIndicator = () => {
             {/* Dot indicator */}
             <motion.div
               className={cn(
-                "w-2.5 h-2.5 rounded-full border-2 transition-all duration-300 relative z-10",
+                "w-3 h-3 rounded-full border-2 transition-all duration-300 relative z-10",
                 isActive
-                  ? "bg-primary border-primary scale-125 shadow-[0_0_10px_hsl(var(--primary))]"
+                  ? "bg-primary border-primary shadow-[0_0_12px_hsl(var(--primary)),0_0_24px_hsl(var(--primary)/0.4)]"
                   : isViewed
-                  ? "bg-primary/60 border-primary/60"
-                  : "bg-background border-muted-foreground/30"
+                  ? "bg-primary/70 border-primary/70 shadow-sm"
+                  : "bg-muted border-muted-foreground/40 hover:border-muted-foreground/60"
               )}
-              animate={isActive ? { scale: [1, 1.3, 1] } : {}}
-              transition={{ duration: 0.5, repeat: isActive ? Infinity : 0, repeatDelay: 2 }}
+              animate={isActive ? { 
+                scale: [1, 1.2, 1],
+                boxShadow: [
+                  "0 0 12px hsl(var(--primary)), 0 0 24px hsl(var(--primary)/0.4)",
+                  "0 0 16px hsl(var(--primary)), 0 0 32px hsl(var(--primary)/0.5)",
+                  "0 0 12px hsl(var(--primary)), 0 0 24px hsl(var(--primary)/0.4)"
+                ]
+              } : {}}
+              transition={{ duration: 1.5, repeat: isActive ? Infinity : 0, repeatDelay: 0.5 }}
             />
 
             {/* Tooltip */}
-            <div className="absolute right-6 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+            <div className="absolute right-8 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none translate-x-2 group-hover:translate-x-0">
               <div className="px-3 py-1.5 rounded-lg bg-background/95 backdrop-blur-sm border border-border/50 shadow-lg whitespace-nowrap">
                 <span className={cn(
                   "text-xs font-medium",
@@ -155,7 +172,7 @@ export const SectionProgressIndicator = () => {
                   {name}
                 </span>
                 {isViewed && !isActive && (
-                  <span className="ml-1.5 text-[10px] text-muted-foreground">✓</span>
+                  <span className="ml-1.5 text-[10px] text-green-500">✓</span>
                 )}
               </div>
             </div>
@@ -165,13 +182,13 @@ export const SectionProgressIndicator = () => {
 
       {/* Progress percentage */}
       <motion.div
-        className="mt-3 px-2 py-1 rounded-full bg-background/80 backdrop-blur-sm border border-border/30 shadow-sm"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        className="mt-4 px-2.5 py-1.5 rounded-full bg-background/90 backdrop-blur-sm border border-border/40 shadow-md"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
       >
-        <span className="text-[10px] font-medium text-muted-foreground">
-          {Math.round(progress)}%
+        <span className="text-[10px] font-semibold text-muted-foreground">
+          {viewedSections.size}/{SECTIONS.length}
         </span>
       </motion.div>
     </motion.div>
