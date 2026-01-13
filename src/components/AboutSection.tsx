@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { AboutBackground3D } from "./AboutBackground3D";
 import { MobileGradientBackground } from "./MobileGradientBackground";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 const techStack = [
   "HTML",
@@ -17,6 +18,7 @@ const techStack = [
 export const AboutSection = () => {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -75,84 +77,95 @@ export const AboutSection = () => {
           {/* Content */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 items-center">
             {/* Image/Avatar Placeholder */}
-            <motion.div 
-              initial={{ opacity: 0, x: -50 }}
-              animate={isVisible ? { opacity: 1, x: 0 } : {}}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              <div className="relative" style={{ perspective: "1200px" }}>
-                <motion.div
-                  className="relative"
-                  style={{ transformStyle: "preserve-3d" }}
-                  whileHover={{ scale: 1.05, rotateX: 10, rotateY: -12 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {/* Depth/shadow plane */}
-                  <div
-                    aria-hidden
-                    className="absolute inset-0 rounded-2xl bg-primary/10 blur-2xl"
-                    style={{ transform: "translateZ(-60px) translateY(22px) scale(0.94)" }}
-                  />
-
-                  <div className="aspect-square rounded-2xl glass-enhanced overflow-hidden card-hover">
-                    <motion.div
-                      className="relative w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center"
-                      style={{ transformStyle: "preserve-3d" }}
-                      animate={{
-                        background: [
-                          "linear-gradient(135deg, hsl(175 80% 50% / 0.2) 0%, hsl(175 80% 50% / 0.05) 100%)",
-                          "linear-gradient(135deg, hsl(200 90% 60% / 0.2) 0%, hsl(175 80% 50% / 0.05) 100%)",
-                          "linear-gradient(135deg, hsl(175 80% 50% / 0.2) 0%, hsl(175 80% 50% / 0.05) 100%)",
-                        ],
-                      }}
-                      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                    >
-                      {/* Sheen/highlight */}
-                      <div
-                        aria-hidden
-                        className="absolute inset-0 bg-gradient-to-tr from-background/10 via-transparent to-background/5"
-                        style={{ transform: "translateZ(20px)" }}
-                      />
-
-                      {/* Subtle rim */}
-                      <div
-                        aria-hidden
-                        className="absolute inset-0 rounded-2xl ring-1 ring-primary/25"
-                        style={{ transform: "translateZ(26px)" }}
-                      />
-
-                      {/* Foreground content pushed forward */}
-                      <div style={{ transform: "translateZ(70px)" }}>
-                        <motion.span
-                          className="text-6xl"
-                          animate={{ rotate: [0, 10, -10, 0] }}
-                          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                        >
-                          👨‍💻
-                        </motion.span>
-                      </div>
-                    </motion.div>
+            <div className={isVisible ? "opacity-100" : "opacity-0"} style={{ transition: "opacity 0.6s ease-out 0.2s" }}>
+              {isMobile ? (
+                /* Simplified mobile version - no 3D transforms */
+                <div className="relative">
+                  <div className="aspect-square rounded-2xl glass-enhanced overflow-hidden">
+                    <div className="relative w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+                      <span className="text-6xl">👨‍💻</span>
+                    </div>
                   </div>
-                {/* Decorative elements */}
-                <motion.div 
-                  className="absolute -top-4 -right-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl"
-                  animate={{ 
-                    scale: [1, 1.2, 1],
-                    opacity: [0.3, 0.5, 0.3]
-                  }}
-                  transition={{ duration: 3, repeat: Infinity }}
-                />
-                <motion.div 
-                  className="absolute -bottom-4 -left-4 w-32 h-32 bg-primary/10 rounded-full blur-2xl"
-                  animate={{ 
-                    scale: [1, 1.3, 1],
-                    opacity: [0.2, 0.4, 0.2]
-                  }}
-                  transition={{ duration: 4, repeat: Infinity }}
-                />
-                </motion.div>
-              </div>
-            </motion.div>
+                  {/* Static decorative elements */}
+                  <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl opacity-40" />
+                  <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-primary/10 rounded-full blur-2xl opacity-30" />
+                </div>
+              ) : (
+                /* Desktop version with 3D effects */
+                <div className="relative" style={{ perspective: "1200px" }}>
+                  <motion.div
+                    className="relative"
+                    style={{ transformStyle: "preserve-3d" }}
+                    whileHover={{ scale: 1.05, rotateX: 10, rotateY: -12 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {/* Depth/shadow plane */}
+                    <div
+                      aria-hidden
+                      className="absolute inset-0 rounded-2xl bg-primary/10 blur-2xl"
+                      style={{ transform: "translateZ(-60px) translateY(22px) scale(0.94)" }}
+                    />
+
+                    <div className="aspect-square rounded-2xl glass-enhanced overflow-hidden card-hover">
+                      <motion.div
+                        className="relative w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center"
+                        style={{ transformStyle: "preserve-3d" }}
+                        animate={{
+                          background: [
+                            "linear-gradient(135deg, hsl(175 80% 50% / 0.2) 0%, hsl(175 80% 50% / 0.05) 100%)",
+                            "linear-gradient(135deg, hsl(200 90% 60% / 0.2) 0%, hsl(175 80% 50% / 0.05) 100%)",
+                            "linear-gradient(135deg, hsl(175 80% 50% / 0.2) 0%, hsl(175 80% 50% / 0.05) 100%)",
+                          ],
+                        }}
+                        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                      >
+                        {/* Sheen/highlight */}
+                        <div
+                          aria-hidden
+                          className="absolute inset-0 bg-gradient-to-tr from-background/10 via-transparent to-background/5"
+                          style={{ transform: "translateZ(20px)" }}
+                        />
+
+                        {/* Subtle rim */}
+                        <div
+                          aria-hidden
+                          className="absolute inset-0 rounded-2xl ring-1 ring-primary/25"
+                          style={{ transform: "translateZ(26px)" }}
+                        />
+
+                        {/* Foreground content pushed forward */}
+                        <div style={{ transform: "translateZ(70px)" }}>
+                          <motion.span
+                            className="text-6xl"
+                            animate={{ rotate: [0, 10, -10, 0] }}
+                            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                          >
+                            👨‍💻
+                          </motion.span>
+                        </div>
+                      </motion.div>
+                    </div>
+                  {/* Decorative elements */}
+                  <motion.div 
+                    className="absolute -top-4 -right-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl"
+                    animate={{ 
+                      scale: [1, 1.2, 1],
+                      opacity: [0.3, 0.5, 0.3]
+                    }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                  />
+                  <motion.div 
+                    className="absolute -bottom-4 -left-4 w-32 h-32 bg-primary/10 rounded-full blur-2xl"
+                    animate={{ 
+                      scale: [1, 1.3, 1],
+                      opacity: [0.2, 0.4, 0.2]
+                    }}
+                    transition={{ duration: 4, repeat: Infinity }}
+                  />
+                  </motion.div>
+                </div>
+              )}
+            </div>
 
             {/* Text Content */}
             <motion.div 
@@ -175,16 +188,26 @@ export const AboutSection = () => {
                 <h3 className="font-display text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-foreground drop-shadow-sm">Tech Stack</h3>
                 <div className="flex flex-wrap gap-2 sm:gap-3">
                   {techStack.map((tech, index) => (
-                    <motion.span
-                      key={tech}
-                      initial={{ opacity: 0, scale: 0 }}
-                      animate={isVisible ? { opacity: 1, scale: 1 } : {}}
-                      transition={{ duration: 0.4, delay: 0.4 + index * 0.05, type: "spring" }}
-                      whileHover={{ scale: 1.1, y: -3 }}
-                      className="px-3 py-1.5 sm:px-4 sm:py-2 glass-card rounded-full text-xs sm:text-sm font-medium hover:bg-primary/20 transition-all duration-300 cursor-default magnetic-hover"
-                    >
-                      {tech}
-                    </motion.span>
+                    isMobile ? (
+                      <span
+                        key={tech}
+                        className="px-3 py-1.5 sm:px-4 sm:py-2 glass-card rounded-full text-xs sm:text-sm font-medium hover:bg-primary/20 transition-colors duration-300 cursor-default"
+                        style={{ opacity: isVisible ? 1 : 0, transition: `opacity 0.4s ease-out ${0.4 + index * 0.05}s` }}
+                      >
+                        {tech}
+                      </span>
+                    ) : (
+                      <motion.span
+                        key={tech}
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={isVisible ? { opacity: 1, scale: 1 } : {}}
+                        transition={{ duration: 0.4, delay: 0.4 + index * 0.05, type: "spring" }}
+                        whileHover={{ scale: 1.1, y: -3 }}
+                        className="px-3 py-1.5 sm:px-4 sm:py-2 glass-card rounded-full text-xs sm:text-sm font-medium hover:bg-primary/20 transition-all duration-300 cursor-default magnetic-hover"
+                      >
+                        {tech}
+                      </motion.span>
+                    )
                   ))}
                 </div>
               </div>

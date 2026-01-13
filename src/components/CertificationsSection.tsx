@@ -6,6 +6,7 @@ import {
   Filter, X, Grid3x3, List, SortAsc, SortDesc, Tag, Building2, 
   TrendingUp, Eye, Download, Share2, Copy, Check
 } from "lucide-react";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { CertificationsBackground3D } from "./CertificationsBackground3D";
 import { MobileGradientBackground } from "./MobileGradientBackground";
 import { useCertifications } from "@/hooks/useCertifications";
@@ -39,11 +40,12 @@ const CertificationCard = ({ cert, index, onViewDetails }: CertificationCardProp
   const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   const showVerify = Boolean(cert.credentialUrl && cert.credentialUrl !== "#");
   const skills = Array.isArray(cert.skills) ? cert.skills : [];
 
-  // 3D tilt effect
+  // 3D tilt effect - only used on desktop
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const mouseXSpring = useSpring(x, { stiffness: 400, damping: 50 });
@@ -52,7 +54,7 @@ const CertificationCard = ({ cert, index, onViewDetails }: CertificationCardProp
   const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-8deg", "8deg"]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
+    if (!cardRef.current || isMobile) return;
     const rect = cardRef.current.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
@@ -68,6 +70,128 @@ const CertificationCard = ({ cert, index, onViewDetails }: CertificationCardProp
     setIsHovered(false);
   };
 
+  // Mobile: simplified static card
+  if (isMobile) {
+    return (
+      <div
+        ref={cardRef}
+        className="group relative cursor-pointer"
+        onClick={() => onViewDetails(cert)}
+      >
+        <div className="relative h-full rounded-3xl overflow-hidden border-2 border-primary/20 bg-gradient-to-br from-card/95 via-card/90 to-card/95">
+          {/* Top accent bar */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-60 z-30" />
+
+          {/* Certificate Image Section */}
+          <div className="relative aspect-[16/9] bg-gradient-to-br from-primary/15 via-primary/8 to-primary/15 overflow-hidden">
+            {cert.imageUrl && !imageError ? (
+              <>
+                <img
+                  src={cert.imageUrl}
+                  alt={`${cert.title} certificate`}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  loading="lazy"
+                  onError={() => setImageError(true)}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/60 to-transparent z-10" />
+              </>
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/20 via-primary/10 to-primary/20">
+                <div className="p-6 rounded-2xl bg-background/50 border-2 border-primary/30">
+                  <ImageIcon className="w-12 h-12 text-primary/60" />
+                </div>
+              </div>
+            )}
+
+            {/* Badge overlay */}
+            <div className="absolute top-4 right-4 z-30">
+              <div className="bg-gradient-to-br from-background/95 to-background/80 rounded-xl px-3 py-2 border-2 border-primary/30 shadow-xl flex items-center gap-2">
+                <Award className="w-5 h-5 text-primary" />
+                <span className="text-xs font-bold text-primary">Certified</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Content Section */}
+          <div className="p-4 sm:p-5 relative z-20 bg-gradient-to-b from-transparent to-background/50">
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  <div className="p-1 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/30 flex-shrink-0">
+                    <Star className="w-3.5 h-3.5 text-primary fill-primary/30" />
+                  </div>
+                  <h3 className="font-display text-base sm:text-xl font-bold leading-tight text-foreground line-clamp-2">
+                    {cert.title}
+                  </h3>
+                </div>
+                <div className="flex items-center gap-2 text-primary/90 font-semibold">
+                  <Award className="w-4 h-4 shrink-0" />
+                  <span className="truncate text-sm">{cert.issuer}</span>
+                </div>
+              </div>
+
+              {showVerify && (
+                <a
+                  href={cert.credentialUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink-0 inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold border-2 border-primary/40 bg-gradient-to-r from-primary/20 to-primary/10 transition-all duration-300 touch-manipulation"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              )}
+            </div>
+
+            {/* Meta Information */}
+            <div className="flex flex-wrap gap-1.5 mb-3">
+              {cert.issueDate && (
+                <Badge variant="secondary" className="gap-1 text-[10px] font-semibold bg-gradient-to-r from-primary/15 to-primary/10 border border-primary/25 touch-manipulation">
+                  <Calendar className="w-3 h-3" />
+                  <span className="truncate max-w-[120px]">{cert.issueDate}</span>
+                </Badge>
+              )}
+              {cert.credentialId && (
+                <Badge variant="outline" className="gap-1 border-primary/30 bg-background/50 text-[10px] font-semibold touch-manipulation">
+                  <Hash className="w-3 h-3" />
+                  <span className="truncate max-w-[100px]">{cert.credentialId}</span>
+                </Badge>
+              )}
+            </div>
+
+            {/* Description */}
+            {cert.description && (
+              <p className="text-xs leading-relaxed line-clamp-2 mb-3 text-muted-foreground">
+                {cert.description}
+              </p>
+            )}
+
+            {/* Skills */}
+            {skills.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {skills.slice(0, 5).map((skill) => (
+                  <span
+                    key={skill}
+                    className="text-[10px] px-2 py-0.5 bg-gradient-to-r from-primary/15 via-primary/10 to-primary/15 border border-primary/25 rounded-full text-primary/90 font-semibold touch-manipulation"
+                  >
+                    {skill}
+                  </span>
+                ))}
+                {skills.length > 5 && (
+                  <span className="text-[10px] px-2 py-0.5 bg-muted/50 border border-border rounded-full text-muted-foreground font-semibold">
+                    +{skills.length - 5}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop: full animated card
   return (
     <motion.div
       ref={cardRef}
