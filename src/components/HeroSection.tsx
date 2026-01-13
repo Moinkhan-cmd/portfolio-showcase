@@ -245,7 +245,7 @@ export const HeroSection = () => {
                     Digital
                   </span>
                   <motion.span
-                    className="absolute -right-8 top-0"
+                    className="absolute -right-8 top-0 hidden sm:block"
                     animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.1, 1] }}
                     transition={{ duration: 2, repeat: Infinity }}
                   >
@@ -498,7 +498,7 @@ export const HeroSection = () => {
                 ].map((pos, i) => (
                   <motion.div
                     key={i}
-                    className="absolute"
+                    className="absolute hidden sm:block"
                     style={{ top: pos.top, bottom: pos.bottom, right: pos.right, left: pos.left }}
                     initial={{ opacity: 0, scale: 0 }}
                     animate={isInView ? { opacity: 1, scale: 1 } : {}}
