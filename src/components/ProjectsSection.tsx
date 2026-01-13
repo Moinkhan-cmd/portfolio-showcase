@@ -2,6 +2,7 @@ import { useRef, useState, useMemo } from "react";
 import { ExternalLink, Github, Folder, Sparkles, ArrowRight, Loader2, Star, Zap, Code, Tag, Clock, CheckCircle2, Search, X, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from "framer-motion";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { ProjectsBackground3D } from "./ProjectsBackground3D";
 import { MobileGradientBackground } from "./MobileGradientBackground";
 import { useProjects } from "@/hooks/useProjects";
@@ -32,8 +33,9 @@ interface ProjectCardProps {
 const ProjectCard = ({ project, index, isFeatured = false }: ProjectCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
-  // Subtle 3D tilt effect
+  // Subtle 3D tilt effect - only used on desktop
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   
@@ -44,7 +46,7 @@ const ProjectCard = ({ project, index, isFeatured = false }: ProjectCardProps) =
   const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-4deg", "4deg"]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
+    if (!ref.current || isMobile) return;
     
     const rect = ref.current.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
@@ -62,6 +64,95 @@ const ProjectCard = ({ project, index, isFeatured = false }: ProjectCardProps) =
     setIsHovered(false);
   };
 
+  // Mobile: simplified static card
+  if (isMobile) {
+    return (
+      <div ref={ref} className="group relative">
+        <div className="relative h-full rounded-2xl overflow-hidden border border-primary/10 bg-gradient-to-br from-card/90 via-card/80 to-card/90 flex flex-col">
+          {/* Featured badge */}
+          {isFeatured && (
+            <div className="absolute top-4 right-4 z-30">
+              <Badge className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground border-0 shadow-lg flex items-center gap-1.5 px-3 py-1">
+                <Star className="w-3.5 h-3.5 fill-current" />
+                Featured
+              </Badge>
+            </div>
+          )}
+
+          {/* Project Image */}
+          <div className={`relative overflow-hidden ${isFeatured ? 'aspect-[21/9]' : 'aspect-video'} bg-gradient-to-br from-primary/10 via-primary/5 to-transparent`}>
+            <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent z-20 pointer-events-none opacity-85" />
+            {project.thumbnail ? (
+              <img src={project.thumbnail} alt={project.title} className="w-full h-full object-cover" />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Folder className="w-16 h-16 text-primary/30" />
+              </div>
+            )}
+          </div>
+
+          {/* Project Content */}
+          <div className="p-4 sm:p-5 relative z-10 flex flex-col h-full min-h-0">
+            <div className="flex items-start justify-between gap-2 mb-2">
+              <div className="flex items-center gap-2 min-w-0 flex-1">
+                <div className="p-1 rounded-lg bg-primary/10 shrink-0">
+                  <Code className="w-3.5 h-3.5 text-primary" />
+                </div>
+                <h3 className="font-display text-base sm:text-lg font-semibold text-foreground truncate">
+                  {project.title}
+                </h3>
+              </div>
+            </div>
+
+            <p className="text-xs sm:text-sm line-clamp-2 mb-3 text-muted-foreground leading-relaxed">
+              {project.shortDescription}
+            </p>
+
+            {/* Tech Stack */}
+            <div className="flex flex-wrap gap-1.5 mb-3 min-h-[1.75rem]">
+              {project.techStack.slice(0, isFeatured ? 5 : 4).map((tech) => (
+                <span
+                  key={tech}
+                  className="text-[10px] px-2 py-0.5 bg-primary/10 border border-primary/20 rounded-full text-primary/90 font-medium touch-manipulation"
+                >
+                  {tech}
+                </span>
+              ))}
+              {project.techStack.length > (isFeatured ? 5 : 4) && (
+                <span className="text-[10px] px-2 py-0.5 bg-muted/50 border border-border rounded-full text-muted-foreground font-medium">
+                  +{project.techStack.length - (isFeatured ? 5 : 4)}
+                </span>
+              )}
+            </div>
+
+            <div className="flex-grow" />
+
+            {/* Action Buttons */}
+            <div className="flex gap-2 mt-auto pt-2">
+              {project.liveUrl && (
+                <Button variant="hero" size="sm" asChild className="flex-1 text-xs font-medium shadow-md touch-manipulation py-2">
+                  <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1.5">
+                    <Zap className="w-3.5 h-3.5" />
+                    <span>Live Demo</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </a>
+                </Button>
+              )}
+              {project.githubUrl && (
+                <Button variant="outline" size="sm" asChild className="px-3 border-primary/25 touch-manipulation min-w-[2.5rem]">
+                  <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
+                    <Github className="w-3.5 h-3.5" />
+                  </a>
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop: full animated card
   return (
     <motion.div
       ref={ref}
