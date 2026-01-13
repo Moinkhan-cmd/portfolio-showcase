@@ -26,6 +26,7 @@ import {
   userActivitySchema,
   activityItemSchema,
 } from "./admin/analyticsValidation";
+import { safeLocalStorage } from "./safeStorage";
 
 // ============================================
 // INPUT SANITIZATION UTILITIES
@@ -86,21 +87,25 @@ const sanitizeTrafficSource = (source: string): string => {
 // ============================================
 
 // Visitor session ID (stored in localStorage)
+let memorySessionId: string | null = null;
 const getSessionId = (): string => {
-  const stored = localStorage.getItem("visitor_session_id");
+  const stored = safeLocalStorage.getItem("visitor_session_id") || memorySessionId;
   if (stored) return stored;
   const newId = `session_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
-  localStorage.setItem("visitor_session_id", newId);
+  memorySessionId = newId;
+  safeLocalStorage.setItem("visitor_session_id", newId);
   return newId;
 };
 
 // Visitor ID (stored in localStorage, persists across sessions)
+let memoryVisitorId: string | null = null;
 const getVisitorId = (): string => {
-  const stored = localStorage.getItem("visitor_id");
+  const stored = safeLocalStorage.getItem("visitor_id") || memoryVisitorId;
   if (stored) return stored;
   const newId = `visitor_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
-  localStorage.setItem("visitor_id", newId);
-  localStorage.setItem("visitor_first_visit", new Date().toISOString());
+  memoryVisitorId = newId;
+  safeLocalStorage.setItem("visitor_id", newId);
+  safeLocalStorage.setItem("visitor_first_visit", new Date().toISOString());
   return newId;
 };
 
@@ -176,19 +181,19 @@ export const trackPageView = async (pagePath: string, pageTitle?: string) => {
     const deviceType = validateDeviceType(getDeviceType());
     const { country, region } = getCountryRegion();
     const trafficSource = getTrafficSource();
-    const isNewVisitor = !localStorage.getItem("visitor_has_visited");
+    const isNewVisitor = !safeLocalStorage.getItem("visitor_has_visited");
     
     if (isNewVisitor) {
-      localStorage.setItem("visitor_has_visited", "true");
+      safeLocalStorage.setItem("visitor_has_visited", "true");
     }
 
     // Check if this is the first visit today
     const today = new Date().toISOString().split("T")[0];
-    const lastVisitDate = localStorage.getItem("visitor_last_visit_date");
+    const lastVisitDate = safeLocalStorage.getItem("visitor_last_visit_date");
     const isNewSession = lastVisitDate !== today;
     
     if (isNewSession) {
-      localStorage.setItem("visitor_last_visit_date", today);
+      safeLocalStorage.setItem("visitor_last_visit_date", today);
     }
 
     // Build and validate page view data

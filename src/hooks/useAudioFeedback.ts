@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { safeLocalStorage } from "@/lib/safeStorage";
 
 type SoundType = "navigate" | "hover" | "click" | "success";
 
@@ -8,7 +9,7 @@ interface AudioFeedbackOptions {
 
 export const useAudioFeedback = (options: AudioFeedbackOptions = {}) => {
   const [isEnabled, setIsEnabled] = useState(() => {
-    const stored = localStorage.getItem("portfolio_audio_enabled");
+    const stored = safeLocalStorage.getItem("portfolio_audio_enabled");
     return stored !== null ? stored === "true" : true;
   });
   const [isPlaying, setIsPlaying] = useState(false);
@@ -28,7 +29,7 @@ export const useAudioFeedback = (options: AudioFeedbackOptions = {}) => {
 
   // Persist preference
   useEffect(() => {
-    localStorage.setItem("portfolio_audio_enabled", String(isEnabled));
+    safeLocalStorage.setItem("portfolio_audio_enabled", String(isEnabled));
   }, [isEnabled]);
 
   // Keyboard shortcut to toggle audio (M key)

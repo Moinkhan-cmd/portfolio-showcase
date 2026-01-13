@@ -9,6 +9,7 @@ import { AudioFeedbackProvider } from "@/components/AudioFeedbackProvider";
 import { useKeyboardNavigation } from "@/hooks/useKeyboardNavigation";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { safeLocalStorage } from "@/lib/safeStorage";
 
 const AboutSection = lazy(async () => {
   const mod = await import("@/components/AboutSection");
@@ -47,7 +48,7 @@ const Index = () => {
 
   // Check if returning visitor (loader was skipped)
   useEffect(() => {
-    const hasVisited = localStorage.getItem("portfolio_visited");
+    const hasVisited = safeLocalStorage.getItem("portfolio_visited");
     if (hasVisited) {
       setIsReturningVisitor(true);
       // Trigger entrance animation after a tiny delay
@@ -57,7 +58,7 @@ const Index = () => {
     } else {
       // First-time visitor - show content immediately (loader handles transition)
       setShowContent(true);
-      localStorage.setItem("portfolio_visited", "true");
+      safeLocalStorage.setItem("portfolio_visited", "true");
     }
   }, []);
 

@@ -32,7 +32,7 @@ export const use3DPerformance = (): PerformanceSettings => {
     const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
     const prefersReducedMotion = window.matchMedia?.(
       "(prefers-reduced-motion: reduce)"
-    ).matches;
+    )?.matches ?? false;
     
     // Check for low-power mode hints
     const isLowPower = window.matchMedia?.("(prefers-reduced-data: reduce)")?.matches || false;
@@ -102,7 +102,7 @@ export const shouldEnable3D = (): boolean => {
   const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
   const prefersReducedMotion = window.matchMedia?.(
     "(prefers-reduced-motion: reduce)"
-  ).matches;
+  )?.matches ?? false;
 
   return !isMobile && !isTouch && !prefersReducedMotion;
 };

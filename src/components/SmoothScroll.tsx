@@ -9,7 +9,7 @@ let lenisInstance: Lenis | null = null;
 const shouldEnableLenis = () => {
   if (typeof window === "undefined") return false;
   if (window.location.pathname.startsWith("/admin")) return false;
-  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return false;
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches) return false;
   // Disable on touch devices for native scrolling (much smoother)
   if ("ontouchstart" in window || navigator.maxTouchPoints > 0) return false;
   return true;
