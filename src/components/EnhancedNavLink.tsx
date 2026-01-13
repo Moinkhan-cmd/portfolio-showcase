@@ -1,4 +1,4 @@
-import { useRef, useState, MouseEvent } from "react";
+import { useRef, useState, MouseEvent, useEffect } from "react";
 import { motion, useMotionTemplate, useMotionValue, animate } from "framer-motion";
 
 interface EnhancedNavLinkProps {
@@ -8,20 +8,54 @@ interface EnhancedNavLinkProps {
   index: number;
 }
 
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+      const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      setIsMobile(isTouchDevice || isMobileUA);
+    };
+    checkMobile();
+  }, []);
+  
+  return isMobile;
+};
+
 export const EnhancedNavLink = ({ link, isActive, onClick, index }: EnhancedNavLinkProps) => {
   const linkRef = useRef<HTMLButtonElement>(null);
+  const isMobile = useIsMobile();
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const radius = 100;
 
   const handleMouseMove = (e: MouseEvent<HTMLButtonElement>) => {
-    if (!linkRef.current) return;
+    if (!linkRef.current || isMobile) return;
     const { left, top } = linkRef.current.getBoundingClientRect();
     const x = e.clientX - left;
     const y = e.clientY - top;
     mouseX.set(x);
     mouseY.set(y);
   };
+
+  // Simplified mobile version without heavy animations
+  if (isMobile) {
+    return (
+      <li className="relative">
+        <button
+          ref={linkRef}
+          type="button"
+          onClick={onClick}
+          className={`relative text-sm font-medium tracking-wide px-6 py-2.5 rounded-full overflow-hidden ${
+            isActive ? "text-white bg-white/10" : "text-zinc-400"
+          }`}
+        >
+          <span className="relative z-10">{link.name}</span>
+        </button>
+      </li>
+    );
+  }
 
   return (
     <motion.li
