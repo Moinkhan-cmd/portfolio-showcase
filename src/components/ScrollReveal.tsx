@@ -1,5 +1,20 @@
 import { motion, useInView, useScroll, useTransform, Variants } from "framer-motion";
-import { useRef, ReactNode } from "react";
+import { useRef, ReactNode, useEffect, useState } from "react";
+
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+      const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      setIsMobile(isTouchDevice || isMobileUA);
+    };
+    checkMobile();
+  }, []);
+  
+  return isMobile;
+};
 
 interface ScrollRevealProps {
   children: ReactNode;
@@ -60,7 +75,13 @@ export const ScrollReveal = ({
   distance = 40,
 }: ScrollRevealProps) => {
   const ref = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
   const isInView = useInView(ref, { once, amount: threshold });
+
+  // On mobile, skip animations for better performance
+  if (isMobile) {
+    return <div ref={ref} className={className}>{children}</div>;
+  }
 
   // Enhanced variant with custom distance
   const baseHidden = variants[variant].hidden as Record<string, number | string>;
@@ -88,7 +109,7 @@ export const ScrollReveal = ({
         duration,
         delay,
         ease: [0.25, 0.46, 0.45, 0.94],
-        type: "tween", // Changed from spring to tween for better performance
+        type: "tween",
       }}
       style={{ willChange: 'opacity, transform' }}
       className={className}
@@ -117,7 +138,19 @@ export const StaggerReveal = ({
   duration = 0.4,
 }: StaggerRevealProps) => {
   const ref = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
   const isInView = useInView(ref, { once, amount: 0.2 });
+
+  // On mobile, skip animations
+  if (isMobile) {
+    return (
+      <div ref={ref} className={className}>
+        {children.map((child, index) => (
+          <div key={index}>{child}</div>
+        ))}
+      </div>
+    );
+  }
 
   const containerVariants: Variants = {
     hidden: {},
@@ -144,7 +177,7 @@ export const StaggerReveal = ({
           transition={{
             duration,
             ease: [0.25, 0.46, 0.45, 0.94],
-            type: "tween", // Changed from spring to tween
+            type: "tween",
           }}
           style={{ willChange: 'opacity, transform' }}
         >
@@ -172,6 +205,7 @@ export const ParallaxScroll = ({
   offset = 0,
 }: ParallaxScrollProps) => {
   const ref = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
@@ -185,6 +219,11 @@ export const ParallaxScroll = ({
 
   const opacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.3, 1, 0.3]);
   const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.95, 1, 0.95]);
+
+  // On mobile, skip parallax effects
+  if (isMobile) {
+    return <div ref={ref} className={className}>{children}</div>;
+  }
 
   return (
     <motion.div
@@ -210,6 +249,7 @@ interface ScrollProgressProps {
 
 export const ScrollProgressElement = ({ children, className = "" }: ScrollProgressProps) => {
   const ref = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
@@ -217,6 +257,11 @@ export const ScrollProgressElement = ({ children, className = "" }: ScrollProgre
 
   const opacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 1, 1, 0]);
   const scale = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0.8, 1, 1, 0.8]);
+
+  // On mobile, skip scroll effects
+  if (isMobile) {
+    return <div ref={ref} className={className}>{children}</div>;
+  }
 
   return (
     <motion.div
@@ -247,6 +292,7 @@ export const FadeInScroll = ({
   fadeDistance = 50,
 }: FadeInScrollProps) => {
   const ref = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
@@ -262,6 +308,11 @@ export const FadeInScroll = ({
     [0, triggerPoint, 1 - triggerPoint, 1],
     [fadeDistance, fadeDistance, 0, 0]
   );
+
+  // On mobile, skip scroll effects
+  if (isMobile) {
+    return <div ref={ref} className={className}>{children}</div>;
+  }
 
   return (
     <motion.div

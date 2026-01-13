@@ -2,6 +2,21 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+      const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      setIsMobile(isTouchDevice || isMobileUA);
+    };
+    checkMobile();
+  }, []);
+  
+  return isMobile;
+};
+
 const SECTIONS = [
   { id: "hero", name: "Home" },
   { id: "about", name: "About" },
@@ -16,6 +31,10 @@ export const SectionProgressIndicator = () => {
   const [viewedSections, setViewedSections] = useState<Set<string>>(new Set(["hero"]));
   const [activeSection, setActiveSection] = useState("hero");
   const [isVisible, setIsVisible] = useState(false);
+  const isMobile = useIsMobile();
+
+  // Don't render on mobile
+  if (isMobile) return null;
 
   // Show/hide based on scroll position
   useEffect(() => {

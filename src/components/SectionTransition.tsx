@@ -1,5 +1,5 @@
 import { motion, useInView } from "framer-motion";
-import { useRef, ReactNode } from "react";
+import { useRef, ReactNode, useEffect, useState } from "react";
 
 interface SectionTransitionProps {
   children: ReactNode;
@@ -7,13 +7,38 @@ interface SectionTransitionProps {
   id?: string;
 }
 
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+      const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      setIsMobile(isTouchDevice || isMobileUA);
+    };
+    checkMobile();
+  }, []);
+  
+  return isMobile;
+};
+
 export const SectionTransition = ({ children, className = "", id }: SectionTransitionProps) => {
   const ref = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
   const isInView = useInView(ref, { 
     once: false, 
     amount: 0.15,
     margin: "-50px 0px -50px 0px"
   });
+
+  // On mobile, skip all animations for better performance
+  if (isMobile) {
+    return (
+      <section ref={ref} id={id} className={className}>
+        {children}
+      </section>
+    );
+  }
 
   return (
     <motion.section
