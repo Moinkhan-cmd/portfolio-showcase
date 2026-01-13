@@ -16,6 +16,7 @@ import { HeroBackground3D } from "./HeroBackground3D";
 import { MobileGradientBackground } from "./MobileGradientBackground";
 import { scrollToSection } from "@/components/SmoothScroll";
 import { useAudioContext } from "@/hooks/useAudioFeedback";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 const socialLinks = [
   { icon: Github, href: "https://github.com/Moinkhan-cmd", label: "GitHub", gradient: "from-[#333] to-[#6e5494]" },
@@ -33,6 +34,7 @@ export const HeroSection = () => {
   const [cursorGlowEnabled, setCursorGlowEnabled] = useState(false);
   const cursorRafRef = useRef<number | null>(null);
   const cursorPendingRef = useRef<{ x: number; y: number }>({ x: -1000, y: -1000 });
+  const isMobile = useIsMobile();
   
   // Audio feedback
   let playClickSound = () => {};
@@ -43,6 +45,7 @@ export const HeroSection = () => {
     // Audio context not available
   }
   
+  // Only use motion values on desktop - these hooks are always called but values are only used on desktop
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const springConfig = { damping: 25, stiffness: 150 };
@@ -115,21 +118,23 @@ export const HeroSection = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background/60 to-background pointer-events-none z-[1]" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,hsl(var(--primary)/0.15),transparent)] pointer-events-none z-[1]" />
       
-      {/* Mesh gradient */}
-      <div className="absolute inset-0 overflow-hidden z-[1]">
-        <motion.div
-          className="absolute -top-1/4 -right-1/4 w-[800px] h-[800px] rounded-full blur-[120px] opacity-20"
-          style={{ background: "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)" }}
-          animate={{ scale: [1, 1.2, 1], rotate: [0, 180, 360] }}
-          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-        />
-        <motion.div
-          className="absolute -bottom-1/4 -left-1/4 w-[600px] h-[600px] rounded-full blur-[100px] opacity-15"
-          style={{ background: "radial-gradient(circle, hsl(280 70% 50%) 0%, transparent 70%)" }}
-          animate={{ scale: [1.2, 1, 1.2], rotate: [360, 180, 0] }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-        />
-      </div>
+      {/* Mesh gradient - disabled on mobile for performance */}
+      {!isMobile && (
+        <div className="absolute inset-0 overflow-hidden z-[1]">
+          <motion.div
+            className="absolute -top-1/4 -right-1/4 w-[800px] h-[800px] rounded-full blur-[120px] opacity-20"
+            style={{ background: "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)" }}
+            animate={{ scale: [1, 1.2, 1], rotate: [0, 180, 360] }}
+            transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+          />
+          <motion.div
+            className="absolute -bottom-1/4 -left-1/4 w-[600px] h-[600px] rounded-full blur-[100px] opacity-15"
+            style={{ background: "radial-gradient(circle, hsl(280 70% 50%) 0%, transparent 70%)" }}
+            animate={{ scale: [1.2, 1, 1.2], rotate: [360, 180, 0] }}
+            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          />
+        </div>
+      )}
 
       {/* Interactive cursor glow */}
       {cursorGlowEnabled && (
