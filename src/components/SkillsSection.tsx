@@ -126,7 +126,16 @@ const normalizeCategory = (category: unknown): SkillCategory => {
   if (enumValues.includes(trimmed as SkillCategory)) return trimmed as SkillCategory;
   return 'tools_platform';
 };
-const Card3D = ({ children, className }: { children: React.ReactNode; className?: string }) => {
+// Wrapper that uses simple div on mobile, 3D card on desktop
+const Card3D = ({ children, className, isMobile }: { children: React.ReactNode; className?: string; isMobile?: boolean }) => {
+  if (isMobile) {
+    return <div className={className}>{children}</div>;
+  }
+  return <Card3DDesktop className={className}>{children}</Card3DDesktop>;
+};
+
+// Desktop-only component with framer-motion hooks
+const Card3DDesktop = ({ children, className }: { children: React.ReactNode; className?: string }) => {
   const ref = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -161,9 +170,61 @@ interface SkillCardProps {
   skills: Skill[];
   index: number;
   category: SkillCategory;
+  isMobile?: boolean;
 }
 
-const SkillCard = ({ title, icon: Icon, skills, index, category }: SkillCardProps) => {
+const SkillCard = ({ title, icon: Icon, skills, index, category, isMobile }: SkillCardProps) => {
+  const colors = categoryColors[category];
+  
+  // Mobile: simplified static card without animations
+  if (isMobile) {
+    return (
+      <div className="group relative">
+        <div
+          className={cn(
+            'relative h-full rounded-2xl overflow-hidden',
+            'bg-gradient-to-br from-card/95 via-card/90 to-card/85',
+            'border-2', colors.border,
+            'shadow-xl'
+          )}
+        >
+          <div className={cn('absolute inset-0 bg-gradient-to-br opacity-30', colors.gradient)} />
+          <div className="relative z-10 p-5">
+            <div className="flex items-start gap-3 mb-4">
+              <div className={cn('p-3 rounded-2xl bg-gradient-to-br shadow-lg', colors.iconBg)}>
+                <Icon className="w-5 h-5 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-display text-base font-bold text-foreground leading-tight flex items-center gap-2">
+                  {title}
+                  <Sparkles className={cn('w-3.5 h-3.5', colors.accent)} />
+                </h3>
+                <div className="flex items-center gap-2 mt-1">
+                  <div className={cn('flex items-center gap-1 px-2 py-0.5 rounded-full', colors.bg)}>
+                    <Crown className={cn('w-3 h-3', colors.accent)} />
+                    <span className={cn('text-xs font-bold', colors.accent)}>{skills.length}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {skills.map((skill, i) => (
+                <SkillBadgeMobile key={skill.id || i} skill={skill} category={category} />
+              ))}
+            </div>
+          </div>
+          <div className={cn('absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r', colors.iconBg)} />
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop: full animated card
+  return <SkillCardDesktop title={title} icon={Icon} skills={skills} index={index} category={category} />;
+};
+
+// Desktop version with all animations
+const SkillCardDesktop = ({ title, icon: Icon, skills, index, category }: Omit<SkillCardProps, 'isMobile'>) => {
   const colors = categoryColors[category];
   const [isHovered, setIsHovered] = useState(false);
   
@@ -271,6 +332,24 @@ const SkillCard = ({ title, icon: Icon, skills, index, category }: SkillCardProp
     </motion.div>
   );
 };
+
+// Mobile: simple static badge
+const SkillBadgeMobile = ({ skill, category }: { skill: Skill; category: SkillCategory }) => {
+  const colors = categoryColors[category];
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium',
+        'bg-background/70 border border-white/10'
+      )}
+    >
+      <span className={cn('absolute inset-0 rounded-lg -z-10 bg-gradient-to-br opacity-20', colors.gradient)} />
+      <span className="text-foreground/90">{skill.name}</span>
+    </span>
+  );
+};
+
+// Desktop: animated badge
 const SkillBadge = ({ skill, index, category }: { skill: Skill; index: number; category: SkillCategory }) => {
   const colors = categoryColors[category];
   const [isHovered, setIsHovered] = useState(false);
@@ -491,7 +570,7 @@ export const SkillsSection = () => {
             <AnimatePresence mode="popLayout">
               {filteredCategories.map((category, index) => (
                 <motion.div key={category.title} layout>
-                  <SkillCard title={category.title} icon={category.icon} skills={category.skills} index={index} category={category.category} />
+                  <SkillCard title={category.title} icon={category.icon} skills={category.skills} index={index} category={category.category} isMobile={isMobile} />
                 </motion.div>
               ))}
             </AnimatePresence>
