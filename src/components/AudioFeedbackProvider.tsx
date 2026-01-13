@@ -10,12 +10,18 @@ export const AudioFeedbackProvider = ({ children }: AudioFeedbackProviderProps) 
 
   // Listen for section navigation events
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     const handleSectionNavigate = () => {
       audio.playSound("navigate");
     };
 
-    window.addEventListener("sectionNavigate", handleSectionNavigate);
-    return () => window.removeEventListener("sectionNavigate", handleSectionNavigate);
+    try {
+      window.addEventListener("sectionNavigate", handleSectionNavigate);
+      return () => window.removeEventListener("sectionNavigate", handleSectionNavigate);
+    } catch {
+      return;
+    }
   }, [audio]);
 
   return (

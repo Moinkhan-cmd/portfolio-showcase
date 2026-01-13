@@ -1,9 +1,15 @@
 import { ArrowUp, ExternalLink, Github, Heart, Linkedin, Mail, MapPin, Send } from "lucide-react";
 import { motion } from "framer-motion";
-import { useRef } from "react";
-import { FooterBackground3D } from "./FooterBackground3D";
+import { useRef, lazy, Suspense } from "react";
 import { scrollToSection, scrollToTop } from "@/components/SmoothScroll";
 import { cn } from "@/lib/utils";
+import { useRealMobile } from "@/hooks/useRealMobile";
+import { shouldEnable3D } from "@/hooks/use3DPerformance";
+
+const FooterBackground3D = lazy(async () => {
+  const mod = await import("./FooterBackground3D");
+  return { default: mod.FooterBackground3D };
+});
 
 const socialLinks = [
   {
@@ -40,38 +46,47 @@ const techStack = ["React", "TypeScript", "Tailwind", "Three.js", "Framer Motion
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
   const footerRef = useRef<HTMLElement>(null);
+  const { isRealMobile, prefersReducedMotion } = useRealMobile();
 
   return (
     <footer
       ref={footerRef}
       className="relative mt-20 border-t border-primary/10 bg-background overflow-hidden"
     >
-      <FooterBackground3D />
+      {shouldEnable3D() && (
+        <Suspense fallback={null}>
+          <FooterBackground3D />
+        </Suspense>
+      )}
 
       {/* Readability overlay on top of 3D background */}
       <div className="absolute inset-0 bg-gradient-to-b from-background/55 via-background/70 to-background/90 pointer-events-none z-10" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,transparent_0%,hsl(var(--background)/0.55)_55%,hsl(var(--background)/0.95)_100%)] pointer-events-none z-10" />
 
-      {/* Subtle animated top border */}
-      <motion.div
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 max-w-3xl h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent z-20"
-        animate={{ opacity: [0.25, 0.9, 0.25] }}
-        transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
-      />
+      {!isRealMobile && !prefersReducedMotion && (
+        <>
+          {/* Subtle animated top border */}
+          <motion.div
+            className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 max-w-3xl h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent z-20"
+            animate={{ opacity: [0.25, 0.9, 0.25] }}
+            transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
+          />
 
-      {/* Ambient orbs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
-        <motion.div
-          className="absolute -top-20 left-1/3 w-72 sm:w-96 h-72 sm:h-96 bg-primary/10 rounded-full blur-[90px]"
-          animate={{ x: [0, 40, 0], y: [0, 20, 0], scale: [1, 1.15, 1] }}
-          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute -bottom-24 right-1/3 w-64 sm:w-80 h-64 sm:h-80 bg-purple-500/10 rounded-full blur-[80px]"
-          animate={{ x: [0, -30, 0], y: [0, -15, 0], scale: [1, 1.12, 1] }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </div>
+          {/* Ambient orbs */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
+            <motion.div
+              className="absolute -top-20 left-1/3 w-72 sm:w-96 h-72 sm:h-96 bg-primary/10 rounded-full blur-[90px]"
+              animate={{ x: [0, 40, 0], y: [0, 20, 0], scale: [1, 1.15, 1] }}
+              transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+            />
+            <motion.div
+              className="absolute -bottom-24 right-1/3 w-64 sm:w-80 h-64 sm:h-80 bg-purple-500/10 rounded-full blur-[80px]"
+              animate={{ x: [0, -30, 0], y: [0, -15, 0], scale: [1, 1.12, 1] }}
+              transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+            />
+          </div>
+        </>
+      )}
 
       {/* Light grid texture */}
       <div

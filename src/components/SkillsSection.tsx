@@ -1,11 +1,16 @@
-import { useEffect, useRef, useState, useMemo } from 'react';
+import { useEffect, useRef, useState, useMemo, lazy, Suspense } from 'react';
 import { Code2, Database, Users, Wrench, Code, Loader2, TrendingUp, Star, Sparkles, Filter, Zap, Award, Target, Layers, Cpu, Globe, Rocket, ChevronRight, Gem, Crown, Flame, Heart, Activity } from 'lucide-react';
 import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from 'framer-motion';
-import { SkillsBackground3D } from './SkillsBackground3D';
 import { MobileGradientBackground } from './MobileGradientBackground';
 import { useSkills } from '@/hooks/useSkills';
 import type { Skill } from '@/lib/admin/skills';
 import { cn } from '@/lib/utils';
+import { shouldEnable3D } from '@/hooks/use3DPerformance';
+
+const SkillsBackground3D = lazy(async () => {
+  const mod = await import('./SkillsBackground3D');
+  return { default: mod.SkillsBackground3D };
+});
 
 const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -475,7 +480,11 @@ export const SkillsSection = () => {
   }), [skills, skillCategories]);
   return (
     <section id="skills" ref={sectionRef} className="section-padding relative overflow-hidden bg-gradient-to-b from-background via-secondary/5 to-background min-h-screen">
-      <SkillsBackground3D />
+      {shouldEnable3D() && (
+        <Suspense fallback={null}>
+          <SkillsBackground3D />
+        </Suspense>
+      )}
       <MobileGradientBackground variant="skills" />
       <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/80 to-background/60 pointer-events-none z-10" />
       

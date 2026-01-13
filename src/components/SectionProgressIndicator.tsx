@@ -1,21 +1,7 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-
-const useIsMobile = () => {
-  const [isMobile, setIsMobile] = useState(false);
-  
-  useEffect(() => {
-    const checkMobile = () => {
-      const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0;
-      const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      setIsMobile(isTouchDevice || isMobileUA);
-    };
-    checkMobile();
-  }, []);
-  
-  return isMobile;
-};
+import { useRealMobile } from "@/hooks/useRealMobile";
 
 const SECTIONS = [
   { id: "hero", name: "Home" },
@@ -28,15 +14,21 @@ const SECTIONS = [
 ];
 
 export const SectionProgressIndicator = () => {
+  const { isRealMobile, prefersReducedMotion } = useRealMobile();
+
+  // Don't render on mobile
+  if (isRealMobile || prefersReducedMotion) return null;
+
+  return <SectionProgressIndicatorInner />;
+};
+
+const SectionProgressIndicatorInner = () => {
   const [viewedSections, setViewedSections] = useState<Set<string>>(new Set(["hero"]));
   const [activeSection, setActiveSection] = useState("hero");
   const [isVisible, setIsVisible] = useState(false);
-  const isMobile = useIsMobile();
-
-  // Don't render on mobile
-  if (isMobile) return null;
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
     const handleScroll = () => {
       setIsVisible(window.scrollY > 300);
     };
@@ -47,18 +39,29 @@ export const SectionProgressIndicator = () => {
   }, []);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const sectionId = entry.target.id || "hero";
-            setActiveSection(sectionId);
-            setViewedSections((prev) => new Set([...prev, sectionId]));
-          }
-        });
-      },
-      { rootMargin: "-40% 0px -40% 0px", threshold: 0.1 }
-    );
+    if (typeof window === "undefined" || typeof document === "undefined") return;
+    if (typeof IntersectionObserver === "undefined") return;
+
+    let observer: IntersectionObserver | null = null;
+    try {
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const sectionId = entry.target.id || "hero";
+              setActiveSection(sectionId);
+              setViewedSections((prev) => new Set([...prev, sectionId]));
+            }
+          });
+        },
+        { rootMargin: "-40% 0px -40% 0px", threshold: 0.1 }
+      );
+    } catch (error) {
+      console.warn("SectionProgressIndicator: IntersectionObserver init failed", error);
+      return;
+    }
+
+    if (!observer) return;
 
     // Observe hero section (main element or first section)
     const heroElement = document.querySelector("main > div.relative > section:first-of-type") || 
@@ -72,19 +75,28 @@ export const SectionProgressIndicator = () => {
       if (element) observer.observe(element);
     });
 
-    return () => observer.disconnect();
+    return () => observer?.disconnect();
   }, []);
 
   const scrollToSection = (sectionId: string) => {
+    if (typeof window === "undefined" || typeof document === "undefined") return;
     if (sectionId === "hero") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      try {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } catch {
+        window.scrollTo(0, 0);
+      }
       return;
     }
     const element = document.getElementById(sectionId);
     if (element) {
       const offset = 80;
       const top = element.getBoundingClientRect().top + window.scrollY - offset;
-      window.scrollTo({ top, behavior: "smooth" });
+      try {
+        window.scrollTo({ top, behavior: "smooth" });
+      } catch {
+        window.scrollTo(0, top);
+      }
     }
   };
 

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo, lazy, Suspense } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { 
   Award, ExternalLink, Calendar, Loader2, Image as ImageIcon, Hash, 
@@ -7,10 +7,10 @@ import {
   TrendingUp, Eye, Download, Share2, Copy, Check
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import { CertificationsBackground3D } from "./CertificationsBackground3D";
 import { MobileGradientBackground } from "./MobileGradientBackground";
 import { useCertifications } from "@/hooks/useCertifications";
 import type { Certification } from "@/lib/admin/certifications";
+import { getDeviceFlags } from "@/lib/device";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +29,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { shouldEnable3D } from "@/hooks/use3DPerformance";
+
+const CertificationsBackground3D = lazy(async () => {
+  const mod = await import("./CertificationsBackground3D");
+  return { default: mod.CertificationsBackground3D };
+});
 
 interface CertificationCardProps {
   cert: Certification;
@@ -91,6 +97,7 @@ const CertificationCard = ({ cert, index, onViewDetails }: CertificationCardProp
                   alt={`${cert.title} certificate`}
                   className="absolute inset-0 w-full h-full object-cover"
                   loading="lazy"
+                  decoding="async"
                   onError={() => setImageError(true)}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/60 to-transparent z-10" />
@@ -1071,6 +1078,7 @@ export const CertificationsSection = () => {
   const [showAll, setShowAll] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const { data: certifications = [], isLoading } = useCertifications();
+  const isMobile = useIsMobile();
 
   // Filter and sort state
   const [searchQuery, setSearchQuery] = useState("");
@@ -1156,14 +1164,31 @@ export const CertificationsSection = () => {
   };
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setIsVisible(true);
-      },
-      { threshold: 0.1 }
-    );
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    return () => observer.disconnect();
+    if (typeof window === "undefined" || typeof document === "undefined") return;
+    if (getDeviceFlags().isRealMobile) {
+      setIsVisible(true);
+      return;
+    }
+    if (typeof IntersectionObserver === "undefined") {
+      setIsVisible(true);
+      return;
+    }
+
+    let observer: IntersectionObserver | null = null;
+    try {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) setIsVisible(true);
+        },
+        { threshold: 0.1 }
+      );
+      if (sectionRef.current) observer.observe(sectionRef.current);
+    } catch (error) {
+      console.warn("CertificationsSection: IntersectionObserver init failed", error);
+      setIsVisible(true);
+    }
+
+    return () => observer?.disconnect();
   }, []);
 
   return (
@@ -1172,7 +1197,11 @@ export const CertificationsSection = () => {
       ref={sectionRef}
       className="section-padding relative overflow-hidden bg-gradient-to-b from-background via-secondary/10 to-background"
     >
-      <CertificationsBackground3D />
+      {shouldEnable3D() && (
+        <Suspense fallback={null}>
+          <CertificationsBackground3D />
+        </Suspense>
+      )}
       <MobileGradientBackground variant="certifications" />
       {/* Enhanced Background Overlays */}
       <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/90 to-background/80 pointer-events-none z-10" />
@@ -1184,7 +1213,8 @@ export const CertificationsSection = () => {
         }}
       />
 
-      {/* Animated Background Orbs */}
+      {/* Animated Background Orbs (disabled on mobile for performance) */}
+      {!isMobile && (
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-10 opacity-30">
         <motion.div
           className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl"
@@ -1213,6 +1243,7 @@ export const CertificationsSection = () => {
           }}
         />
       </div>
+      )}
 
       {/* Subtle Grid Pattern */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border)/0.08)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.08)_1px,transparent_1px)] bg-[size:50px_50px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_70%)] pointer-events-none z-10" />
@@ -1302,7 +1333,7 @@ export const CertificationsSection = () => {
               {/* Issuer Filter */}
               {issuers.length > 0 && (
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground font-medium hidden sm:inline flex items-center gap-1">
+                  <span className="text-xs text-muted-foreground font-medium hidden sm:flex items-center gap-1">
                     <Building2 className="w-3.5 h-3.5" />
                     Issuer:
                   </span>
@@ -1325,7 +1356,7 @@ export const CertificationsSection = () => {
               {/* Skill Filter */}
               {allSkills.length > 0 && (
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground font-medium hidden sm:inline flex items-center gap-1">
+                  <span className="text-xs text-muted-foreground font-medium hidden sm:flex items-center gap-1">
                     <Tag className="w-3.5 h-3.5" />
                     Skill:
                   </span>
@@ -1347,11 +1378,11 @@ export const CertificationsSection = () => {
 
               {/* Sort */}
               <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground font-medium hidden sm:inline flex items-center gap-1">
+                <span className="text-xs text-muted-foreground font-medium hidden sm:flex items-center gap-1">
                   <TrendingUp className="w-3.5 h-3.5" />
                   Sort:
                 </span>
-                <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+                <Select value={sortBy} onValueChange={(value) => setSortBy(value as typeof sortBy)}>
                   <SelectTrigger className="h-9 w-[160px] bg-background/50 border-primary/20">
                     <SelectValue />
                   </SelectTrigger>
@@ -1526,6 +1557,8 @@ export const CertificationsSection = () => {
                                 src={cert.imageUrl}
                                 alt={cert.title}
                                 className="w-full h-full object-cover"
+                                loading="lazy"
+                                decoding="async"
                               />
                             ) : (
                               <div className="flex items-center justify-center h-full">

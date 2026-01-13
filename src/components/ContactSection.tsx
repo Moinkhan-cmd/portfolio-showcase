@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, lazy, Suspense } from "react";
 import { Mail, Github, Linkedin, Send, MapPin, AlertCircle, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,10 +6,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import emailjs from "@emailjs/browser";
-import { ContactBackground3D } from "./ContactBackground3D";
 import { MobileGradientBackground } from "./MobileGradientBackground";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useAudioContext } from "@/hooks/useAudioFeedback";
+import { getDeviceFlags } from "@/lib/device";
+import { shouldEnable3D } from "@/hooks/use3DPerformance";
+
+const ContactBackground3D = lazy(async () => {
+  const mod = await import("./ContactBackground3D");
+  return { default: mod.ContactBackground3D };
+});
 
 const socialLinks = [
   { name: "GitHub", icon: Github, url: "https://github.com/Moinkhan-cmd", label: "github.com/Moinkhan-cmd" },
@@ -41,20 +47,36 @@ export const ContactSection = () => {
   const isEmailJSConfigured = !!(serviceId && templateId && publicKey);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.1 }
-    );
+    if (typeof window === "undefined" || typeof document === "undefined") return;
+    if (getDeviceFlags().isRealMobile) {
+      setIsVisible(true);
+      return;
+    }
+    if (typeof IntersectionObserver === "undefined") {
+      setIsVisible(true);
+      return;
+    }
+    let observer: IntersectionObserver | null = null;
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
+    try {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+          }
+        },
+        { threshold: 0.1 }
+      );
+
+      if (sectionRef.current) {
+        observer.observe(sectionRef.current);
+      }
+    } catch (error) {
+      console.warn("ContactSection: IntersectionObserver init failed", error);
+      setIsVisible(true);
     }
 
-    return () => observer.disconnect();
+    return () => observer?.disconnect();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -108,8 +130,16 @@ export const ContactSection = () => {
       });
       
       form.reset();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("EmailJS Error:", error);
+
+      const errorText =
+        typeof error === "object" &&
+        error !== null &&
+        "text" in error &&
+        typeof (error as { text?: unknown }).text === "string"
+          ? (error as { text: string }).text
+          : "";
       
       // Fallback to email client on error
       const subject = encodeURIComponent(`Contact from ${name} - Portfolio`);
@@ -118,7 +148,7 @@ export const ContactSection = () => {
       
       toast({
         title: "Failed to send via form",
-        description: error?.text || "An error occurred. Opening your email client as a fallback.",
+        description: errorText || "An error occurred. Opening your email client as a fallback.",
         variant: "destructive",
         duration: 5000,
       });
@@ -138,7 +168,11 @@ export const ContactSection = () => {
       ref={sectionRef}
       className="section-padding relative overflow-hidden"
     >
-      <ContactBackground3D />
+      {shouldEnable3D() && (
+        <Suspense fallback={null}>
+          <ContactBackground3D />
+        </Suspense>
+      )}
       <MobileGradientBackground variant="contact" />
       
       {/* Overlay for text contrast */}

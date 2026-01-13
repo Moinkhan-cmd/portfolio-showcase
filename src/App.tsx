@@ -12,6 +12,7 @@ import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { AnalyticsTracker } from "@/components/AnalyticsTracker";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { useRealMobile } from "@/hooks/useRealMobile";
 
 const Index = lazy(() => import("./pages/Index"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -51,54 +52,58 @@ const AdminPersonalDetails = lazy(async () => {
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <ErrorBoundary>
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-        <TooltipProvider>
-          <AuthProvider>
-            <SmoothScroll />
-            <ScrollProgress />
-            <Toaster />
-            <Sonner />
-            <BrowserRouter
-              // Opt-in to upcoming React Router v7 behaviors to remove v6 warning noise.
-              // Some react-router-dom v6 versions don't type this prop yet.
-              future={{
-                v7_startTransition: true,
-                v7_relativeSplatPath: true,
-              } as any}
-            >
-              <AnalyticsTracker />
-              <Suspense fallback={null}>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/admin/login" element={<AdminLogin />} />
-                  <Route
-                    path="/admin"
-                    element={
-                      <ProtectedRoute>
-                        <AdminLayout />
-                      </ProtectedRoute>
-                    }
-                  >
-                    <Route index element={<AdminDashboard />} />
-                    <Route path="personal-details" element={<AdminPersonalDetails />} />
-                    <Route path="analytics" element={<AdminAnalytics />} />
-                    <Route path="projects" element={<AdminProjects />} />
-                    <Route path="certifications" element={<AdminCertifications />} />
-                    <Route path="experience" element={<AdminExperience />} />
-                    <Route path="skills" element={<AdminSkills />} />
-                  </Route>
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </Suspense>
-            </BrowserRouter>
-          </AuthProvider>
-        </TooltipProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
-  </ErrorBoundary>
-);
+const App = () => {
+  const { isRealMobile } = useRealMobile();
+
+  return (
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          <TooltipProvider>
+            <AuthProvider>
+              {!isRealMobile && <SmoothScroll />}
+              {!isRealMobile && <ScrollProgress />}
+              <Toaster />
+              <Sonner />
+              <BrowserRouter
+                // Opt-in to upcoming React Router v7 behaviors to remove v6 warning noise.
+                // Some react-router-dom v6 versions don't type this prop yet.
+                future={{
+                  v7_startTransition: true,
+                  v7_relativeSplatPath: true,
+                }}
+              >
+                <AnalyticsTracker />
+                <Suspense fallback={null}>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/admin/login" element={<AdminLogin />} />
+                    <Route
+                      path="/admin"
+                      element={
+                        <ProtectedRoute>
+                          <AdminLayout />
+                        </ProtectedRoute>
+                      }
+                    >
+                      <Route index element={<AdminDashboard />} />
+                      <Route path="personal-details" element={<AdminPersonalDetails />} />
+                      <Route path="analytics" element={<AdminAnalytics />} />
+                      <Route path="projects" element={<AdminProjects />} />
+                      <Route path="certifications" element={<AdminCertifications />} />
+                      <Route path="experience" element={<AdminExperience />} />
+                      <Route path="skills" element={<AdminSkills />} />
+                    </Route>
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </Suspense>
+              </BrowserRouter>
+            </AuthProvider>
+          </TooltipProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
+  );
+};
 
 export default App;

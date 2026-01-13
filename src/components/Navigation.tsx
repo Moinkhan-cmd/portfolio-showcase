@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { scrollToSection as smoothScrollToSection, scrollToTop } from '@/components/SmoothScroll';
 import { useAudioContext } from '@/hooks/useAudioFeedback';
+import { getDeviceFlags } from '@/lib/device';
 
 const navLinks = [
   { name: 'About', href: '#about' },
@@ -187,32 +188,51 @@ export const Navigation = () => {
   }, []);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
-        });
-      },
-      { rootMargin: '-30% 0px -50% 0px', threshold: 0.1 }
-    );
+    if (typeof window === "undefined" || typeof document === "undefined") return;
+    if (getDeviceFlags().isRealMobile) return;
+    if (typeof IntersectionObserver === "undefined") return;
+
+    let observer: IntersectionObserver | null = null;
+
+    try {
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setActiveSection(entry.target.id);
+            }
+          });
+        },
+        { rootMargin: "-30% 0px -50% 0px", threshold: 0.1 }
+      );
+    } catch (error) {
+      console.warn("Navigation: IntersectionObserver init failed", error);
+      return;
+    }
+
+    if (!observer) return;
 
     navLinks.forEach((link) => {
       const element = document.getElementById(link.href.substring(1));
       if (element) observer.observe(element);
     });
 
-    return () => observer.disconnect();
+    return () => observer?.disconnect();
   }, []);
 
   const scrollToSection = useCallback((href: string) => {
     const sectionId = href.substring(1);
     
     // Dispatch custom event for section transition
-    window.dispatchEvent(new CustomEvent('sectionNavigate', { 
-      detail: { sectionId } 
-    }));
+    try {
+      window.dispatchEvent(
+        new CustomEvent("sectionNavigate", {
+          detail: { sectionId },
+        })
+      );
+    } catch {
+      // ignore
+    }
     
     smoothScrollToSection(href, 80);
     setIsMobileMenuOpen(false);

@@ -126,6 +126,56 @@ a, button, [role="button"], input[type="submit"], input[type="button"], .cursor-
     scroll-behavior: smooth;
   }
 
+  /* Reduce motion and heavy effects on real mobile devices */
+  html.real-mobile {
+    scroll-behavior: auto;
+  }
+
+  html.real-mobile *,
+  html.real-mobile *::before,
+  html.real-mobile *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Disable the decorative desktop cursor on touch devices */
+  html.real-mobile *,
+  html.touch * {
+    cursor: auto !important;
+  }
+
+  /* Avoid hover transforms on touch/real-mobile */
+  html.real-mobile .hover-lift:hover,
+  html.touch .hover-lift:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Respect OS-level reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Touch devices generally shouldn't animate on hover */
+  @media (hover: none) {
+    .hover-lift:hover {
+      transform: none;
+      box-shadow: none;
+    }
+  }
+
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-body);

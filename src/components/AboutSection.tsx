@@ -1,8 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, lazy, Suspense } from "react";
 import { motion } from "framer-motion";
-import { AboutBackground3D } from "./AboutBackground3D";
 import { MobileGradientBackground } from "./MobileGradientBackground";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { getDeviceFlags } from "@/lib/device";
+import { shouldEnable3D } from "@/hooks/use3DPerformance";
+
+const AboutBackground3D = lazy(async () => {
+  const mod = await import("./AboutBackground3D");
+  return { default: mod.AboutBackground3D };
+});
 
 const techStack = [
   "HTML",
@@ -21,23 +27,39 @@ export const AboutSection = () => {
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { 
-        threshold: 0.2,
-        rootMargin: '50px'
-      }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
+    if (typeof window === "undefined" || typeof document === "undefined") return;
+    if (getDeviceFlags().isRealMobile) {
+      setIsVisible(true);
+      return;
+    }
+    if (typeof IntersectionObserver === "undefined") {
+      setIsVisible(true);
+      return;
     }
 
-    return () => observer.disconnect();
+    let observer: IntersectionObserver | null = null;
+    try {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+          }
+        },
+        {
+          threshold: 0.2,
+          rootMargin: "50px",
+        }
+      );
+
+      if (sectionRef.current) {
+        observer.observe(sectionRef.current);
+      }
+    } catch (error) {
+      console.warn("AboutSection: IntersectionObserver init failed", error);
+      setIsVisible(true);
+    }
+
+    return () => observer?.disconnect();
   }, []);
 
   return (
@@ -46,7 +68,11 @@ export const AboutSection = () => {
       ref={sectionRef}
       className="section-padding relative overflow-hidden min-h-screen"
     >
-      <AboutBackground3D />
+      {shouldEnable3D() && (
+        <Suspense fallback={null}>
+          <AboutBackground3D />
+        </Suspense>
+      )}
       <MobileGradientBackground variant="about" />
       
       {/* Enhanced dark overlay for better text contrast with gradient - lighter to show 3D */}

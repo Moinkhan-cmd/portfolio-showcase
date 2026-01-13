@@ -1,9 +1,8 @@
-import { useRef, useState, useMemo } from "react";
+import { useRef, useState, useMemo, lazy, Suspense } from "react";
 import { ExternalLink, Github, Folder, Sparkles, ArrowRight, Loader2, Star, Zap, Code, Tag, Clock, CheckCircle2, Search, X, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from "framer-motion";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import { ProjectsBackground3D } from "./ProjectsBackground3D";
 import { MobileGradientBackground } from "./MobileGradientBackground";
 import { useProjects } from "@/hooks/useProjects";
 import type { Project } from "@/lib/admin/projects";
@@ -23,6 +22,12 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
+import { shouldEnable3D } from "@/hooks/use3DPerformance";
+
+const ProjectsBackground3D = lazy(async () => {
+  const mod = await import("./ProjectsBackground3D");
+  return { default: mod.ProjectsBackground3D };
+});
 
 interface ProjectCardProps {
   project: Project;
@@ -83,7 +88,13 @@ const ProjectCard = ({ project, index, isFeatured = false }: ProjectCardProps) =
           <div className={`relative overflow-hidden ${isFeatured ? 'aspect-[21/9]' : 'aspect-video'} bg-gradient-to-br from-primary/10 via-primary/5 to-transparent`}>
             <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent z-20 pointer-events-none opacity-85" />
             {project.thumbnail ? (
-              <img src={project.thumbnail} alt={project.title} className="w-full h-full object-cover" />
+              <img
+                src={project.thumbnail}
+                alt={project.title}
+                className="w-full h-full object-cover"
+                loading="lazy"
+                decoding="async"
+              />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center">
                 <Folder className="w-16 h-16 text-primary/30" />
@@ -636,7 +647,11 @@ export const ProjectsSection = () => {
       ref={sectionRef}
       className="section-padding relative overflow-hidden bg-secondary/20"
     >
-      <ProjectsBackground3D />
+      {shouldEnable3D() && (
+        <Suspense fallback={null}>
+          <ProjectsBackground3D />
+        </Suspense>
+      )}
       <MobileGradientBackground variant="projects" />
       {/* Background overlays */}
       <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/80 to-background/70 pointer-events-none z-10" />

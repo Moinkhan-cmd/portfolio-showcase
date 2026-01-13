@@ -7,16 +7,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { motion, useMotionValue, useSpring, useTransform, useInView, AnimatePresence, useReducedMotion } from "framer-motion";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, lazy, Suspense } from "react";
 import photo800Webp from "@/images/my-photo-800.webp";
 import photo1200Webp from "@/images/my-photo-1200.webp";
 import photo800Jpg from "@/images/my-photo-800.jpg";
 import photo1200Jpg from "@/images/my-photo-1200.jpg";
-import { HeroBackground3D } from "./HeroBackground3D";
 import { MobileGradientBackground } from "./MobileGradientBackground";
 import { scrollToSection } from "@/components/SmoothScroll";
 import { useAudioContext } from "@/hooks/useAudioFeedback";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { shouldEnable3D } from "@/hooks/use3DPerformance";
+
+const HeroBackground3D = lazy(async () => {
+  const mod = await import("./HeroBackground3D");
+  return { default: mod.HeroBackground3D };
+});
 
 const socialLinks = [
   { icon: Github, href: "https://github.com/Moinkhan-cmd", label: "GitHub", gradient: "from-[#333] to-[#6e5494]" },
@@ -111,7 +116,11 @@ export const HeroSection = () => {
       className="relative min-h-screen overflow-hidden bg-background pt-20 sm:pt-24 md:pt-28 lg:pt-32 flex items-center pb-16 sm:pb-20 md:pb-24 lg:pb-16"
     >
       {/* 3D Background */}
-      <HeroBackground3D />
+      {shouldEnable3D() && (
+        <Suspense fallback={null}>
+          <HeroBackground3D />
+        </Suspense>
+      )}
       <MobileGradientBackground variant="hero" />
       
       {/* Layered gradient overlays */}

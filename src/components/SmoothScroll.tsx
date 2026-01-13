@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback } from "react";
 import Lenis from "lenis";
+import { isRealMobileDevice } from "@/lib/device";
 
 // Simpler, faster easing
 const easeOutQuart = (t: number) => 1 - Math.pow(1 - t, 4);
@@ -12,6 +13,8 @@ const shouldEnableLenis = () => {
   if (window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches) return false;
   // Disable on touch devices for native scrolling (much smoother)
   if ("ontouchstart" in window || navigator.maxTouchPoints > 0) return false;
+  // Also disable on real mobile devices (not desktop emulation)
+  if (isRealMobileDevice()) return false;
   return true;
 };
 
@@ -81,6 +84,7 @@ export const SmoothScroll = () => {
 export const getLenisInstance = () => lenisInstance;
 
 export const scrollToSection = (selector: string, offset: number = 80) => {
+  if (typeof window === "undefined" || typeof document === "undefined") return;
   const element = document.querySelector(selector);
   if (!element) return;
   const top = element.getBoundingClientRect().top + window.scrollY - offset;
@@ -93,6 +97,7 @@ export const scrollToSection = (selector: string, offset: number = 80) => {
 };
 
 export const scrollToTop = (duration: number = 0.8) => {
+  if (typeof window === "undefined") return;
   if (lenisInstance) {
     lenisInstance.scrollTo(0, { duration, easing: easeOutQuart });
   } else {

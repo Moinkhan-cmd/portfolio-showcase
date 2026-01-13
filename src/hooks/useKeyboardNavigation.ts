@@ -1,5 +1,6 @@
 import { useEffect, useCallback, useState } from "react";
 import { scrollToSection } from "@/components/SmoothScroll";
+import { getDeviceFlags } from "@/lib/device";
 
 const SECTIONS = [
   { id: "hero", key: "0" },
@@ -19,17 +20,34 @@ export const useKeyboardNavigation = () => {
     const section = SECTIONS[index];
     if (!section) return;
 
+    if (typeof window === "undefined") return;
+    if (getDeviceFlags().isRealMobile) return;
+
     setCurrentIndex(index);
     
     // Dispatch custom event for audio feedback
-    window.dispatchEvent(new CustomEvent('sectionNavigate', { 
-      detail: { sectionId: section.id } 
-    }));
+    try {
+      window.dispatchEvent(
+        new CustomEvent("sectionNavigate", {
+          detail: { sectionId: section.id },
+        })
+      );
+    } catch {
+      // ignore
+    }
     
     if (section.id === "hero") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      try {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } catch {
+        window.scrollTo(0, 0);
+      }
     } else {
-      scrollToSection(`#${section.id}`, 80);
+      try {
+        scrollToSection(`#${section.id}`, 80);
+      } catch {
+        // ignore
+      }
     }
   }, []);
 
@@ -44,6 +62,9 @@ export const useKeyboardNavigation = () => {
   }, [currentIndex, navigateToSection]);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (getDeviceFlags().isRealMobile) return;
+
     const handleKeyDown = (e: KeyboardEvent) => {
       // Ignore if user is typing in an input
       if (
@@ -95,25 +116,42 @@ export const useKeyboardNavigation = () => {
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    try {
+      window.addEventListener("keydown", handleKeyDown);
+      return () => window.removeEventListener("keydown", handleKeyDown);
+    } catch {
+      return;
+    }
   }, [navigateNext, navigatePrev, navigateToSection]);
 
   // Update current index based on scroll position
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const index = SECTIONS.findIndex((s) => s.id === entry.target.id);
-            if (index !== -1) {
-              setCurrentIndex(index);
+    if (typeof window === "undefined" || typeof document === "undefined") return;
+    if (getDeviceFlags().isRealMobile) return;
+    if (typeof IntersectionObserver === "undefined") return;
+
+    let observer: IntersectionObserver | null = null;
+
+    try {
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const index = SECTIONS.findIndex((s) => s.id === entry.target.id);
+              if (index !== -1) {
+                setCurrentIndex(index);
+              }
             }
-          }
-        });
-      },
-      { rootMargin: "-40% 0px -40% 0px", threshold: 0.1 }
-    );
+          });
+        },
+        { rootMargin: "-40% 0px -40% 0px", threshold: 0.1 }
+      );
+    } catch (error) {
+      console.warn("useKeyboardNavigation: IntersectionObserver init failed", error);
+      return;
+    }
+
+    if (!observer) return;
 
     SECTIONS.forEach(({ id }) => {
       if (id === "hero") return;
@@ -121,7 +159,7 @@ export const useKeyboardNavigation = () => {
       if (element) observer.observe(element);
     });
 
-    return () => observer.disconnect();
+    return () => observer?.disconnect();
   }, []);
 
   return { currentIndex, showHint, setShowHint };

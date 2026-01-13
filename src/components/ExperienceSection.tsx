@@ -1,12 +1,18 @@
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo, lazy, Suspense } from "react";
 import { Briefcase, Calendar, Loader2, MapPin, Laptop, Building2, Award, Sparkles, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ExperienceBackground3D } from "./ExperienceBackground3D";
 import { MobileGradientBackground } from "./MobileGradientBackground";
 import { useExperience } from "@/hooks/useExperience";
 import type { Experience } from "@/lib/admin/experience";
 import { Badge } from "@/components/ui/badge";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { getDeviceFlags } from "@/lib/device";
+import { shouldEnable3D } from "@/hooks/use3DPerformance";
+
+const ExperienceBackground3D = lazy(async () => {
+  const mod = await import("./ExperienceBackground3D");
+  return { default: mod.ExperienceBackground3D };
+});
 
 export const ExperienceSection = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -63,14 +69,31 @@ export const ExperienceSection = () => {
   }, [experiences]);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setIsVisible(true);
-      },
-      { threshold: 0.1 }
-    );
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    return () => observer.disconnect();
+    if (typeof window === "undefined" || typeof document === "undefined") return;
+    if (getDeviceFlags().isRealMobile) {
+      setIsVisible(true);
+      return;
+    }
+    if (typeof IntersectionObserver === "undefined") {
+      setIsVisible(true);
+      return;
+    }
+
+    let observer: IntersectionObserver | null = null;
+    try {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) setIsVisible(true);
+        },
+        { threshold: 0.1 }
+      );
+      if (sectionRef.current) observer.observe(sectionRef.current);
+    } catch (error) {
+      console.warn("ExperienceSection: IntersectionObserver init failed", error);
+      setIsVisible(true);
+    }
+
+    return () => observer?.disconnect();
   }, []);
 
   return (
@@ -79,7 +102,11 @@ export const ExperienceSection = () => {
       ref={sectionRef}
       className="section-padding relative overflow-hidden bg-gradient-to-b from-background via-secondary/10 to-background"
     >
-      <ExperienceBackground3D />
+      {shouldEnable3D() && (
+        <Suspense fallback={null}>
+          <ExperienceBackground3D />
+        </Suspense>
+      )}
       <MobileGradientBackground variant="experience" />
       {/* Enhanced Background Overlays */}
       <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/90 to-background/80 pointer-events-none z-10" />

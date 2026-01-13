@@ -1,6 +1,7 @@
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
+import { useRealMobile } from "@/hooks/useRealMobile";
 
-export const ScrollProgress = () => {
+const ScrollProgressInner = () => {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -19,13 +20,13 @@ export const ScrollProgress = () => {
     >
       {/* Animated gradient background */}
       <motion.div
-        className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-primary via-purple-500 to-pink-500"
+        className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-primary to-pink-500"
         style={{
           backgroundSize: "200% 100%",
           backgroundPosition: gradientPosition,
         }}
       />
-      
+
       {/* Glow effect */}
       <motion.div
         className="absolute inset-0 bg-white/30 blur-sm"
@@ -38,7 +39,7 @@ export const ScrollProgress = () => {
           ease: "easeInOut",
         }}
       />
-      
+
       {/* Shimmer effect */}
       <motion.div
         className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent"
@@ -53,4 +54,11 @@ export const ScrollProgress = () => {
       />
     </motion.div>
   );
+};
+
+export const ScrollProgress = () => {
+  const { isRealMobile, prefersReducedMotion } = useRealMobile();
+  if (isRealMobile || prefersReducedMotion) return null;
+
+  return <ScrollProgressInner />;
 };
