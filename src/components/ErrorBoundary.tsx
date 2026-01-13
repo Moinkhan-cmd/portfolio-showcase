@@ -8,20 +8,22 @@ interface Props {
 interface State {
   hasError: boolean;
   error: Error | null;
+  errorInfo: React.ErrorInfo | null;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = { hasError: false, error: null, errorInfo: null };
   }
 
   static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error };
+    return { hasError: true, error, errorInfo: null };
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error("ErrorBoundary caught an error:", error, errorInfo);
+    this.setState({ errorInfo });
   }
 
   render() {
@@ -42,6 +44,11 @@ export class ErrorBoundary extends Component<Props, State> {
                 <p className="text-sm font-mono text-destructive">
                   {this.state.error.toString()}
                 </p>
+                {this.state.errorInfo?.componentStack && (
+                  <pre className="mt-3 text-xs font-mono text-muted-foreground whitespace-pre-wrap break-words">
+                    {this.state.errorInfo.componentStack}
+                  </pre>
+                )}
               </div>
             )}
             <button
