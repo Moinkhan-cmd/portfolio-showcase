@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Menu, X, ArrowUpRight } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { AudioVisualizer } from '@/components/AudioVisualizer';
 import { AudioToggle } from '@/components/AudioToggle';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -297,6 +298,7 @@ export const Navigation = () => {
 
           {/* Right side buttons */}
           <div className="flex items-center gap-1.5 sm:gap-2">
+            <AudioVisualizer />
             <AudioToggle />
             <div className="shrink-0"><ThemeToggle /></div>
             <Button
