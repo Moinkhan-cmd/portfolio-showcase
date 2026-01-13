@@ -1,5 +1,6 @@
 // Zod validation schemas for analytics data
 import { z } from "zod";
+import { safeLocalStorage } from "../safeStorage";
 
 // ============================================
 // RATE LIMITING
@@ -18,11 +19,11 @@ interface RateLimitState {
 export const isRateLimited = (): boolean => {
   try {
     const now = Date.now();
-    const stored = localStorage.getItem(RATE_LIMIT_KEY);
+    const stored = safeLocalStorage.getItem(RATE_LIMIT_KEY);
     
     if (!stored) {
       // First request - initialize
-      localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify({
+      safeLocalStorage.setItem(RATE_LIMIT_KEY, JSON.stringify({
         count: 1,
         windowStart: now,
       }));
@@ -34,7 +35,7 @@ export const isRateLimited = (): boolean => {
     // Check if we're in a new window
     if (now - state.windowStart > RATE_LIMIT_WINDOW_MS) {
       // Reset window
-      localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify({
+      safeLocalStorage.setItem(RATE_LIMIT_KEY, JSON.stringify({
         count: 1,
         windowStart: now,
       }));
@@ -47,7 +48,7 @@ export const isRateLimited = (): boolean => {
     }
     
     // Increment counter
-    localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify({
+    safeLocalStorage.setItem(RATE_LIMIT_KEY, JSON.stringify({
       count: state.count + 1,
       windowStart: state.windowStart,
     }));

@@ -26,6 +26,10 @@ export class ErrorBoundary extends Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
+      const showDetails =
+        typeof window !== "undefined" &&
+        new URLSearchParams(window.location.search).has("debug");
+
       return (
         <div className="min-h-screen flex items-center justify-center bg-background p-4">
           <div className="max-w-md w-full text-center space-y-4">
@@ -33,7 +37,7 @@ export class ErrorBoundary extends Component<Props, State> {
             <p className="text-muted-foreground">
               We encountered an error while loading the page. Please try refreshing.
             </p>
-            {process.env.NODE_ENV === "development" && this.state.error && (
+            {showDetails && this.state.error && (
               <div className="mt-4 p-4 bg-muted rounded-lg text-left">
                 <p className="text-sm font-mono text-destructive">
                   {this.state.error.toString()}
