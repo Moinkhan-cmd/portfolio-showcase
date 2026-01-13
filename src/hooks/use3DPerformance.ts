@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from "react";
-import { usePerformanceMode } from "./usePerformanceMode";
 
 interface PerformanceSettings {
   shouldRender3D: boolean;
@@ -15,7 +14,6 @@ interface PerformanceSettings {
  * based on device performance characteristics
  */
 export const use3DPerformance = (): PerformanceSettings => {
-  const { disable3D } = usePerformanceMode();
   const [deviceInfo, setDeviceInfo] = useState({
     isMobile: false,
     isTouch: false,
@@ -58,8 +56,8 @@ export const use3DPerformance = (): PerformanceSettings => {
   return useMemo(() => {
     const { isMobile, isTouch, prefersReducedMotion, isLowPower, deviceMemory, hardwareConcurrency } = deviceInfo;
 
-    // Disable 3D if performance mode is minimal, or on mobile/touch/reduced motion
-    const shouldRender3D = !disable3D && !isMobile && !isTouch && !prefersReducedMotion;
+    // Disable 3D entirely on mobile/touch devices or reduced motion preference
+    const shouldRender3D = !isMobile && !isTouch && !prefersReducedMotion;
 
     // Determine if device is low-powered
     const isLowPowerDevice = isLowPower || deviceMemory < 4 || hardwareConcurrency < 4;
@@ -89,7 +87,7 @@ export const use3DPerformance = (): PerformanceSettings => {
       geometryDetail,
       dpr,
     };
-  }, [deviceInfo, disable3D]);
+  }, [deviceInfo]);
 };
 
 /**

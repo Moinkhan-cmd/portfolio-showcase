@@ -3,7 +3,6 @@ import { OrbitControls, PerspectiveCamera, Stars } from "@react-three/drei";
 import { Suspense, useState, useEffect, useRef, memo } from "react";
 import { useScrollPause } from "@/hooks/useScrollPause";
 import { use3DPerformance } from "@/hooks/use3DPerformance";
-import { Fade3DWrapper } from "./Fade3DWrapper";
 import * as THREE from "three";
 
 // Simplified timeline elements - reduced count
@@ -133,7 +132,7 @@ ExperienceScene.displayName = "ExperienceScene";
 export const ExperienceBackground3D = () => {
   const [isVisible, setIsVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const isScrolling = useScrollPause(100);
+  const isScrolling = useScrollPause(200);
   const { shouldRender3D, isMobile } = use3DPerformance();
 
   useEffect(() => {
@@ -153,6 +152,10 @@ export const ExperienceBackground3D = () => {
     return () => observer.disconnect();
   }, [shouldRender3D, isMobile]);
 
+  if (!shouldRender3D || isMobile) {
+    return null;
+  }
+
   return (
     <div 
       ref={containerRef}
@@ -164,11 +167,7 @@ export const ExperienceBackground3D = () => {
         contain: 'layout style paint',
       }}
     >
-      <Fade3DWrapper
-        isVisible={isVisible}
-        className="w-full h-full"
-        style={{ opacity: 0.25 }}
-      >
+      {isVisible && (
         <Canvas
           dpr={[1, 1]}
           performance={{ min: 0.3, max: 0.6 }}
@@ -179,13 +178,13 @@ export const ExperienceBackground3D = () => {
             powerPreference: "low-power",
             stencil: false,
           }}
-          className="w-full h-full"
+          style={{ opacity: 0.25 }}
         >
           <Suspense fallback={null}>
             <ExperienceScene />
           </Suspense>
         </Canvas>
-      </Fade3DWrapper>
+      )}
     </div>
   );
 };

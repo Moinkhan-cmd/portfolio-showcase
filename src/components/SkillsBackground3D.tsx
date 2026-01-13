@@ -3,7 +3,6 @@ import { OrbitControls, PerspectiveCamera, Float, MeshDistortMaterial } from "@r
 import { Suspense, useEffect, useMemo, useRef, useState, memo } from "react";
 import { useScrollPause } from "@/hooks/useScrollPause";
 import { use3DPerformance } from "@/hooks/use3DPerformance";
-import { Fade3DWrapper } from "./Fade3DWrapper";
 import * as THREE from "three";
 
 const WebGLContextGuard = () => {
@@ -166,7 +165,7 @@ SkillsScene.displayName = "SkillsScene";
 
 export const SkillsBackground3D = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const isScrolling = useScrollPause(100);
+  const isScrolling = useScrollPause(200);
   const [isVisible, setIsVisible] = useState(false);
   const { shouldRender3D, isMobile } = use3DPerformance();
 
@@ -187,6 +186,10 @@ export const SkillsBackground3D = () => {
     return () => observer.disconnect();
   }, [shouldRender3D, isMobile]);
 
+  if (!shouldRender3D || isMobile) {
+    return null;
+  }
+
   return (
     <div 
       ref={containerRef}
@@ -198,11 +201,7 @@ export const SkillsBackground3D = () => {
         contain: 'layout style paint',
       }}
     >
-      <Fade3DWrapper
-        isVisible={isVisible}
-        className="w-full h-full"
-        style={{ opacity: 0.35 }}
-      >
+      {isVisible && (
         <Canvas
           dpr={[1, 1]}
           performance={{ min: 0.3, max: 0.6 }}
@@ -213,13 +212,13 @@ export const SkillsBackground3D = () => {
             powerPreference: "low-power",
             stencil: false,
           }}
-          className="w-full h-full"
+          style={{ opacity: 0.35 }}
         >
           <Suspense fallback={null}>
             <SkillsScene />
           </Suspense>
         </Canvas>
-      </Fade3DWrapper>
+      )}
     </div>
   );
 };

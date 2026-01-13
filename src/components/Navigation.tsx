@@ -1,261 +1,162 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Menu, X, ArrowUpRight } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { SoundToggle } from '@/components/SoundToggle';
-import { PerformanceToggle } from '@/components/PerformanceToggle';
 import { AudioVisualizer } from '@/components/AudioVisualizer';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AudioToggle } from '@/components/AudioToggle';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { scrollToSection as smoothScrollToSection, scrollToTop } from '@/components/SmoothScroll';
-import { playSectionTransitionSound, initSoundSystem } from '@/lib/sounds';
+import { useAudioContext } from '@/hooks/useAudioFeedback';
 
 const navLinks = [
+  { name: 'About', href: '#about' },
   { name: 'Skills', href: '#skills' },
   { name: 'Projects', href: '#projects' },
   { name: 'Experience', href: '#experience' },
   { name: 'Certifications', href: '#certifications' },
   { name: 'Contact', href: '#contact' },
-  { name: 'About', href: '#about' },
 ] as const;
 
 // Mobile Menu Component - rendered via Portal to escape all parent CSS
-type MobileMenuProps = {
-  isOpen: boolean;
+const MobileMenu = ({ 
+  isOpen, 
+  onClose, 
+  activeSection,
+  scrollToSection,
+  playHoverSound,
+  playClickSound,
+}: { 
+  isOpen: boolean; 
   onClose: () => void;
   activeSection: string;
   scrollToSection: (href: string) => void;
-};
-
-const MobileMenu = ({ isOpen, onClose, activeSection, scrollToSection }: MobileMenuProps) => {
-  const shouldReduceMotion = useReducedMotion();
-  const panelRef = useRef<HTMLDivElement | null>(null);
-  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
-  const previouslyFocusedElement = useRef<HTMLElement | null>(null);
-
-  const aboutLink = navLinks.find((l) => l.name === 'About');
-  const primaryLinks = navLinks.filter((l) => l.name !== 'About');
-
-  useEffect(() => {
-    if (!isOpen) return;
-    previouslyFocusedElement.current = document.activeElement as HTMLElement | null;
-    const raf = window.requestAnimationFrame(() => closeButtonRef.current?.focus());
-    return () => window.cancelAnimationFrame(raf);
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (isOpen) return;
-    previouslyFocusedElement.current?.focus?.();
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleFocusTrap = (e: KeyboardEvent) => {
-      if (e.key !== 'Tab') return;
-      const root = panelRef.current;
-      if (!root) return;
-
-      const focusable = Array.from(
-        root.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        )
-      ).filter((el) => !el.hasAttribute('disabled') && el.getAttribute('aria-hidden') !== 'true');
-
-      if (focusable.length === 0) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      const active = document.activeElement as HTMLElement | null;
-
-      if (e.shiftKey) {
-        if (!active || active === first) {
-          e.preventDefault();
-          last.focus();
-        }
-        return;
-      }
-
-      if (active === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    };
-
-    document.addEventListener('keydown', handleFocusTrap);
-    return () => document.removeEventListener('keydown', handleFocusTrap);
-  }, [isOpen]);
-
-  if (typeof document === 'undefined') return null;
-
-  const transition = shouldReduceMotion
-    ? { duration: 0 }
-    : { type: 'spring', stiffness: 420, damping: 42 };
-
-  const backdropTransition = shouldReduceMotion ? { duration: 0 } : { duration: 0.25 };
-
-  const listVariants = {
-    hidden: {},
-    show: {
-      transition: shouldReduceMotion
-        ? { duration: 0 }
-        : { staggerChildren: 0.06, delayChildren: 0.06 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, x: 14, filter: 'blur(6px)' },
-    show: { opacity: 1, x: 0, filter: 'blur(0px)' },
-  };
+  playHoverSound: () => void;
+  playClickSound: () => void;
+}) => {
+  if (!isOpen) return null;
 
   return createPortal(
-    <AnimatePresence>
-      {isOpen && (
-        <div
-          id="mobile-menu-root"
-          className="fixed inset-0 z-[99999] lg:hidden"
-          aria-hidden={!isOpen}
+    <div id="mobile-menu-root">
+      {/* Backdrop */}
+      <div 
+        onClick={onClose}
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          backdropFilter: 'blur(4px)',
+          zIndex: 99998,
+        }}
+      />
+      {/* Drawer Panel */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          right: 0,
+          width: '85vw',
+          maxWidth: '320px',
+          height: '100vh',
+          backgroundColor: 'hsl(var(--background))',
+          borderLeft: '1px solid hsl(var(--border))',
+          boxShadow: '-4px 0 24px rgba(0, 0, 0, 0.3)',
+          zIndex: 99999,
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        {/* Header */}
+        <div 
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '16px',
+            borderBottom: '1px solid hsl(var(--border) / 0.3)',
+          }}
         >
-          {/* Backdrop */}
-          <motion.div
-            className="absolute inset-0 bg-black/70 backdrop-blur-md"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={backdropTransition}
+          <ThemeToggle />
+          <button 
             onClick={onClose}
-          />
-
-          {/* Drawer Panel */}
-          <motion.div
-            ref={panelRef}
-            id="mobile-menu-panel"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Navigation menu"
-            className={cn(
-              'absolute right-0 top-0 h-full w-[86vw] max-w-[360px] border-l border-border/40',
-              'bg-background/95 backdrop-blur-xl shadow-2xl',
-              'flex flex-col overflow-hidden'
-            )}
-            initial={{ x: '100%', opacity: 1 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: '100%', opacity: 1 }}
-            transition={transition}
-            onClick={(e) => e.stopPropagation()}
+            style={{
+              padding: '10px',
+              borderRadius: '12px',
+              border: 'none',
+              background: 'hsl(var(--secondary) / 0.5)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+            aria-label="Close menu"
           >
-            {/* Subtle animated glow */}
-            <motion.div
-              aria-hidden
-              className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full bg-primary/20 blur-3xl"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={shouldReduceMotion ? { opacity: 0.35 } : { opacity: [0.25, 0.45, 0.25], scale: [0.9, 1.05, 0.9] }}
-              transition={shouldReduceMotion ? { duration: 0 } : { duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
-            />
-
-            {/* Header */}
-            <div className="relative z-10 flex items-center justify-between px-4 py-4 border-b border-border/30">
-              <div className="flex items-center gap-2">
-                <ThemeToggle />
-                <div className="flex items-center gap-1">
-                  <AudioVisualizer />
-                  <SoundToggle />
-                  <PerformanceToggle />
-                </div>
-              </div>
-
-              <motion.button
-                ref={closeButtonRef}
-                onClick={onClose}
-                className={cn(
-                  'flex items-center justify-center min-h-[44px] min-w-[44px] p-2 rounded-xl',
-                  'glass-card hover:bg-secondary/80 transition-colors'
-                )}
-                whileTap={{ scale: shouldReduceMotion ? 1 : 0.96 }}
-                aria-label="Close menu"
-              >
-                <X className="w-6 h-6" />
-              </motion.button>
-            </div>
-
-            {/* Links */}
-            <div className="relative z-10 flex-1 overflow-y-auto px-4 py-4">
-              <motion.div
-                variants={listVariants}
-                initial="hidden"
-                animate="show"
-                className="flex flex-col gap-2"
-              >
-                {primaryLinks.map((link) => {
-                  const isActive = activeSection === link.href.substring(1);
-                  return (
-                    <motion.button
-                      key={link.name}
-                      variants={itemVariants}
-                      onClick={() => scrollToSection(link.href)}
-                      className={cn(
-                        'group w-full text-left px-4 py-4 rounded-xl text-[17px] font-medium',
-                        'transition-colors duration-200',
-                        isActive
-                          ? 'bg-primary/15 text-primary ring-1 ring-primary/25'
-                          : 'bg-secondary/30 text-foreground hover:bg-secondary/50'
-                      )}
-                      whileHover={shouldReduceMotion ? undefined : { x: 2 }}
-                      whileTap={{ scale: shouldReduceMotion ? 1 : 0.99 }}
-                      aria-current={isActive ? 'page' : undefined}
-                    >
-                      <span className="flex items-center justify-between">
-                        <span>{link.name}</span>
-                        <ArrowUpRight
-                          className={cn(
-                            'w-4 h-4 opacity-70 transition-transform',
-                            isActive ? 'translate-x-0' : 'group-hover:translate-x-0.5'
-                          )}
-                        />
-                      </span>
-                    </motion.button>
-                  );
-                })}
-              </motion.div>
-            </div>
-
-            {/* Bottom area (About link + CTA) */}
-            <div className="relative z-10 px-4 pt-3 pb-4 border-t border-border/30 space-y-3">
-              {aboutLink && (
-                <motion.button
-                  onClick={() => scrollToSection(aboutLink.href)}
-                  initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
-                  animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
-                  transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.28, delay: 0.08 }}
-                  className={cn(
-                    'w-full text-left rounded-xl p-4',
-                    'bg-gradient-to-r from-primary/15 via-secondary/20 to-purple-500/10',
-                    'border border-border/30 hover:border-primary/30',
-                    'transition-colors'
-                  )}
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-sm text-muted-foreground">Learn more</div>
-                      <div className="text-base font-semibold text-foreground">About Me</div>
-                    </div>
-                    <ArrowUpRight className="w-5 h-5 text-primary" />
-                  </div>
-                </motion.button>
-              )}
-
-              <Button
-                onClick={() => scrollToSection('#contact')}
-                className="w-full rounded-xl font-semibold py-6 text-lg gap-2"
-                size="lg"
-              >
-                Let's Talk
-                <ArrowUpRight className="w-5 h-5" />
-              </Button>
-            </div>
-          </motion.div>
+            <X style={{ width: '24px', height: '24px', color: 'hsl(var(--foreground))' }} />
+          </button>
         </div>
-      )}
-    </AnimatePresence>,
+
+        {/* Navigation Links */}
+        <div 
+          style={{
+            flex: 1,
+            overflowY: 'auto',
+            padding: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px',
+          }}
+        >
+          {navLinks.map((link) => {
+            const isActive = activeSection === link.href.substring(1);
+            return (
+              <button
+                key={link.name}
+                onClick={() => { playClickSound(); scrollToSection(link.href); }}
+                onMouseEnter={playHoverSound}
+                style={{
+                  width: '100%',
+                  textAlign: 'left',
+                  padding: '16px',
+                  borderRadius: '12px',
+                  border: 'none',
+                  fontSize: '18px',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  backgroundColor: isActive ? 'hsl(var(--primary) / 0.15)' : 'hsl(var(--secondary) / 0.3)',
+                  color: isActive ? 'hsl(var(--primary))' : 'hsl(var(--foreground))',
+                }}
+              >
+                {link.name}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* CTA Button */}
+        <div 
+          style={{
+            padding: '16px',
+            borderTop: '1px solid hsl(var(--border) / 0.3)',
+          }}
+        >
+          <Button 
+            onClick={() => { playClickSound(); scrollToSection('#contact'); }} 
+            onMouseEnter={playHoverSound}
+            className="w-full rounded-xl font-semibold py-6 text-lg gap-2" 
+            size="lg"
+          >
+            Let's Talk
+            <ArrowUpRight className="w-5 h-5" />
+          </Button>
+        </div>
+      </div>
+    </div>,
     document.body
   );
 };
@@ -264,6 +165,17 @@ export const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('');
+  
+  // Audio feedback - wrapped in try/catch for when used outside provider
+  let playHoverSound = () => {};
+  let playClickSound = () => {};
+  try {
+    const audio = useAudioContext();
+    playHoverSound = () => audio.playSound("hover");
+    playClickSound = () => audio.playSound("click");
+  } catch {
+    // Audio context not available
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -297,10 +209,7 @@ export const Navigation = () => {
   const scrollToSection = useCallback((href: string) => {
     const sectionId = href.substring(1);
     
-    // Play sound and dispatch navigation event
-    initSoundSystem();
-    playSectionTransitionSound();
-    
+    // Dispatch custom event for section transition
     window.dispatchEvent(new CustomEvent('sectionNavigate', { 
       detail: { sectionId } 
     }));
@@ -370,7 +279,8 @@ export const Navigation = () => {
               return (
                 <button
                   key={link.name}
-                  onClick={() => scrollToSection(link.href)}
+                  onClick={() => { playClickSound(); scrollToSection(link.href); }}
+                  onMouseEnter={playHoverSound}
                   className={cn(
                     'relative px-2.5 lg:px-4 py-1.5 lg:py-2 text-xs lg:text-sm font-medium transition-all duration-300 rounded-full whitespace-nowrap',
                     isActive ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
@@ -392,14 +302,12 @@ export const Navigation = () => {
 
           {/* Right side buttons */}
           <div className="flex items-center gap-1.5 sm:gap-2">
-            <div className="shrink-0 hidden sm:flex items-center gap-1">
-              <AudioVisualizer />
-              <SoundToggle />
-              <PerformanceToggle />
-            </div>
+            <AudioVisualizer />
+            <AudioToggle />
             <div className="shrink-0"><ThemeToggle /></div>
             <Button
-              onClick={() => scrollToSection('#contact')}
+              onClick={() => { playClickSound(); scrollToSection('#contact'); }}
+              onMouseEnter={playHoverSound}
               size={isScrolled ? 'sm' : 'default'}
               className={cn(
                 'hidden sm:flex rounded-full font-semibold gap-1.5 lg:gap-2 transition-all duration-300 text-xs lg:text-sm',
@@ -412,38 +320,13 @@ export const Navigation = () => {
             </Button>
             
             {/* Hamburger Button - Only visible on mobile/tablet */}
-            <motion.button
-              onClick={() => setIsMobileMenuOpen((v) => !v)}
+            <button
+              onClick={() => { playClickSound(); setIsMobileMenuOpen(true); }}
               className="lg:hidden flex items-center justify-center min-h-[44px] min-w-[44px] p-2 rounded-xl glass-card hover:bg-secondary/80"
-              aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
-              aria-expanded={isMobileMenuOpen}
-              aria-controls="mobile-menu-panel"
-              whileTap={{ scale: 0.96 }}
+              aria-label="Open menu"
             >
-              <AnimatePresence initial={false} mode="wait">
-                {isMobileMenuOpen ? (
-                  <motion.span
-                    key="x"
-                    initial={{ opacity: 0, rotate: -90, scale: 0.9 }}
-                    animate={{ opacity: 1, rotate: 0, scale: 1 }}
-                    exit={{ opacity: 0, rotate: 90, scale: 0.9 }}
-                    transition={{ duration: 0.18 }}
-                  >
-                    <X className="w-6 h-6" />
-                  </motion.span>
-                ) : (
-                  <motion.span
-                    key="menu"
-                    initial={{ opacity: 0, rotate: 90, scale: 0.9 }}
-                    animate={{ opacity: 1, rotate: 0, scale: 1 }}
-                    exit={{ opacity: 0, rotate: -90, scale: 0.9 }}
-                    transition={{ duration: 0.18 }}
-                  >
-                    <Menu className="w-6 h-6" />
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </motion.button>
+              <Menu className="w-6 h-6" />
+            </button>
           </div>
         </div>
       </nav>
@@ -454,6 +337,8 @@ export const Navigation = () => {
         onClose={() => setIsMobileMenuOpen(false)}
         activeSection={activeSection}
         scrollToSection={scrollToSection}
+        playHoverSound={playHoverSound}
+        playClickSound={playClickSound}
       />
     </>
   );

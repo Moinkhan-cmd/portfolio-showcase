@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { playNavigationSound, playHoverSound, initSoundSystem } from "@/lib/sounds";
 
 const SECTIONS = [
   { id: "hero", name: "Home" },
@@ -17,48 +16,11 @@ export const SectionProgressIndicator = () => {
   const [viewedSections, setViewedSections] = useState<Set<string>>(new Set(["hero"]));
   const [activeSection, setActiveSection] = useState("hero");
   const [isVisible, setIsVisible] = useState(false);
-  const [isReady, setIsReady] = useState(false);
 
-  // Determine active section based on scroll position
-  const updateActiveSection = useCallback(() => {
-    const scrollY = window.scrollY;
-    const windowHeight = window.innerHeight;
-    
-    // Check from bottom to top to find the current section
-    for (let i = SECTIONS.length - 1; i >= 0; i--) {
-      const section = SECTIONS[i];
-      const element = document.getElementById(section.id);
-      
-      if (element) {
-        const rect = element.getBoundingClientRect();
-        const elementTop = rect.top + scrollY;
-        
-        // Section is active if we've scrolled past its top (with some offset)
-        if (scrollY >= elementTop - windowHeight * 0.4) {
-          if (activeSection !== section.id) {
-            setActiveSection(section.id);
-            setViewedSections(prev => {
-              const newSet = new Set(prev);
-              newSet.add(section.id);
-              return newSet;
-            });
-          }
-          break;
-        }
-      }
-    }
-    
-    // Special case: at very top, always show hero
-    if (scrollY < 100) {
-      setActiveSection("hero");
-    }
-  }, [activeSection]);
-
-  // Show/hide based on scroll position and track active section
+  // Show/hide based on scroll position
   useEffect(() => {
     const handleScroll = () => {
       setIsVisible(window.scrollY > 200);
-      updateActiveSection();
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -67,23 +29,51 @@ export const SectionProgressIndicator = () => {
     handleScroll();
     
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [updateActiveSection]);
+  }, []);
 
-  // Mark as ready after initial mount delay
+  // Observe sections for active tracking using IntersectionObserver
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsReady(true);
-      // Do initial section detection
-      updateActiveSection();
-    }, 300);
-    
-    return () => clearTimeout(timer);
-  }, [updateActiveSection]);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const sectionId = entry.target.id || "hero";
+            setActiveSection(sectionId);
+            setViewedSections((prev) => new Set([...prev, sectionId]));
+          }
+        });
+      },
+      { rootMargin: "-40% 0px -40% 0px", threshold: 0.1 }
+    );
+
+    // Observe hero section (main element or first section)
+    const heroElement = document.querySelector("main > div.relative > section:first-of-type") || 
+                        document.getElementById("hero");
+    if (heroElement) {
+      observer.observe(heroElement);
+    }
+
+    SECTIONS.slice(1).forEach(({ id }) => {
+      const element = document.getElementById(id);
+      if (element) observer.observe(element);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Track scroll position for hero section (when at top)
+  useEffect(() => {
+    const handleScrollForHero = () => {
+      if (window.scrollY < 200) {
+        setActiveSection("hero");
+      }
+    };
+
+    window.addEventListener("scroll", handleScrollForHero, { passive: true });
+    return () => window.removeEventListener("scroll", handleScrollForHero);
+  }, []);
 
   const scrollToSection = (sectionId: string) => {
-    initSoundSystem();
-    playNavigationSound();
-    
     if (sectionId === "hero") {
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
@@ -96,16 +86,9 @@ export const SectionProgressIndicator = () => {
     }
   };
 
-  const handleHover = () => {
-    initSoundSystem();
-    playHoverSound();
-  };
-
   // Calculate progress based on current active section index
   const activeIndex = SECTIONS.findIndex(s => s.id === activeSection);
   const lineProgress = activeIndex >= 0 ? ((activeIndex + 1) / SECTIONS.length) * 100 : 0;
-
-  if (!isReady) return null;
 
   return (
     <motion.div
@@ -135,7 +118,6 @@ export const SectionProgressIndicator = () => {
           <motion.button
             key={id}
             onClick={() => scrollToSection(id)}
-            onMouseEnter={handleHover}
             className="relative group py-2.5 px-2"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}

@@ -33,7 +33,7 @@ export const AnimatedLogo = ({ onClick }: AnimatedLogoProps) => {
         whileHover={{ scale: 1.5, rotate: 720, transition: { duration: 0.8 } }}
         style={{ transform: "translateZ(25px)" }}
       >
-        <Sparkles className="hidden sm:block w-6 h-6 text-primary drop-shadow-[0_0_12px_rgba(6,182,212,0.9)]" />
+        <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 text-primary drop-shadow-[0_0_12px_rgba(6,182,212,0.9)]" />
         <motion.span
           className="absolute inset-0 bg-primary rounded-full blur-lg -z-10"
           animate={{ opacity: [0.4, 0.9, 0.4], scale: [1, 1.5, 1] }}

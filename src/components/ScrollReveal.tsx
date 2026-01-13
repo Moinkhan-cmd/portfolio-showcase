@@ -1,6 +1,5 @@
-import { motion, useInView, useScroll, useTransform, Variants, useReducedMotion } from "framer-motion";
-import { useRef, ReactNode, useMemo } from "react";
-import { useScrollPause } from "@/hooks/useScrollPause";
+import { motion, useInView, useScroll, useTransform, Variants } from "framer-motion";
+import { useRef, ReactNode } from "react";
 
 interface ScrollRevealProps {
   children: ReactNode;
@@ -58,21 +57,10 @@ export const ScrollReveal = ({
   once = true,
   threshold = 0.2,
   amount = 0.3,
-  distance = 24,
+  distance = 40,
 }: ScrollRevealProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once, amount: threshold });
-
-  const reduceMotion = useReducedMotion();
-  const isScrolling = useScrollPause(100);
-  const isCoarsePointer = useMemo(() => {
-    if (typeof window === "undefined") return false;
-    return window.matchMedia?.("(pointer: coarse)")?.matches ?? false;
-  }, []);
-
-  // Key UX perf rule: avoid running entrance animations while the user is actively scrolling.
-  // Instead, show content immediately and only animate when scroll is idle.
-  const shouldAnimate = !reduceMotion && !isCoarsePointer && !isScrolling;
 
   // Enhanced variant with custom distance
   const baseHidden = variants[variant].hidden as Record<string, number | string>;
@@ -93,16 +81,16 @@ export const ScrollReveal = ({
   return (
     <motion.div
       ref={ref}
-      initial={shouldAnimate ? "hidden" : false}
-      animate={shouldAnimate ? (isInView ? "visible" : "hidden") : "visible"}
+      initial="hidden"
+      animate={isInView ? "visible" : "hidden"}
       variants={customVariants}
       transition={{
-        duration: shouldAnimate ? duration : 0,
-        delay: shouldAnimate ? delay : 0,
+        duration,
+        delay,
         ease: [0.25, 0.46, 0.45, 0.94],
         type: "tween", // Changed from spring to tween for better performance
       }}
-      style={shouldAnimate ? { willChange: "opacity, transform" } : undefined}
+      style={{ willChange: 'opacity, transform' }}
       className={className}
     >
       {children}
@@ -131,14 +119,6 @@ export const StaggerReveal = ({
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once, amount: 0.2 });
 
-  const reduceMotion = useReducedMotion();
-  const isScrolling = useScrollPause(100);
-  const isCoarsePointer = useMemo(() => {
-    if (typeof window === "undefined") return false;
-    return window.matchMedia?.("(pointer: coarse)")?.matches ?? false;
-  }, []);
-  const shouldAnimate = !reduceMotion && !isCoarsePointer && !isScrolling;
-
   const containerVariants: Variants = {
     hidden: {},
     visible: {
@@ -152,8 +132,8 @@ export const StaggerReveal = ({
   return (
     <motion.div
       ref={ref}
-      initial={shouldAnimate ? "hidden" : false}
-      animate={shouldAnimate ? (isInView ? "visible" : "hidden") : "visible"}
+      initial="hidden"
+      animate={isInView ? "visible" : "hidden"}
       variants={containerVariants}
       className={className}
     >
@@ -162,11 +142,11 @@ export const StaggerReveal = ({
           key={index}
           variants={variants[variant]}
           transition={{
-            duration: shouldAnimate ? duration : 0,
+            duration,
             ease: [0.25, 0.46, 0.45, 0.94],
             type: "tween", // Changed from spring to tween
           }}
-          style={shouldAnimate ? { willChange: "opacity, transform" } : undefined}
+          style={{ willChange: 'opacity, transform' }}
         >
           {child}
         </motion.div>

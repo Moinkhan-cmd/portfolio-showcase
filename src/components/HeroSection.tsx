@@ -1,5 +1,11 @@
-import { ArrowDown, Eye, Github, Linkedin, Mail, Sparkles, ExternalLink, Code2, Zap } from "lucide-react";
+import { ArrowDown, Download, Eye, Github, Linkedin, Mail, Sparkles, ExternalLink, ChevronDown, Code2, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { motion, useMotionValue, useSpring, useTransform, useInView, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import photo800Webp from "@/images/my-photo-800.webp";
@@ -10,6 +16,7 @@ import { HeroBackground3D } from "./HeroBackground3D";
 import { MobileGradientBackground } from "./MobileGradientBackground";
 import { scrollToSection } from "@/components/SmoothScroll";
 import { usePersonalDetails } from "@/hooks/usePersonalDetails";
+import { useAudioContext } from "@/hooks/useAudioFeedback";
 
 const socialLinks = [
   { icon: Github, href: "https://github.com/Moinkhan-cmd", label: "GitHub", gradient: "from-[#333] to-[#6e5494]" },
@@ -26,9 +33,19 @@ export const HeroSection = () => {
   const reduceMotion = useReducedMotion();
   const { data: personalDetails } = usePersonalDetails();
   const resumeUrl = personalDetails?.resumeUrl?.trim();
+  const resumeFileName = personalDetails?.resumeFileName?.trim() || "Resume.pdf";
   const [cursorGlowEnabled, setCursorGlowEnabled] = useState(false);
   const cursorRafRef = useRef<number | null>(null);
   const cursorPendingRef = useRef<{ x: number; y: number }>({ x: -1000, y: -1000 });
+  
+  // Audio feedback
+  let playClickSound = () => {};
+  try {
+    const audio = useAudioContext();
+    playClickSound = () => audio.playSound("click");
+  } catch {
+    // Audio context not available
+  }
   
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -232,7 +249,7 @@ export const HeroSection = () => {
                     animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.1, 1] }}
                     transition={{ duration: 2, repeat: Infinity }}
                   >
-                    <Sparkles className="hidden sm:block w-6 h-6 text-primary" />
+                    <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
                   </motion.span>
                 </motion.span>
                 <motion.span 
@@ -291,7 +308,7 @@ export const HeroSection = () => {
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Button
                   size="lg"
-                  onClick={() => scrollToSection("#projects")}
+                  onClick={() => { playClickSound(); scrollToSection("#projects"); }}
                   className="group relative overflow-hidden bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-6 text-base shadow-2xl shadow-primary/25 hover:shadow-primary/40 transition-all duration-300"
                 >
                   <span className="relative z-10 flex items-center gap-2">
@@ -311,16 +328,45 @@ export const HeroSection = () => {
               
               {resumeUrl ? (
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="group border-2 border-border hover:border-primary/50 hover:bg-primary/5 px-8 py-6 text-base font-semibold backdrop-blur-sm"
-                    aria-label="View Resume"
-                    onClick={() => window.open(resumeUrl, "_blank", "noopener,noreferrer")}
-                  >
-                    <Eye className="mr-2 h-4 w-4" />
-                    Resume
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        size="lg"
+                        variant="outline"
+                        onClick={playClickSound}
+                        className="group border-2 border-border hover:border-primary/50 hover:bg-primary/5 px-8 py-6 text-base font-semibold backdrop-blur-sm"
+                      >
+                        <Download className="mr-2 h-4 w-4" />
+                        Resume
+                        <ChevronDown className="ml-2 h-4 w-4 group-hover:rotate-180 transition-transform duration-300" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48 z-[9999]" sideOffset={8}>
+                      <DropdownMenuItem
+                        onClick={() => { playClickSound(); window.open(resumeUrl, "_blank", "noopener,noreferrer"); }}
+                        className="cursor-pointer"
+                      >
+                        <Eye className="w-4 h-4 mr-2" />
+                        View Resume
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          playClickSound();
+                          // Convert Google Drive view URL to download URL if applicable
+                          let downloadUrl = resumeUrl;
+                          const driveMatch = resumeUrl.match(/drive\.google\.com\/file\/d\/([^/]+)/);
+                          if (driveMatch) {
+                            downloadUrl = `https://drive.google.com/uc?export=download&id=${driveMatch[1]}`;
+                          }
+                          window.open(downloadUrl, "_blank", "noopener,noreferrer");
+                        }}
+                        className="cursor-pointer"
+                      >
+                        <Download className="w-4 h-4 mr-2" />
+                        Download PDF
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </motion.div>
               ) : null}
             </motion.div>
@@ -340,6 +386,7 @@ export const HeroSection = () => {
                     href={link.href}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={playClickSound}
                     className="group relative p-3 rounded-xl border border-border bg-background/50 backdrop-blur-sm hover:border-primary/50 transition-all duration-300 overflow-hidden"
                     initial={{ opacity: 0, scale: 0 }}
                     animate={isInView ? { opacity: 1, scale: 1 } : {}}
@@ -461,7 +508,7 @@ export const HeroSection = () => {
                       animate={{ rotate: 360, scale: [1, 1.3, 1] }}
                       transition={{ duration: 4 + i, repeat: Infinity }}
                     >
-                      <Sparkles className="hidden sm:block w-6 h-6 text-primary" />
+                      <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
                     </motion.div>
                   </motion.div>
                 ))}

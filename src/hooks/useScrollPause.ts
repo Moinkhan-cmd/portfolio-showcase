@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
  * Hook to detect when user is actively scrolling
  * Returns true when scrolling, false when idle
  */
-export const useScrollPause = (idleDelay: number = 100) => {
+export const useScrollPause = (idleDelay: number = 150) => {
   const [isScrolling, setIsScrolling] = useState(false);
   const isScrollingRef = useRef(false);
   const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
