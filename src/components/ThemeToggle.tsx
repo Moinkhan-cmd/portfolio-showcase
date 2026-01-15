@@ -18,7 +18,7 @@ export const ThemeToggle = () => {
       <Button
         variant="ghost"
         size="icon"
-        className="relative w-9 h-9 rounded-full glass-card"
+        className="relative w-8 h-8 xs:w-9 xs:h-9 rounded-full bg-secondary/50"
       >
         <span className="sr-only">Toggle theme</span>
       </Button>
@@ -32,7 +32,7 @@ export const ThemeToggle = () => {
       variant="ghost"
       size="icon"
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="relative w-9 h-9 rounded-full glass-card hover:shadow-[0_0_20px_hsl(175_80%_50%/0.3)] transition-shadow"
+      className="relative w-8 h-8 xs:w-9 xs:h-9 rounded-full bg-secondary/50 hover:bg-secondary/80 transition-colors"
     >
       <AnimatePresence mode="wait" initial={false}>
         {isDark ? (
