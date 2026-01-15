@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 const logoText = "Moinkhan";
 const colors = ["#06b6d4", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981", "#3b82f6", "#f43f5e", "#14b8a6"];
@@ -9,7 +10,24 @@ interface AnimatedLogoProps {
   onClick: (e: React.MouseEvent) => void;
 }
 
-export const AnimatedLogo = ({ onClick }: AnimatedLogoProps) => {
+// Simple mobile version - no animations
+const MobileLogo = ({ onClick }: AnimatedLogoProps) => (
+  <a
+    href="#"
+    onClick={onClick}
+    className="font-signature text-xl relative flex items-center gap-2 cursor-pointer"
+  >
+    <span className="relative flex-shrink-0">
+      <Sparkles className="w-5 h-5 text-primary" />
+    </span>
+    <span className="italic font-light tracking-wider text-foreground">
+      {logoText}
+    </span>
+  </a>
+);
+
+// Desktop version with animations
+const DesktopLogo = ({ onClick }: AnimatedLogoProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -114,4 +132,14 @@ export const AnimatedLogo = ({ onClick }: AnimatedLogoProps) => {
       />
     </motion.a>
   );
+};
+
+export const AnimatedLogo = ({ onClick }: AnimatedLogoProps) => {
+  const isMobile = useIsMobile();
+  
+  if (isMobile) {
+    return <MobileLogo onClick={onClick} />;
+  }
+  
+  return <DesktopLogo onClick={onClick} />;
 };

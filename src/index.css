@@ -1302,3 +1302,149 @@ a:focus-visible {
 .stack-3d::after {
   transform: translateZ(-20px) scale(0.9);
 }
+
+/* ============================================
+   MOBILE PERFORMANCE OPTIMIZATIONS
+   Aggressive disabling of heavy effects for 
+   smooth scrolling and responsiveness
+   ============================================ */
+
+@media (max-width: 768px), (pointer: coarse), (hover: none) {
+  /* Disable all 3D transforms */
+  *,
+  *::before,
+  *::after {
+    transform-style: flat !important;
+    perspective: none !important;
+    backface-visibility: visible !important;
+  }
+
+  /* Disable all blur effects - major performance killer */
+  .glass-card,
+  .glass-card-enhanced,
+  [class*="backdrop-blur"],
+  [class*="blur-"] {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    filter: none !important;
+  }
+
+  /* Disable will-change - causes layer explosion on mobile */
+  * {
+    will-change: auto !important;
+  }
+
+  /* Disable expensive shadows */
+  .neon-glow,
+  .neon-text,
+  .depth-shadow {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Disable animations that cause jank */
+  .card-3d,
+  .tilt-3d,
+  .btn-3d,
+  .stack-3d,
+  .parallax-layer,
+  .isometric {
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Disable pseudo-element effects */
+  .card-3d::before,
+  .card-3d::after,
+  .stack-3d::before,
+  .stack-3d::after,
+  .btn-3d::before,
+  .holographic::after {
+    display: none !important;
+  }
+
+  /* Simplify glassmorphism */
+  .glass-card {
+    background: hsl(var(--card)) !important;
+    border: 1px solid hsl(var(--border) / 0.5) !important;
+  }
+
+  /* Disable complex gradients */
+  .gradient-mesh,
+  [class*="mesh-gradient"] {
+    background: hsl(var(--background)) !important;
+  }
+
+  /* Disable shimmer animations */
+  @keyframes shimmer {
+    0%, 100% { opacity: 1; }
+  }
+
+  @keyframes holographic-shine {
+    0%, 100% { background-position: 0% 50%; }
+  }
+
+  /* Force hardware acceleration only where needed */
+  .scrollable-container {
+    transform: translateZ(0);
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Disable hover effects entirely */
+  .card-3d:hover,
+  .tilt-3d:hover,
+  .btn-3d:hover,
+  .perspective-card:hover {
+    transform: none !important;
+  }
+
+  /* Simplify transitions */
+  a, button, [role="button"] {
+    transition: opacity 0.15s ease !important;
+  }
+
+  /* Use default cursor on mobile */
+  * {
+    cursor: auto !important;
+  }
+
+  /* Disable floating animations */
+  @keyframes float {
+    0%, 100% { transform: none; }
+  }
+
+  @keyframes float-slow {
+    0%, 100% { transform: none; }
+  }
+
+  @keyframes float-delayed {
+    0%, 100% { transform: none; }
+  }
+
+  /* Reduce motion for all animated elements */
+  [class*="animate-"] {
+    animation: none !important;
+  }
+
+  /* Disable gradient text which causes repaints */
+  .gradient-text,
+  [class*="bg-gradient-to"] {
+    background: none !important;
+    -webkit-background-clip: initial !important;
+    background-clip: initial !important;
+    -webkit-text-fill-color: currentColor !important;
+  }
+}
+
+/* Respect user's reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

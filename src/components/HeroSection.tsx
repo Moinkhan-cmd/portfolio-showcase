@@ -411,54 +411,69 @@ export const HeroSection = () => {
             transition={{ duration: 1, delay: 0.3 }}
             className="relative flex items-center justify-center pt-8 lg:pt-0"
           >
-            <motion.div
+            {/* Mobile: Simple static container, Desktop: 3D rotation with orbitals */}
+            <div 
               className="relative"
-              style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+              style={!isMobile ? { 
+                transform: `perspective(1000px) rotateX(${rotateX.get()}deg) rotateY(${rotateY.get()}deg)`,
+                transformStyle: "preserve-3d" 
+              } : undefined}
             >
-              {/* Orbital rings */}
-              <motion.div
-                className="absolute inset-0 -m-12 rounded-full border border-primary/10"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-              >
-                <motion.div
-                  className="absolute top-0 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-primary/60 shadow-lg shadow-primary/50"
-                  animate={{ scale: [1, 1.3, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                />
-              </motion.div>
-              <motion.div
-                className="absolute inset-0 -m-20 rounded-full border border-primary/5"
-                animate={{ rotate: -360 }}
-                transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
-              >
-                <motion.div
-                  className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-violet-500/60"
-                />
-              </motion.div>
+              {/* Orbital rings - Desktop only */}
+              {!isMobile && (
+                <>
+                  <motion.div
+                    className="absolute inset-0 -m-12 rounded-full border border-primary/10"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+                  >
+                    <motion.div
+                      className="absolute top-0 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-primary/60 shadow-lg shadow-primary/50"
+                      animate={{ scale: [1, 1.3, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                  </motion.div>
+                  <motion.div
+                    className="absolute inset-0 -m-20 rounded-full border border-primary/5"
+                    animate={{ rotate: -360 }}
+                    transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+                  >
+                    <motion.div className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-violet-500/60" />
+                  </motion.div>
+                </>
+              )}
 
-              {/* Main image container - Enhanced - Responsive */}
+              {/* Main image container */}
               <div className="relative w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-[420px] lg:h-[420px] xl:w-[480px] xl:h-[480px] mx-auto">
-                {/* Enhanced gradient glow */}
-                <motion.div
-                  className="absolute inset-0 rounded-3xl blur-3xl opacity-30"
-                  style={{ background: "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(280 70% 50%) 50%, hsl(340 70% 50%) 100%)" }}
-                  animate={{ opacity: [0.2, 0.4, 0.2], scale: [1, 1.05, 1] }}
-                  transition={{ duration: 4, repeat: Infinity }}
-                />
+                {/* Enhanced gradient glow - simplified on mobile */}
+                {!isMobile && (
+                  <motion.div
+                    className="absolute inset-0 rounded-3xl blur-3xl opacity-30"
+                    style={{ background: "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(280 70% 50%) 50%, hsl(340 70% 50%) 100%)" }}
+                    animate={{ opacity: [0.2, 0.4, 0.2], scale: [1, 1.05, 1] }}
+                    transition={{ duration: 4, repeat: Infinity }}
+                  />
+                )}
                 
                 {/* Image frame */}
                 <div className="relative w-full h-full rounded-3xl overflow-hidden">
-                  {/* Animated gradient border */}
-                  <motion.div
-                    className="absolute inset-0 rounded-3xl p-[3px] border-gradient-animated"
-                    style={{
-                      background: "conic-gradient(from var(--angle, 0deg), hsl(var(--primary)), hsl(280 70% 50%), hsl(340 70% 50%), hsl(var(--primary)))",
-                      "--angle": "0deg",
-                    } as React.CSSProperties}
-                  >
-                    <div className="w-full h-full rounded-[21px] bg-background" />
-                  </motion.div>
+                  {/* Animated gradient border - Desktop only */}
+                  {!isMobile && (
+                    <motion.div
+                      className="absolute inset-0 rounded-3xl p-[3px] border-gradient-animated"
+                      style={{
+                        background: "conic-gradient(from var(--angle, 0deg), hsl(var(--primary)), hsl(280 70% 50%), hsl(340 70% 50%), hsl(var(--primary)))",
+                        "--angle": "0deg",
+                      } as React.CSSProperties}
+                    >
+                      <div className="w-full h-full rounded-[21px] bg-background" />
+                    </motion.div>
+                  )}
+
+                  {/* Simple border for mobile */}
+                  {isMobile && (
+                    <div className="absolute inset-0 rounded-3xl border-2 border-primary/30" />
+                  )}
 
                   <picture>
                     <source
@@ -481,16 +496,18 @@ export const HeroSection = () => {
                   {/* Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent rounded-3xl" />
                   
-                  {/* Shine effect */}
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full rounded-3xl"
-                    animate={{ translateX: ["-100%", "200%"] }}
-                    transition={{ duration: 4, repeat: Infinity, repeatDelay: 3 }}
-                  />
+                  {/* Shine effect - Desktop only */}
+                  {!isMobile && (
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full rounded-3xl"
+                      animate={{ translateX: ["-100%", "200%"] }}
+                      transition={{ duration: 4, repeat: Infinity, repeatDelay: 3 }}
+                    />
+                  )}
                 </div>
 
-                {/* Sparkle decorations - Enhanced */}
-                {[
+                {/* Sparkle decorations - Desktop only */}
+                {!isMobile && [
                   { top: "-8%", right: "5%", delay: 0 },
                   { bottom: "15%", left: "-10%", delay: 0.5 },
                   { top: "25%", right: "-8%", delay: 1 },
@@ -512,7 +529,7 @@ export const HeroSection = () => {
                   </motion.div>
                 ))}
               </div>
-            </motion.div>
+            </div>
           </motion.div>
         </div>
       </div>
