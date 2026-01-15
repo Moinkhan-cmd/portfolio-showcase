@@ -2,6 +2,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera, Stars } from "@react-three/drei";
 import { Suspense, useState, useEffect, useRef } from "react";
 import { useScrollPause } from "@/hooks/useScrollPause";
+import { use3DPerformance } from "@/hooks/use3DPerformance";
 import * as THREE from "three";
 
 // Footer-themed celebration elements
@@ -140,8 +141,11 @@ export const FooterBackground3D = () => {
   const [isVisible, setIsVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const isScrolling = useScrollPause(200);
+  const { shouldRender3D, isMobile } = use3DPerformance();
 
   useEffect(() => {
+    if (!shouldRender3D || isMobile) return;
+    
     const observer = new IntersectionObserver(
       ([entry]) => {
         setIsVisible(entry.isIntersecting);
@@ -154,7 +158,12 @@ export const FooterBackground3D = () => {
     }
 
     return () => observer.disconnect();
-  }, []);
+  }, [shouldRender3D, isMobile]);
+
+  // Don't render 3D on mobile
+  if (!shouldRender3D || isMobile) {
+    return null;
+  }
 
   return (
     <div 

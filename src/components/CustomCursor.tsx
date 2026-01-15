@@ -1,5 +1,6 @@
 import { useEffect, useState, RefObject } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 interface CustomCursorProps {
   isActive?: boolean;
@@ -7,8 +8,12 @@ interface CustomCursorProps {
 }
 
 export const CustomCursor = ({ isActive = true, containerRef }: CustomCursorProps) => {
+  const isMobile = useIsMobile();
   const [isVisible, setIsVisible] = useState(false);
   const [isPointer, setIsPointer] = useState(false);
+  
+  // Completely disable on mobile
+  if (isMobile) return null;
   
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
