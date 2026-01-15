@@ -3,6 +3,7 @@ import { OrbitControls, PerspectiveCamera, Stars } from "@react-three/drei";
 import { Suspense, useState, useEffect, useRef } from "react";
 import { useScrollPause } from "@/hooks/useScrollPause";
 import { use3DPerformance } from "@/hooks/use3DPerformance";
+import { WebGLContextGuard } from "@/components/WebGLContextGuard";
 import * as THREE from "three";
 
 // Footer-themed celebration elements
@@ -141,6 +142,7 @@ export const FooterBackground3D = () => {
   const [isVisible, setIsVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const isScrolling = useScrollPause(200);
+  const [webglKey, setWebglKey] = useState(0);
   const { shouldRender3D, isMobile } = use3DPerformance();
 
   useEffect(() => {
@@ -173,6 +175,7 @@ export const FooterBackground3D = () => {
     >
       {isVisible && (
         <Canvas
+          key={webglKey}
           dpr={[1, 1]}
           performance={{ min: 0.3, max: 0.8 }}
           frameloop={isVisible && !isScrolling ? "always" : "never"}
@@ -185,6 +188,7 @@ export const FooterBackground3D = () => {
         >
           <PerspectiveCamera makeDefault position={[0, 0, 12]} fov={50} />
           <Suspense fallback={null}>
+            <WebGLContextGuard onContextLost={() => setWebglKey((k) => k + 1)} />
             <ambientLight intensity={0.5} />
             <pointLight position={[10, 10, 10]} intensity={1.1} color="#06b6d4" />
             <pointLight position={[-10, -10, -10]} intensity={1.0} color="#8b5cf6" />

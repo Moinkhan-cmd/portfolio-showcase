@@ -6,6 +6,7 @@ import { FloatingParticles } from "./FloatingParticles";
 import { GeometricShapes } from "./GeometricShapes";
 import { useScrollPause } from "@/hooks/useScrollPause";
 import { use3DPerformance } from "@/hooks/use3DPerformance";
+import { WebGLContextGuard } from "@/components/WebGLContextGuard";
 
 const AboutScene = memo(() => (
   <>
@@ -47,6 +48,7 @@ export const AboutBackground3D = () => {
   const [isVisible, setIsVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const isScrolling = useScrollPause(200);
+  const [webglKey, setWebglKey] = useState(0);
   const { shouldRender3D, isMobile } = use3DPerformance();
 
   useEffect(() => {
@@ -84,6 +86,7 @@ export const AboutBackground3D = () => {
     >
       {isVisible && (
         <Canvas
+          key={webglKey}
           dpr={[1, 1]}
           performance={{ min: 0.3, max: 0.6 }}
           frameloop={isScrolling ? "never" : "always"}
@@ -96,6 +99,7 @@ export const AboutBackground3D = () => {
           style={{ opacity: 0.35 }}
         >
           <Suspense fallback={null}>
+            <WebGLContextGuard onContextLost={() => setWebglKey((k) => k + 1)} />
             <AboutScene />
           </Suspense>
         </Canvas>

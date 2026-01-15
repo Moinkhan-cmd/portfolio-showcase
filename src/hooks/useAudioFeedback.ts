@@ -15,15 +15,48 @@ export const useAudioFeedback = (options: AudioFeedbackOptions = {}) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
+  const hasUserGestureRef = useRef(false);
 
-  // Initialize AudioContext lazily
+  // Browser autoplay policies require WebAudio to be started/resumed after a user gesture.
+  useEffect(() => {
+    const unlock = () => {
+      if (hasUserGestureRef.current) return;
+      hasUserGestureRef.current = true;
+
+      const ctx = audioContextRef.current;
+      if (ctx?.state === "suspended") {
+        void ctx.resume().catch(() => {
+          // Ignore: some browsers still block resume in edge cases.
+        });
+      }
+
+      window.removeEventListener("pointerdown", unlock, true);
+      window.removeEventListener("keydown", unlock, true);
+      window.removeEventListener("touchstart", unlock, true);
+    };
+
+    window.addEventListener("pointerdown", unlock, true);
+    window.addEventListener("keydown", unlock, true);
+    window.addEventListener("touchstart", unlock, true);
+
+    return () => {
+      window.removeEventListener("pointerdown", unlock, true);
+      window.removeEventListener("keydown", unlock, true);
+      window.removeEventListener("touchstart", unlock, true);
+    };
+  }, []);
+
+  // Initialize AudioContext lazily, but only after a user gesture.
   const getAudioContext = useCallback(() => {
+    if (!hasUserGestureRef.current) return null;
+
     if (!audioContextRef.current) {
       audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
       analyserRef.current = audioContextRef.current.createAnalyser();
       analyserRef.current.fftSize = 32;
       analyserRef.current.connect(audioContextRef.current.destination);
     }
+
     return { ctx: audioContextRef.current, analyser: analyserRef.current! };
   }, []);
 
@@ -51,11 +84,16 @@ export const useAudioFeedback = (options: AudioFeedbackOptions = {}) => {
     (type: SoundType) => {
       if (!isEnabled) return;
 
-      const { ctx, analyser } = getAudioContext();
+      const audioNodes = getAudioContext();
+      if (!audioNodes) return;
+
+      const { ctx, analyser } = audioNodes;
 
       // Resume context if suspended (browser autoplay policy)
       if (ctx.state === "suspended") {
-        ctx.resume();
+        void ctx.resume().catch(() => {
+          // Ignore if resume is blocked; we just won't play audio.
+        });
       }
 
       const oscillator = ctx.createOscillator();

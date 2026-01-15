@@ -1,12 +1,13 @@
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera, Stars } from "@react-three/drei";
-import { Suspense, memo } from "react";
+import { Suspense, memo, useEffect, useRef, useState } from "react";
 import { AnimatedSphere } from "./AnimatedSphere";
 import { FloatingCube } from "./FloatingCube";
 import { ParticleField } from "./ParticleField";
 import { WaveGeometry } from "./WaveGeometry";
 import { useScrollPause } from "@/hooks/useScrollPause";
 import { use3DPerformance } from "@/hooks/use3DPerformance";
+import { WebGLContextGuard } from "@/components/WebGLContextGuard";
 
 const HeroScene = memo(() => (
   <>
@@ -48,14 +49,35 @@ HeroScene.displayName = "HeroScene";
 export const HeroBackground3D = () => {
   const isScrolling = useScrollPause(200);
   const { shouldRender3D, isMobile } = use3DPerformance();
+  const [isVisible, setIsVisible] = useState(true);
+  const [webglKey, setWebglKey] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
   
   // Don't render 3D on mobile/touch devices
   if (!shouldRender3D || isMobile) {
     return null;
   }
+
+  useEffect(() => {
+    if (typeof IntersectionObserver === "undefined") return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.01, rootMargin: "100px" }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
   
   return (
     <div 
+      ref={containerRef}
       className="absolute inset-0 z-0"
       style={{ 
         willChange: 'transform',
@@ -64,20 +86,24 @@ export const HeroBackground3D = () => {
       }}
     >
       <Suspense fallback={null}>
-        <Canvas
-          dpr={[1, 1]}
-          performance={{ min: 0.3, max: 0.6 }}
-          frameloop={isScrolling ? "never" : "always"}
-          gl={{ 
-            antialias: false,
-            alpha: true,
-            powerPreference: "low-power",
-            stencil: false,
-            depth: true,
-          }}
-        >
-          <HeroScene />
-        </Canvas>
+        {isVisible && (
+          <Canvas
+            key={webglKey}
+            dpr={[1, 1]}
+            performance={{ min: 0.3, max: 0.6 }}
+            frameloop={isVisible && !isScrolling ? "always" : "never"}
+            gl={{ 
+              antialias: false,
+              alpha: true,
+              powerPreference: "low-power",
+              stencil: false,
+              depth: true,
+            }}
+          >
+            <WebGLContextGuard onContextLost={() => setWebglKey((k) => k + 1)} />
+            <HeroScene />
+          </Canvas>
+        )}
       </Suspense>
     </div>
   );

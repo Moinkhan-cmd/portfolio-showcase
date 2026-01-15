@@ -1,27 +1,10 @@
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera, Float, MeshDistortMaterial } from "@react-three/drei";
 import { Suspense, useEffect, useMemo, useRef, useState, memo } from "react";
 import { useScrollPause } from "@/hooks/useScrollPause";
 import { use3DPerformance } from "@/hooks/use3DPerformance";
+import { WebGLContextGuard } from "@/components/WebGLContextGuard";
 import * as THREE from "three";
-
-const WebGLContextGuard = () => {
-  const { gl } = useThree();
-
-  useEffect(() => {
-    const canvas = gl.domElement;
-    const handleContextLost = (event: Event) => {
-      event.preventDefault();
-    };
-
-    canvas.addEventListener("webglcontextlost", handleContextLost, false);
-    return () => {
-      canvas.removeEventListener("webglcontextlost", handleContextLost, false);
-    };
-  }, [gl]);
-
-  return null;
-};
 
 // Simplified Glowing Orb
 const GlowingOrb = memo(({ position, color, size = 0.5 }: { position: [number, number, number]; color: string; size?: number }) => {
@@ -139,7 +122,6 @@ ParticleRing.displayName = "ParticleRing";
 
 const SkillsScene = memo(() => (
   <>
-    <WebGLContextGuard />
     <PerspectiveCamera makeDefault position={[0, 0, 15]} fov={50} />
     <ambientLight intensity={0.4} />
     <pointLight position={[10, 10, 10]} intensity={1.2} color="#06b6d4" />
@@ -167,6 +149,7 @@ export const SkillsBackground3D = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const isScrolling = useScrollPause(200);
   const [isVisible, setIsVisible] = useState(false);
+  const [webglKey, setWebglKey] = useState(0);
   const { shouldRender3D, isMobile } = use3DPerformance();
 
   useEffect(() => {
@@ -203,6 +186,7 @@ export const SkillsBackground3D = () => {
     >
       {isVisible && (
         <Canvas
+          key={webglKey}
           dpr={[1, 1]}
           performance={{ min: 0.3, max: 0.6 }}
           frameloop={isVisible && !isScrolling ? "always" : "never"}
@@ -215,6 +199,7 @@ export const SkillsBackground3D = () => {
           style={{ opacity: 0.35 }}
         >
           <Suspense fallback={null}>
+            <WebGLContextGuard onContextLost={() => setWebglKey((k) => k + 1)} />
             <SkillsScene />
           </Suspense>
         </Canvas>

@@ -3,6 +3,7 @@ import { OrbitControls, PerspectiveCamera, Stars } from "@react-three/drei";
 import { Suspense, useState, useEffect, useRef, memo } from "react";
 import { useScrollPause } from "@/hooks/useScrollPause";
 import { use3DPerformance } from "@/hooks/use3DPerformance";
+import { WebGLContextGuard } from "@/components/WebGLContextGuard";
 import * as THREE from "three";
 
 // Simplified creative shapes - fewer elements
@@ -140,6 +141,7 @@ export const ProjectsBackground3D = () => {
   const [isVisible, setIsVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const isScrolling = useScrollPause(200);
+  const [webglKey, setWebglKey] = useState(0);
   const { shouldRender3D, isMobile } = use3DPerformance();
 
   useEffect(() => {
@@ -176,6 +178,7 @@ export const ProjectsBackground3D = () => {
     >
       {isVisible && (
         <Canvas
+          key={webglKey}
           dpr={[1, 1]}
           performance={{ min: 0.3, max: 0.6 }}
           frameloop={isVisible && !isScrolling ? "always" : "never"}
@@ -188,6 +191,7 @@ export const ProjectsBackground3D = () => {
           style={{ opacity: 0.3 }}
         >
           <Suspense fallback={null}>
+            <WebGLContextGuard onContextLost={() => setWebglKey((k) => k + 1)} />
             <ProjectsScene />
           </Suspense>
         </Canvas>
