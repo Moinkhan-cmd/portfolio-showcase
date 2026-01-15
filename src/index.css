@@ -1427,13 +1427,13 @@ a:focus-visible {
     animation: none !important;
   }
 
-  /* Disable gradient text which causes repaints */
-  .gradient-text,
-  [class*="bg-gradient-to"] {
+  /* Simplified gradient text - use solid primary color instead of invisible text */
+  .gradient-text {
     background: none !important;
     -webkit-background-clip: initial !important;
     background-clip: initial !important;
-    -webkit-text-fill-color: currentColor !important;
+    -webkit-text-fill-color: hsl(var(--primary)) !important;
+    color: hsl(var(--primary)) !important;
   }
 }
 

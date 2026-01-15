@@ -10,8 +10,8 @@ export const AudioToggle = () => {
     <motion.button
       onClick={toggle}
       className={cn(
-        "relative p-2 rounded-full transition-all duration-300",
-        "hover:bg-secondary/80",
+        "relative p-2 w-8 h-8 xs:w-9 xs:h-9 flex items-center justify-center rounded-full transition-colors",
+        "bg-secondary/50 hover:bg-secondary/80",
         isEnabled ? "text-primary" : "text-muted-foreground"
       )}
       whileHover={{ scale: 1.05 }}

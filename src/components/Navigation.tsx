@@ -321,10 +321,14 @@ export const Navigation = () => {
           </div>
 
           {/* Right side buttons */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <AudioVisualizer />
+          <div className="flex items-center gap-1 xs:gap-1.5 sm:gap-2">
+            {/* Audio controls - visible on all screen sizes */}
+            <div className="hidden xs:flex items-center">
+              <AudioVisualizer />
+            </div>
             <AudioToggle />
-            <div className="shrink-0"><ThemeToggle /></div>
+            {/* Theme toggle - always visible */}
+            <ThemeToggle />
             <Button
               onClick={() => { playClickSound(); scrollToSection('#contact'); }}
               onMouseEnter={playHoverSound}
@@ -342,10 +346,10 @@ export const Navigation = () => {
             {/* Hamburger Button - Only visible on mobile/tablet */}
             <button
               onClick={() => { playClickSound(); setIsMobileMenuOpen(true); }}
-              className="lg:hidden flex items-center justify-center min-h-[44px] min-w-[44px] p-2 rounded-xl glass-card hover:bg-secondary/80"
+              className="lg:hidden flex items-center justify-center min-h-[40px] min-w-[40px] p-2 rounded-xl bg-secondary/50 hover:bg-secondary/80"
               aria-label="Open menu"
             >
-              <Menu className="w-6 h-6" />
+              <Menu className="w-5 h-5" />
             </button>
           </div>
         </div>
