@@ -4,7 +4,7 @@ import { Menu, X, ArrowUpRight } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { AudioVisualizer } from '@/components/AudioVisualizer';
 import { AudioToggle } from '@/components/AudioToggle';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { scrollToSection as smoothScrollToSection, scrollToTop } from '@/components/SmoothScroll';
@@ -20,7 +20,45 @@ const navLinks = [
   { name: 'Contact', href: '#contact' },
 ] as const;
 
-// Mobile Menu Component - rendered via Portal to escape all parent CSS
+// Animation variants for mobile menu
+const backdropVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 },
+  exit: { opacity: 0 },
+};
+
+const drawerVariants = {
+  hidden: { x: '100%' },
+  visible: { 
+    x: 0,
+    transition: { 
+      type: 'spring' as const, 
+      damping: 30, 
+      stiffness: 300,
+      mass: 0.8,
+    }
+  },
+  exit: { 
+    x: '100%',
+    transition: { 
+      type: 'spring' as const, 
+      damping: 40, 
+      stiffness: 400,
+    }
+  },
+};
+
+const ctaVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { delay: 0.4, duration: 0.3 }
+  },
+  exit: { opacity: 0, y: 20 },
+};
+
+// Mobile Menu Component - rendered via Portal with smooth animations
 const MobileMenu = ({ 
   isOpen, 
   onClose, 
@@ -36,128 +74,113 @@ const MobileMenu = ({
   playHoverSound: () => void;
   playClickSound: () => void;
 }) => {
-  if (!isOpen) return null;
-
   return createPortal(
-    <div id="mobile-menu-root">
-      {/* Backdrop */}
-      <div 
-        onClick={onClose}
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          width: '100vw',
-          height: '100vh',
-          backgroundColor: 'rgba(0, 0, 0, 0.7)',
-          backdropFilter: 'blur(4px)',
-          zIndex: 99998,
-        }}
-      />
-      {/* Drawer Panel */}
-      <div
-        style={{
-          position: 'fixed',
-          top: 0,
-          right: 0,
-          width: '85vw',
-          maxWidth: '320px',
-          height: '100vh',
-          backgroundColor: 'hsl(var(--background))',
-          borderLeft: '1px solid hsl(var(--border))',
-          boxShadow: '-4px 0 24px rgba(0, 0, 0, 0.3)',
-          zIndex: 99999,
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        {/* Header */}
-        <div 
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '16px',
-            borderBottom: '1px solid hsl(var(--border) / 0.3)',
-          }}
-        >
-          <ThemeToggle />
-          <button 
+    <AnimatePresence mode="wait">
+      {isOpen && (
+        <div id="mobile-menu-root">
+          {/* Animated Backdrop */}
+          <motion.div 
             onClick={onClose}
-            style={{
-              padding: '10px',
-              borderRadius: '12px',
-              border: 'none',
-              background: 'hsl(var(--secondary) / 0.5)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-            aria-label="Close menu"
+            className="fixed inset-0 w-screen h-screen bg-black/70 backdrop-blur-sm z-[99998]"
+            variants={backdropVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            transition={{ duration: 0.2 }}
+          />
+          
+          {/* Animated Drawer Panel */}
+          <motion.div
+            className="fixed top-0 right-0 w-[85vw] max-w-[320px] h-screen bg-background border-l border-border shadow-2xl z-[99999] flex flex-col"
+            variants={drawerVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
           >
-            <X style={{ width: '24px', height: '24px', color: 'hsl(var(--foreground))' }} />
-          </button>
-        </div>
-
-        {/* Navigation Links */}
-        <div 
-          style={{
-            flex: 1,
-            overflowY: 'auto',
-            padding: '16px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '8px',
-          }}
-        >
-          {navLinks.map((link) => {
-            const isActive = activeSection === link.href.substring(1);
-            return (
-              <button
-                key={link.name}
-                onClick={() => { playClickSound(); scrollToSection(link.href); }}
-                onMouseEnter={playHoverSound}
-                style={{
-                  width: '100%',
-                  textAlign: 'left',
-                  padding: '16px',
-                  borderRadius: '12px',
-                  border: 'none',
-                  fontSize: '18px',
-                  fontWeight: 500,
-                  cursor: 'pointer',
-                  backgroundColor: isActive ? 'hsl(var(--primary) / 0.15)' : 'hsl(var(--secondary) / 0.3)',
-                  color: isActive ? 'hsl(var(--primary))' : 'hsl(var(--foreground))',
-                }}
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-border/30">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.15, duration: 0.2 }}
               >
-                {link.name}
-              </button>
-            );
-          })}
-        </div>
+                <ThemeToggle />
+              </motion.div>
+              <motion.button 
+                onClick={onClose}
+                className="p-2.5 rounded-xl bg-secondary/50 hover:bg-secondary/80 transition-colors"
+                aria-label="Close menu"
+                initial={{ opacity: 0, rotate: -90 }}
+                animate={{ opacity: 1, rotate: 0 }}
+                transition={{ delay: 0.1, duration: 0.3 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <X className="w-6 h-6 text-foreground" />
+              </motion.button>
+            </div>
 
-        {/* CTA Button */}
-        <div 
-          style={{
-            padding: '16px',
-            borderTop: '1px solid hsl(var(--border) / 0.3)',
-          }}
-        >
-          <Button 
-            onClick={() => { playClickSound(); scrollToSection('#contact'); }} 
-            onMouseEnter={playHoverSound}
-            className="w-full rounded-xl font-semibold py-6 text-lg gap-2" 
-            size="lg"
-          >
-            Let's Talk
-            <ArrowUpRight className="w-5 h-5" />
-          </Button>
+            {/* Navigation Links */}
+            <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
+              {navLinks.map((link, index) => {
+                const isActive = activeSection === link.href.substring(1);
+                return (
+                  <motion.button
+                    key={link.name}
+                    onClick={() => { playClickSound(); scrollToSection(link.href); }}
+                    onMouseEnter={playHoverSound}
+                    className={cn(
+                      "w-full text-left p-4 rounded-xl text-lg font-medium transition-colors",
+                      isActive 
+                        ? "bg-primary/15 text-primary border border-primary/20" 
+                        : "bg-secondary/30 text-foreground hover:bg-secondary/50"
+                    )}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ 
+                      opacity: 1, 
+                      x: 0,
+                      transition: { delay: 0.1 + index * 0.05, duration: 0.3 }
+                    }}
+                    exit={{ opacity: 0, x: 20 }}
+                    whileHover={{ scale: 1.02, x: 4 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <span className="flex items-center justify-between">
+                      {link.name}
+                      {isActive && (
+                        <motion.span 
+                          className="w-2 h-2 rounded-full bg-primary"
+                          layoutId="activeIndicator"
+                        />
+                      )}
+                    </span>
+                  </motion.button>
+                );
+              })}
+            </div>
+
+            {/* CTA Button */}
+            <motion.div 
+              className="p-4 border-t border-border/30"
+              variants={ctaVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              <Button 
+                onClick={() => { playClickSound(); scrollToSection('#contact'); }} 
+                onMouseEnter={playHoverSound}
+                className="w-full rounded-xl font-semibold py-6 text-lg gap-2 shadow-lg shadow-primary/20" 
+                size="lg"
+              >
+                Let's Talk
+                <ArrowUpRight className="w-5 h-5" />
+              </Button>
+            </motion.div>
+          </motion.div>
         </div>
-      </div>
-    </div>,
+      )}
+    </AnimatePresence>,
     document.body
   );
 };
