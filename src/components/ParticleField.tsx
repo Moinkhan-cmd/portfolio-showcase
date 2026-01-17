@@ -6,15 +6,15 @@ export const ParticleField = memo(() => {
   const pointsRef = useRef<THREE.Points>(null);
   
   const [positions, colors] = useMemo(() => {
-    const count = 500; // Reduced from 1000 for better performance
+    const count = 200; // Reduced from 500 for better performance
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
-      positions[i3] = (Math.random() - 0.5) * 40;
-      positions[i3 + 1] = (Math.random() - 0.5) * 40;
-      positions[i3 + 2] = (Math.random() - 0.5) * 40;
+      positions[i3] = (Math.random() - 0.5) * 35;
+      positions[i3 + 1] = (Math.random() - 0.5) * 35;
+      positions[i3 + 2] = (Math.random() - 0.5) * 35;
       
       colors[i3] = Math.random() * 0.5 + 0.5;
       colors[i3 + 1] = Math.random() * 0.5 + 0.5;

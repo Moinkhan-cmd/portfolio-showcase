@@ -1,5 +1,5 @@
 import { motion, useInView } from "framer-motion";
-import { useRef, ReactNode, useEffect, useState } from "react";
+import { useRef, ReactNode, memo } from "react";
 import { useRealMobile } from "@/hooks/useRealMobile";
 
 interface SectionTransitionProps {
@@ -8,13 +8,13 @@ interface SectionTransitionProps {
   id?: string;
 }
 
-export const SectionTransition = ({ children, className = "", id }: SectionTransitionProps) => {
+export const SectionTransition = memo(({ children, className = "", id }: SectionTransitionProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const { isRealMobile, prefersReducedMotion } = useRealMobile();
   const isInView = useInView(ref, { 
-    once: false, 
-    amount: 0.15,
-    margin: "-50px 0px -50px 0px"
+    once: true, // Changed to once: true to reduce observer overhead
+    amount: 0.1,
+    margin: "-20px 0px"
   });
 
   // On mobile, skip all animations for better performance
@@ -31,32 +31,16 @@ export const SectionTransition = ({ children, className = "", id }: SectionTrans
       ref={ref}
       id={id}
       className={className}
-      initial={{ opacity: 0 }}
-      animate={{ 
-        opacity: isInView ? 1 : 0.3,
-      }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
       transition={{ 
-        duration: 0.5, 
-        ease: [0.25, 0.46, 0.45, 0.94]
-      }}
-      style={{
-        willChange: "opacity",
+        duration: 0.4, 
+        ease: "easeOut"
       }}
     >
-      <motion.div
-        initial={{ y: 30, opacity: 0 }}
-        animate={{ 
-          y: isInView ? 0 : 30, 
-          opacity: isInView ? 1 : 0 
-        }}
-        transition={{ 
-          duration: 0.6, 
-          delay: 0.1,
-          ease: [0.25, 0.46, 0.45, 0.94]
-        }}
-      >
-        {children}
-      </motion.div>
+      {children}
     </motion.section>
   );
-};
+});
+
+SectionTransition.displayName = "SectionTransition";
