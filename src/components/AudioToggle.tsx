@@ -10,8 +10,8 @@ export const AudioToggle = () => {
     <motion.button
       onClick={toggle}
       className={cn(
-        "relative p-2 w-8 h-8 xs:w-9 xs:h-9 flex items-center justify-center rounded-full transition-colors",
-        "bg-secondary/50 hover:bg-secondary/80",
+        "relative p-2 w-9 h-9 flex items-center justify-center rounded-full transition-colors",
+        "bg-secondary/50 hover:bg-secondary/80 border border-border/30",
         isEnabled ? "text-primary" : "text-muted-foreground"
       )}
       whileHover={{ scale: 1.05 }}
@@ -19,41 +19,27 @@ export const AudioToggle = () => {
       aria-label={isEnabled ? "Mute sounds" : "Enable sounds"}
       title={`Sound ${isEnabled ? "on" : "off"} (M)`}
     >
-      {/* Animated ring when playing */}
+      {/* Animated glow ring when playing */}
       {isEnabled && isPlaying && (
         <motion.div
-          className="absolute inset-0 rounded-full border-2 border-primary"
+          className="absolute inset-0 rounded-full border-2 border-primary/60"
           initial={{ opacity: 0.8, scale: 1 }}
-          animate={{ opacity: 0, scale: 1.5 }}
-          transition={{ duration: 0.4 }}
+          animate={{ opacity: 0, scale: 1.4 }}
+          transition={{ duration: 0.5, repeat: Infinity }}
         />
       )}
 
-      {/* Audio visualizer bars */}
-      {isEnabled && (
-        <div className="absolute -top-1 left-1/2 -translate-x-1/2 flex gap-0.5">
-          {[0, 1, 2].map((i) => (
-            <motion.div
-              key={i}
-              className="w-0.5 bg-primary rounded-full"
-              animate={{
-                height: isPlaying ? [2, 6, 2] : 2,
-              }}
-              transition={{
-                duration: 0.3,
-                delay: i * 0.1,
-                repeat: isPlaying ? Infinity : 0,
-              }}
-            />
-          ))}
-        </div>
-      )}
-
-      {isEnabled ? (
-        <Volume2 className="w-4 h-4" />
-      ) : (
-        <VolumeX className="w-4 h-4" />
-      )}
+      {/* Icon with subtle pulse when enabled and playing */}
+      <motion.div
+        animate={isEnabled && isPlaying ? { scale: [1, 1.1, 1] } : { scale: 1 }}
+        transition={{ duration: 0.5, repeat: isPlaying ? Infinity : 0 }}
+      >
+        {isEnabled ? (
+          <Volume2 className="w-4 h-4" />
+        ) : (
+          <VolumeX className="w-4 h-4" />
+        )}
+      </motion.div>
     </motion.button>
   );
 };
