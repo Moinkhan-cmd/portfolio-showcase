@@ -6,6 +6,7 @@ import { SectionProgressIndicator } from "@/components/SectionProgressIndicator"
 import { KeyboardHint, KeyboardHintTrigger } from "@/components/KeyboardHint";
 import { WelcomeBackMessage } from "@/components/WelcomeBackMessage";
 import { AudioFeedbackProvider } from "@/components/AudioFeedbackProvider";
+import { SectionSkeleton } from "@/components/SectionSkeleton";
 import { useKeyboardNavigation } from "@/hooks/useKeyboardNavigation";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -127,49 +128,49 @@ const content = (
 
         <SectionDivider />
         <SectionTransition>
-          <Suspense fallback={null}>
+          <Suspense fallback={<SectionSkeleton variant="about" />}>
             <AboutSection />
           </Suspense>
         </SectionTransition>
 
         <SectionDivider />
         <SectionTransition>
-          <Suspense fallback={null}>
+          <Suspense fallback={<SectionSkeleton variant="skills" />}>
             <SkillsSection />
           </Suspense>
         </SectionTransition>
 
         <SectionDivider />
         <SectionTransition>
-          <Suspense fallback={null}>
+          <Suspense fallback={<SectionSkeleton variant="projects" />}>
             <ProjectsSection />
           </Suspense>
         </SectionTransition>
 
         <SectionDivider />
         <SectionTransition>
-          <Suspense fallback={null}>
+          <Suspense fallback={<SectionSkeleton variant="experience" />}>
             <ExperienceSection />
           </Suspense>
         </SectionTransition>
 
         <SectionDivider />
         <SectionTransition>
-          <Suspense fallback={null}>
+          <Suspense fallback={<SectionSkeleton variant="certifications" />}>
             <CertificationsSection />
           </Suspense>
         </SectionTransition>
 
         <SectionDivider />
         <SectionTransition>
-          <Suspense fallback={null}>
+          <Suspense fallback={<SectionSkeleton variant="contact" />}>
             <ContactSection />
           </Suspense>
         </SectionTransition>
 
         <SectionDivider />
         <SectionTransition>
-          <Suspense fallback={null}>
+          <Suspense fallback={<SectionSkeleton variant="footer" />}>
             <Footer />
           </Suspense>
         </SectionTransition>
