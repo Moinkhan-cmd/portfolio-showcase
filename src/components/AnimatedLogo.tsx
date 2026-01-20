@@ -17,9 +17,6 @@ const MobileLogo = ({ onClick }: AnimatedLogoProps) => (
     onClick={onClick}
     className="font-signature text-xl relative flex items-center gap-2 cursor-pointer"
   >
-    <span className="relative flex-shrink-0">
-      <Sparkles className="w-5 h-5 text-primary" />
-    </span>
     <span className="italic font-light tracking-wider text-foreground">
       {logoText}
     </span>

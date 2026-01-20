@@ -255,7 +255,7 @@ export const HeroSection = () => {
                     Digital
                   </span>
                   <motion.span
-                    className="absolute -right-8 top-0"
+                    className="absolute -right-8 top-0 hidden sm:block"
                     animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.1, 1] }}
                     transition={{ duration: 2, repeat: Infinity }}
                   >
