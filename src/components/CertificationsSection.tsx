@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { LazyImage } from "@/components/ui/lazy-image";
 import {
   Dialog,
   DialogContent,
@@ -92,12 +93,10 @@ const CertificationCard = ({ cert, index, onViewDetails }: CertificationCardProp
           <div className="relative aspect-[16/9] bg-gradient-to-br from-primary/15 via-primary/8 to-primary/15 overflow-hidden">
             {cert.imageUrl && !imageError ? (
               <>
-                <img
+                <LazyImage
                   src={cert.imageUrl}
                   alt={`${cert.title} certificate`}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  loading="lazy"
-                  decoding="async"
+                  className="absolute inset-0 w-full h-full"
                   onError={() => setImageError(true)}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/60 to-transparent z-10" />

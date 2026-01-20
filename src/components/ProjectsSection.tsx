@@ -9,6 +9,7 @@ import type { Project } from "@/lib/admin/projects";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { LazyImage } from "@/components/ui/lazy-image";
 import {
   Select,
   SelectContent,
@@ -88,12 +89,10 @@ const ProjectCard = ({ project, index, isFeatured = false }: ProjectCardProps) =
           <div className={`relative overflow-hidden ${isFeatured ? 'aspect-[21/9]' : 'aspect-video'} bg-gradient-to-br from-primary/10 via-primary/5 to-transparent`}>
             <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent z-20 pointer-events-none opacity-85" />
             {project.thumbnail ? (
-              <img
+              <LazyImage
                 src={project.thumbnail}
                 alt={project.title}
-                className="w-full h-full object-cover"
-                loading="lazy"
-                decoding="async"
+                className="absolute inset-0 w-full h-full"
               />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center">
