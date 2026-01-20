@@ -69,6 +69,7 @@ export const useAudioFeedback = (options: AudioFeedbackOptions = {}) => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (
+        typeof e.key === "string" &&
         e.key.toLowerCase() === "m" &&
         !(e.target instanceof HTMLInputElement) &&
         !(e.target instanceof HTMLTextAreaElement)
