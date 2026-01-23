@@ -11,32 +11,30 @@ import { WebGLContextGuard } from "@/components/WebGLContextGuard";
 const AboutScene = memo(() => (
   <>
     <PerspectiveCamera makeDefault position={[0, 0, 12]} fov={50} />
-    {/* Reduced lighting */}
-    <ambientLight intensity={0.5} />
-    <pointLight position={[10, 10, 10]} intensity={1} color="#06b6d4" />
-    <pointLight position={[-10, -10, -10]} intensity={0.8} color="#8b5cf6" />
+    <ambientLight intensity={0.4} />
+    <pointLight position={[10, 10, 10]} intensity={0.8} color="#06b6d4" />
+    <pointLight position={[-10, -10, -10]} intensity={0.6} color="#8b5cf6" />
     
-    {/* 3D Elements */}
     <DNA />
     <FloatingParticles />
     <GeometricShapes />
     
     {/* Reduced stars */}
     <Stars 
-      radius={15} 
-      depth={5} 
-      count={30} 
-      factor={2} 
-      saturation={0.6} 
+      radius={12} 
+      depth={4} 
+      count={20} 
+      factor={1.5} 
+      saturation={0.5} 
       fade 
-      speed={0.2}
+      speed={0.15}
     />
     
     <OrbitControls 
       enableZoom={false} 
       enablePan={false}
       autoRotate
-      autoRotateSpeed={0.2}
+      autoRotateSpeed={0.15}
       enableDamping={false}
     />
   </>
@@ -58,7 +56,7 @@ export const AboutBackground3D = () => {
       ([entry]) => {
         setIsVisible(entry.isIntersecting);
       },
-      { threshold: 0.01, rootMargin: '100px' }
+      { threshold: 0.01, rootMargin: '50px' }
     );
 
     if (containerRef.current) {
@@ -68,7 +66,6 @@ export const AboutBackground3D = () => {
     return () => observer.disconnect();
   }, [shouldRender3D, isMobile]);
 
-  // Don't render 3D on mobile/touch devices
   if (!shouldRender3D || isMobile) {
     return null;
   }
@@ -88,7 +85,7 @@ export const AboutBackground3D = () => {
         <Canvas
           key={webglKey}
           dpr={[1, 1]}
-          performance={{ min: 0.3, max: 0.6 }}
+          performance={{ min: 0.3, max: 0.5 }}
           frameloop={isScrolling ? "never" : "always"}
           gl={{ 
             antialias: false,
@@ -96,7 +93,7 @@ export const AboutBackground3D = () => {
             powerPreference: "low-power",
             stencil: false,
           }}
-          style={{ opacity: 0.35 }}
+          style={{ opacity: 0.3 }}
         >
           <Suspense fallback={null}>
             <WebGLContextGuard onContextLost={() => setWebglKey((k) => k + 1)} />
