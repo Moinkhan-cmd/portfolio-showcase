@@ -1,4 +1,4 @@
-import { ArrowDown, Download, Github, Linkedin, Mail, Sparkles, ExternalLink, Eye, ChevronDown, Code2, Zap } from "lucide-react";
+import { ArrowDown, Download, Github, Linkedin, Mail, Sparkles, ExternalLink, Eye, ChevronDown, Code2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -127,20 +127,16 @@ export const HeroSection = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background/60 to-background pointer-events-none z-[1]" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,hsl(var(--primary)/0.15),transparent)] pointer-events-none z-[1]" />
       
-      {/* Mesh gradient - disabled on mobile for performance */}
+      {/* Static mesh gradient - optimized for performance */}
       {!isMobile && (
         <div className="absolute inset-0 overflow-hidden z-[1]">
-          <motion.div
-            className="absolute -top-1/4 -right-1/4 w-[800px] h-[800px] rounded-full blur-[120px] opacity-20"
+          <div
+            className="absolute -top-1/4 -right-1/4 w-[600px] h-[600px] rounded-full blur-[100px] opacity-15"
             style={{ background: "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)" }}
-            animate={{ scale: [1, 1.2, 1], rotate: [0, 180, 360] }}
-            transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
           />
-          <motion.div
-            className="absolute -bottom-1/4 -left-1/4 w-[600px] h-[600px] rounded-full blur-[100px] opacity-15"
+          <div
+            className="absolute -bottom-1/4 -left-1/4 w-[500px] h-[500px] rounded-full blur-[80px] opacity-10"
             style={{ background: "radial-gradient(circle, hsl(280 70% 50%) 0%, transparent 70%)" }}
-            animate={{ scale: [1.2, 1, 1.2], rotate: [360, 180, 0] }}
-            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
           />
         </div>
       )}
@@ -169,21 +165,32 @@ export const HeroSection = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-7"
           >
-            {/* Status Badge */}
+            {/* Status Badge - Premium Glass Style */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
+              initial={{ opacity: 0, y: 20, scale: 0.9 }}
+              animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+              transition={{ delay: 0.2, type: "spring", stiffness: 120, damping: 15 }}
+              className="inline-block"
             >
-              <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20 backdrop-blur-xl">
-                <span className="relative flex h-2.5 w-2.5">
+              <div className="group relative inline-flex items-center gap-2.5 sm:gap-3 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full overflow-hidden cursor-default">
+                {/* Animated gradient border */}
+                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-emerald-500 via-primary to-violet-500 opacity-80" />
+                <div className="absolute inset-[1.5px] rounded-full bg-background/95 backdrop-blur-xl" />
+                
+                {/* Shimmer effect */}
+                <div className="absolute inset-0 rounded-full overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-[shimmer_3s_ease-in-out_infinite]" />
+                </div>
+                
+                {/* Content */}
+                <span className="relative flex h-2 w-2 sm:h-2.5 sm:w-2.5">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 shadow-lg shadow-emerald-500/50" />
+                  <span className="relative inline-flex rounded-full h-full w-full bg-emerald-500 shadow-lg shadow-emerald-500/50" />
                 </span>
-                <span className="text-sm font-medium bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                  Open to new opportunities
+                <span className="relative text-xs sm:text-sm font-semibold bg-gradient-to-r from-emerald-400 via-primary to-violet-400 bg-clip-text text-transparent">
+                  Open to New Opportunities
                 </span>
-                <Zap className="w-3.5 h-3.5 text-primary animate-pulse" />
+                <Sparkles className="relative w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary" />
               </div>
             </motion.div>
 
