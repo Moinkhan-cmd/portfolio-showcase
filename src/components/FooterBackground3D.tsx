@@ -1,13 +1,15 @@
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera, Stars } from "@react-three/drei";
-import { Suspense, useState, useEffect, useRef } from "react";
+import { Suspense, useState, useEffect, useRef, memo } from "react";
 import { useScrollPause } from "@/hooks/useScrollPause";
 import { use3DPerformance } from "@/hooks/use3DPerformance";
 import { WebGLContextGuard } from "@/components/WebGLContextGuard";
+import { useWebGLFallback } from "@/hooks/useWebGLFallback";
+import { StaticGradientFallback } from "./StaticGradientFallback";
 import * as THREE from "three";
 
 // Footer-themed celebration elements
-const CelebrationElements = () => {
+const CelebrationElements = memo(() => {
   const groupRef = useRef<THREE.Group>(null);
 
   useFrame((state) => {
@@ -18,11 +20,11 @@ const CelebrationElements = () => {
   });
 
   const elements = [
-    { position: [3, 2, -2], color: "#06b6d4", size: 0.6, type: "star" },
-    { position: [-3, -2, 2], color: "#8b5cf6", size: 0.5, type: "star" },
-    { position: [0, 3, 0], color: "#ec4899", size: 0.45, type: "star" },
-    { position: [-2, -3, -1], color: "#f59e0b", size: 0.55, type: "star" },
-    { position: [4, -1, 1], color: "#06b6d4", size: 0.5, type: "star" },
+    { position: [3, 2, -2], color: "#06b6d4", size: 0.6 },
+    { position: [-3, -2, 2], color: "#8b5cf6", size: 0.5 },
+    { position: [0, 3, 0], color: "#ec4899", size: 0.45 },
+    { position: [-2, -3, -1], color: "#f59e0b", size: 0.55 },
+    { position: [4, -1, 1], color: "#06b6d4", size: 0.5 },
   ];
 
   return (
@@ -44,30 +46,35 @@ const CelebrationElements = () => {
       ))}
     </group>
   );
-};
+});
+
+CelebrationElements.displayName = "CelebrationElements";
 
 // Floating celebration particles
-const CelebrationParticles = () => {
+const CelebrationParticles = memo(() => {
   const groupRef = useRef<THREE.Group>(null);
-  const particles: Array<{ position: [number, number, number]; speed: number; size: number; color: string }> = [];
+  const particles = useRef<Array<{ position: [number, number, number]; speed: number; size: number; color: string }>>([]);
 
-  for (let i = 0; i < 22; i++) { // Reduced from 45
-    particles.push({
-      position: [
-        (Math.random() - 0.5) * 22,
-        (Math.random() - 0.5) * 22,
-        (Math.random() - 0.5) * 22,
-      ],
-      speed: 0.2 + Math.random() * 0.3,
-      size: 0.08 + Math.random() * 0.12,
-      color: ["#06b6d4", "#8b5cf6", "#ec4899", "#f59e0b"][i % 4],
-    });
+  if (particles.current.length === 0) {
+    for (let i = 0; i < 22; i++) {
+      particles.current.push({
+        position: [
+          (Math.random() - 0.5) * 22,
+          (Math.random() - 0.5) * 22,
+          (Math.random() - 0.5) * 22,
+        ],
+        speed: 0.2 + Math.random() * 0.3,
+        size: 0.08 + Math.random() * 0.12,
+        color: ["#06b6d4", "#8b5cf6", "#ec4899", "#f59e0b"][i % 4],
+      });
+    }
   }
 
   useFrame((state) => {
     if (groupRef.current) {
       groupRef.current.children.forEach((child, i) => {
-        const particle = particles[i];
+        const particle = particles.current[i];
+        if (!particle) return;
         const time = state.clock.getElapsedTime();
         
         const y = particle.position[1] + Math.sin(time * particle.speed + i) * 1.6;
@@ -84,7 +91,7 @@ const CelebrationParticles = () => {
 
   return (
     <group ref={groupRef}>
-      {particles.map((particle, i) => (
+      {particles.current.map((particle, i) => (
         <mesh key={i} position={particle.position}>
           <sphereGeometry args={[particle.size, 8, 8]} />
           <meshStandardMaterial
@@ -100,10 +107,12 @@ const CelebrationParticles = () => {
       ))}
     </group>
   );
-};
+});
+
+CelebrationParticles.displayName = "CelebrationParticles";
 
 // Heart-shaped elements for "Made with ❤️" theme
-const HeartElements = () => {
+const HeartElements = memo(() => {
   const groupRef = useRef<THREE.Group>(null);
 
   useFrame((state) => {
@@ -136,7 +145,50 @@ const HeartElements = () => {
       ))}
     </group>
   );
-};
+});
+
+HeartElements.displayName = "HeartElements";
+
+const FooterScene = memo(() => (
+  <>
+    <PerspectiveCamera makeDefault position={[0, 0, 12]} fov={50} />
+    <ambientLight intensity={0.5} />
+    <pointLight position={[10, 10, 10]} intensity={1.1} color="#06b6d4" />
+    <pointLight position={[-10, -10, -10]} intensity={1.0} color="#8b5cf6" />
+    <pointLight position={[0, 10, 0]} intensity={0.8} color="#ec4899" />
+    <spotLight 
+      position={[0, 5, 5]} 
+      angle={0.5} 
+      penumbra={0.5} 
+      intensity={0.85} 
+      color="#f59e0b"
+    />
+    
+    <CelebrationElements />
+    <CelebrationParticles />
+    <HeartElements />
+    
+    <Stars 
+      radius={15} 
+      depth={5} 
+      count={50} 
+      factor={2} 
+      saturation={0.6} 
+      fade 
+      speed={0.3}
+    />
+    
+    <OrbitControls 
+      enableZoom={false} 
+      enablePan={false}
+      autoRotate
+      autoRotateSpeed={0.28}
+      enableDamping={false}
+    />
+  </>
+));
+
+FooterScene.displayName = "FooterScene";
 
 export const FooterBackground3D = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -144,9 +196,10 @@ export const FooterBackground3D = () => {
   const isScrolling = useScrollPause(200);
   const [webglKey, setWebglKey] = useState(0);
   const { shouldRender3D, isMobile } = use3DPerformance();
+  const { isWebGLAvailable, showFallback, handleContextLost } = useWebGLFallback();
 
   useEffect(() => {
-    if (!shouldRender3D || isMobile) return;
+    if (!shouldRender3D || isMobile || showFallback) return;
     
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -160,11 +213,10 @@ export const FooterBackground3D = () => {
     }
 
     return () => observer.disconnect();
-  }, [shouldRender3D, isMobile]);
+  }, [shouldRender3D, isMobile, showFallback]);
 
-  // Don't render 3D on mobile
-  if (!shouldRender3D || isMobile) {
-    return null;
+  if (!shouldRender3D || isMobile || showFallback) {
+    return <StaticGradientFallback variant="footer" />;
   }
 
   return (
@@ -173,7 +225,7 @@ export const FooterBackground3D = () => {
       className="w-full h-full absolute inset-0 pointer-events-none"
       style={{ willChange: 'opacity', transform: 'translateZ(0)', zIndex: 1 }}
     >
-      {isVisible && (
+      {isVisible && isWebGLAvailable && (
         <Canvas
           key={webglKey}
           dpr={[1, 1]}
@@ -186,42 +238,12 @@ export const FooterBackground3D = () => {
           }}
           style={{ opacity: 0.35 }}
         >
-          <PerspectiveCamera makeDefault position={[0, 0, 12]} fov={50} />
           <Suspense fallback={null}>
-            <WebGLContextGuard onContextLost={() => setWebglKey((k) => k + 1)} />
-            <ambientLight intensity={0.5} />
-            <pointLight position={[10, 10, 10]} intensity={1.1} color="#06b6d4" />
-            <pointLight position={[-10, -10, -10]} intensity={1.0} color="#8b5cf6" />
-            <pointLight position={[0, 10, 0]} intensity={0.8} color="#ec4899" />
-            <spotLight 
-              position={[0, 5, 5]} 
-              angle={0.5} 
-              penumbra={0.5} 
-              intensity={0.85} 
-              color="#f59e0b"
-            />
-            
-            <CelebrationElements />
-            <CelebrationParticles />
-            <HeartElements />
-            
-            <Stars 
-              radius={15} 
-              depth={5} 
-              count={50} 
-              factor={2} 
-              saturation={0.6} 
-              fade 
-              speed={0.3}
-            />
-            
-            <OrbitControls 
-              enableZoom={false} 
-              enablePan={false}
-              autoRotate
-              autoRotateSpeed={0.28}
-              enableDamping={false}
-            />
+            <WebGLContextGuard onContextLost={() => {
+              handleContextLost();
+              setWebglKey((k) => k + 1);
+            }} />
+            <FooterScene />
           </Suspense>
         </Canvas>
       )}

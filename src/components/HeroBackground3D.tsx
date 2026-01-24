@@ -9,6 +9,8 @@ import { useScrollPause } from "@/hooks/useScrollPause";
 import { use3DPerformance } from "@/hooks/use3DPerformance";
 import { WebGLContextGuard } from "@/components/WebGLContextGuard";
 import { useScrollLOD } from "@/hooks/useScrollLOD";
+import { useWebGLFallback } from "@/hooks/useWebGLFallback";
+import { StaticGradientFallback } from "./StaticGradientFallback";
 
 interface HeroSceneProps {
   sphereDetail: number;
@@ -59,11 +61,7 @@ export const HeroBackground3D = () => {
   const [webglKey, setWebglKey] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const lodSettings = useScrollLOD("hero");
-  
-  // Don't render 3D on mobile/touch devices
-  if (!shouldRender3D || isMobile) {
-    return null;
-  }
+  const { isWebGLAvailable, showFallback, handleContextLost } = useWebGLFallback();
 
   useEffect(() => {
     if (typeof IntersectionObserver === "undefined") return;
@@ -81,6 +79,11 @@ export const HeroBackground3D = () => {
 
     return () => observer.disconnect();
   }, []);
+
+  // Show fallback gradient if WebGL not supported, failed, or on mobile
+  if (!shouldRender3D || isMobile || showFallback) {
+    return <StaticGradientFallback variant="hero" />;
+  }
   
   return (
     <div 
@@ -92,8 +95,8 @@ export const HeroBackground3D = () => {
         contain: 'layout style paint',
       }}
     >
-      <Suspense fallback={null}>
-        {isVisible && (
+      <Suspense fallback={<StaticGradientFallback variant="hero" />}>
+        {isVisible && isWebGLAvailable && (
           <Canvas
             key={webglKey}
             dpr={[1, 1]}
@@ -107,7 +110,10 @@ export const HeroBackground3D = () => {
               depth: true,
             }}
           >
-            <WebGLContextGuard onContextLost={() => setWebglKey((k) => k + 1)} />
+            <WebGLContextGuard onContextLost={() => {
+              handleContextLost();
+              setWebglKey((k) => k + 1);
+            }} />
             <HeroScene {...lodSettings} />
           </Canvas>
         )}
