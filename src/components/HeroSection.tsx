@@ -165,32 +165,29 @@ export const HeroSection = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-7"
           >
-            {/* Status Badge - Premium Glass Style */}
+            {/* Status Badge - Frosted Glass Style */}
             <motion.div
               initial={{ opacity: 0, y: 20, scale: 0.9 }}
               animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
               transition={{ delay: 0.2, type: "spring", stiffness: 120, damping: 15 }}
               className="inline-block"
             >
-              <div className="group relative inline-flex items-center gap-2.5 sm:gap-3 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full overflow-hidden cursor-default">
-                {/* Animated gradient border */}
-                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-emerald-500 via-primary to-violet-500 opacity-80" />
-                <div className="absolute inset-[1.5px] rounded-full bg-background/95 backdrop-blur-xl" />
+              <div className="group relative inline-flex items-center gap-2.5 sm:gap-3 px-5 sm:px-6 py-2.5 sm:py-3 rounded-2xl cursor-default bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-2xl border border-white/20 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:bg-white/[0.12] dark:hover:bg-white/[0.08] hover:border-white/30 dark:hover:border-white/15 transition-all duration-300">
+                {/* Inner glow effect */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
                 
-                {/* Shimmer effect */}
-                <div className="absolute inset-0 rounded-full overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-[shimmer_3s_ease-in-out_infinite]" />
-                </div>
+                {/* Subtle top highlight */}
+                <div className="absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
                 
                 {/* Content */}
                 <span className="relative flex h-2 w-2 sm:h-2.5 sm:w-2.5">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-full w-full bg-emerald-500 shadow-lg shadow-emerald-500/50" />
                 </span>
-                <span className="relative text-xs sm:text-sm font-semibold bg-gradient-to-r from-emerald-400 via-primary to-violet-400 bg-clip-text text-transparent">
+                <span className="relative text-xs sm:text-sm font-medium text-foreground/90">
                   Open to New Opportunities
                 </span>
-                <Sparkles className="relative w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary" />
+                <Sparkles className="relative w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400" />
               </div>
             </motion.div>
 
