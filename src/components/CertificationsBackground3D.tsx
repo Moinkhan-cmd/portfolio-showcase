@@ -4,6 +4,8 @@ import { Suspense, useState, useEffect, useRef, memo } from "react";
 import { useScrollPause } from "@/hooks/useScrollPause";
 import { use3DPerformance } from "@/hooks/use3DPerformance";
 import { WebGLContextGuard } from "@/components/WebGLContextGuard";
+import { useWebGLFallback } from "@/hooks/useWebGLFallback";
+import { StaticGradientFallback } from "./StaticGradientFallback";
 import * as THREE from "three";
 
 // Simplified award elements - reduced count
@@ -136,9 +138,10 @@ export const CertificationsBackground3D = () => {
   const isScrolling = useScrollPause(200);
   const [webglKey, setWebglKey] = useState(0);
   const { shouldRender3D, isMobile } = use3DPerformance();
+  const { isWebGLAvailable, showFallback, handleContextLost } = useWebGLFallback();
 
   useEffect(() => {
-    if (!shouldRender3D || isMobile) return;
+    if (!shouldRender3D || isMobile || showFallback) return;
     
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -152,10 +155,10 @@ export const CertificationsBackground3D = () => {
     }
 
     return () => observer.disconnect();
-  }, [shouldRender3D, isMobile]);
+  }, [shouldRender3D, isMobile, showFallback]);
 
-  if (!shouldRender3D || isMobile) {
-    return null;
+  if (!shouldRender3D || isMobile || showFallback) {
+    return <StaticGradientFallback variant="certifications" />;
   }
 
   return (
@@ -169,7 +172,7 @@ export const CertificationsBackground3D = () => {
         contain: 'layout style paint',
       }}
     >
-      {isVisible && (
+      {isVisible && isWebGLAvailable && (
         <Canvas
           key={webglKey}
           dpr={[1, 1]}
@@ -184,7 +187,10 @@ export const CertificationsBackground3D = () => {
           style={{ opacity: 0.25 }}
         >
           <Suspense fallback={null}>
-            <WebGLContextGuard onContextLost={() => setWebglKey((k) => k + 1)} />
+            <WebGLContextGuard onContextLost={() => {
+              handleContextLost();
+              setWebglKey((k) => k + 1);
+            }} />
             <CertificationsScene />
           </Suspense>
         </Canvas>
