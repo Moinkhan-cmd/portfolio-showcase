@@ -325,7 +325,7 @@ export const Navigation = () => {
                   onClick={() => { playClickSound(); scrollToSection(link.href); }}
                   onMouseEnter={playHoverSound}
                   className={cn(
-                    'relative px-2.5 lg:px-4 py-1.5 lg:py-2 text-xs lg:text-sm font-medium transition-all duration-300 rounded-full whitespace-nowrap',
+                    'relative px-2.5 lg:px-4 py-1.5 lg:py-2 text-xs lg:text-sm font-medium transition-all duration-300 rounded-full whitespace-nowrap hover:scale-105 active:scale-95',
                     isActive 
                       ? 'text-primary-foreground' 
                       : 'text-muted-foreground hover:text-foreground hover:bg-white/[0.08] hover:shadow-[0_0_12px_rgba(45,212,191,0.15)]'
