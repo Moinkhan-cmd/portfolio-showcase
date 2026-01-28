@@ -7,7 +7,7 @@ export const ScrollToTop = () => {
   return (
     <motion.button
       onClick={() => scrollToTop()}
-      className="p-3 sm:p-4 glass-card rounded-full hover:bg-primary/10 transition-all duration-300 glow-on-hover relative overflow-hidden group"
+      className="p-3 sm:p-4 rounded-full bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-2xl border border-white/20 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:bg-white/[0.12] dark:hover:bg-white/[0.08] hover:border-white/30 dark:hover:border-white/15 transition-all duration-300 relative overflow-hidden group"
       aria-label="Scroll to top"
       type="button"
       whileHover={{ scale: 1.1, rotate: 360 }}
