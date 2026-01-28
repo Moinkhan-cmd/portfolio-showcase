@@ -326,7 +326,9 @@ export const Navigation = () => {
                   onMouseEnter={playHoverSound}
                   className={cn(
                     'relative px-2.5 lg:px-4 py-1.5 lg:py-2 text-xs lg:text-sm font-medium transition-all duration-300 rounded-full whitespace-nowrap',
-                    isActive ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
+                    isActive 
+                      ? 'text-primary-foreground' 
+                      : 'text-muted-foreground hover:text-foreground hover:bg-white/[0.08] hover:shadow-[0_0_12px_rgba(45,212,191,0.15)]'
                   )}
                   aria-current={isActive ? 'page' : undefined}
                 >
