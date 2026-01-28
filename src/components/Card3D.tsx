@@ -48,10 +48,13 @@ export const Card3D = ({ children, className = "", intensity = 15 }: Card3DProps
     cardRef.current.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)";
   };
 
+  // Frosted glass base classes
+  const frostedGlassClasses = "relative bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-2xl border border-white/20 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-white/10 before:via-transparent before:to-transparent before:pointer-events-none after:absolute after:inset-x-4 after:top-0 after:h-px after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent after:pointer-events-none";
+
   // On mobile, render without 3D transforms
   if (isMobile) {
     return (
-      <div ref={cardRef} className={className}>
+      <div ref={cardRef} className={`${frostedGlassClasses} ${className}`}>
         {children}
       </div>
     );
@@ -60,14 +63,14 @@ export const Card3D = ({ children, className = "", intensity = 15 }: Card3DProps
   return (
     <motion.div
       ref={cardRef}
-      className={`transform-3d transition-transform duration-300 ease-out ${className}`}
+      className={`${frostedGlassClasses} transform-3d transition-all duration-300 ease-out hover:bg-white/[0.12] dark:hover:bg-white/[0.08] hover:border-white/30 dark:hover:border-white/15 ${className}`}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       style={{
         transformStyle: "preserve-3d",
       }}
     >
-      <div style={{ transform: "translateZ(50px)" }}>
+      <div style={{ transform: "translateZ(50px)" }} className="relative z-10">
         {children}
       </div>
     </motion.div>
