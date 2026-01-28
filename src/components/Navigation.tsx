@@ -91,7 +91,7 @@ const MobileMenu = ({
           
           {/* Animated Drawer Panel */}
           <motion.div
-            className="fixed top-0 right-0 w-[85vw] max-w-[320px] h-screen bg-background border-l border-border shadow-2xl z-[99999] flex flex-col"
+            className="fixed top-0 right-0 w-[85vw] max-w-[320px] h-screen bg-white/[0.08] dark:bg-black/80 backdrop-blur-2xl border-l border-white/20 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)] z-[99999] flex flex-col"
             variants={drawerVariants}
             initial="hidden"
             animate="visible"
@@ -108,7 +108,7 @@ const MobileMenu = ({
               </motion.div>
               <motion.button 
                 onClick={onClose}
-                className="p-2.5 rounded-xl bg-secondary/50 hover:bg-secondary/80 transition-colors"
+                className="p-2.5 rounded-xl bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-xl border border-white/20 dark:border-white/10 hover:bg-white/[0.12] dark:hover:bg-white/[0.08] transition-colors"
                 aria-label="Close menu"
                 initial={{ opacity: 0, rotate: -90 }}
                 animate={{ opacity: 1, rotate: 0 }}
@@ -132,8 +132,8 @@ const MobileMenu = ({
                     className={cn(
                       "w-full text-left p-4 rounded-xl text-lg font-medium transition-colors",
                       isActive 
-                        ? "bg-primary/15 text-primary border border-primary/20" 
-                        : "bg-secondary/30 text-foreground hover:bg-secondary/50"
+                        ? "bg-primary/15 text-primary border border-primary/30 backdrop-blur-xl" 
+                        : "bg-white/[0.06] dark:bg-white/[0.04] border border-white/10 text-foreground hover:bg-white/[0.1] dark:hover:bg-white/[0.06]"
                     )}
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ 
@@ -288,7 +288,7 @@ export const Navigation = () => {
           className={cn(
             'mx-auto flex items-center justify-between transition-all duration-300 ease-out',
             isScrolled
-              ? 'w-[96%] xs:w-[95%] max-w-6xl rounded-xl xs:rounded-2xl px-2.5 xs:px-3 sm:px-4 md:px-6 py-1.5 xs:py-2 sm:py-2.5 bg-background/90 backdrop-blur-xl border border-border/30 shadow-lg'
+              ? 'w-[96%] xs:w-[95%] max-w-6xl rounded-xl xs:rounded-2xl px-2.5 xs:px-3 sm:px-4 md:px-6 py-1.5 xs:py-2 sm:py-2.5 bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-2xl border border-white/20 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)]'
               : 'w-full max-w-7xl px-3 xs:px-4 sm:px-6 md:px-8 py-1.5 xs:py-2 bg-transparent'
           )}
         >
@@ -316,7 +316,7 @@ export const Navigation = () => {
           </a>
 
           {/* Desktop Nav */}
-          <div className="hidden lg:flex items-center gap-0.5 lg:gap-1 p-0.5 lg:p-1 rounded-full bg-secondary/50 border border-border/30 backdrop-blur-sm">
+          <div className="hidden lg:flex items-center gap-0.5 lg:gap-1 p-0.5 lg:p-1 rounded-full bg-white/[0.06] dark:bg-white/[0.04] border border-white/15 dark:border-white/10 backdrop-blur-xl">
             {navLinks.map((link) => {
               const isActive = activeSection === link.href.substring(1);
               return (
@@ -369,7 +369,7 @@ export const Navigation = () => {
             {/* Hamburger Button - Only visible on mobile/tablet */}
             <button
               onClick={() => { playClickSound(); setIsMobileMenuOpen(true); }}
-              className="lg:hidden flex items-center justify-center min-h-[40px] min-w-[40px] p-2 rounded-xl bg-secondary/50 hover:bg-secondary/80"
+              className="lg:hidden flex items-center justify-center min-h-[40px] min-w-[40px] p-2 rounded-xl bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-xl border border-white/20 dark:border-white/10 hover:bg-white/[0.12] dark:hover:bg-white/[0.08] transition-colors"
               aria-label="Open menu"
             >
               <Menu className="w-5 h-5" />
