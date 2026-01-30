@@ -99,19 +99,21 @@ export const Footer = () => {
       />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16 relative z-20">
-        {/* Full-width footer panel (not centered card) */}
+        {/* Full-width footer panel with frosted glass styling */}
         <motion.div
-          className="relative w-full rounded-3xl border border-primary/15 bg-card/40 backdrop-blur-xl overflow-hidden"
+          className="relative w-full rounded-3xl border border-white/20 dark:border-white/10 bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] overflow-hidden"
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, ease: "easeOut" }}
           whileHover={{ y: -2 }}
         >
-          {/* Gradient border glow */}
+          {/* Top highlight for glass effect */}
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent pointer-events-none" />
+          
+          {/* Subtle gradient border glow */}
           <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute -inset-px rounded-3xl bg-gradient-to-r from-primary/25 via-purple-500/20 to-pink-500/25 opacity-60" />
-            <div className="absolute inset-px rounded-3xl bg-card/60" />
+            <div className="absolute -inset-px rounded-3xl bg-gradient-to-r from-primary/15 via-purple-500/10 to-pink-500/15 opacity-50" />
           </div>
 
           {/* Shimmer sweep */}
@@ -150,12 +152,12 @@ export const Footer = () => {
                   </p>
 
                   <div className="flex flex-wrap items-center gap-2.5 pt-1">
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-background/40 border border-primary/15">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.06] dark:bg-white/[0.04] backdrop-blur-xl border border-white/15 dark:border-white/10">
                       <MapPin className="w-3.5 h-3.5 text-primary" />
                       <span className="text-sm text-foreground/80">India</span>
                     </div>
 
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 backdrop-blur-xl border border-emerald-500/20">
                       <span className="relative flex h-2 w-2">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-70" />
                         <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
@@ -179,8 +181,8 @@ export const Footer = () => {
                       className={cn(
                         "inline-flex w-fit items-center justify-start",
                         "px-3 py-1.5 rounded-full text-sm",
-                        "bg-background/35 border border-primary/15 text-foreground/75",
-                        "hover:text-primary hover:border-primary/30 transition-colors"
+                        "bg-white/[0.06] dark:bg-white/[0.04] backdrop-blur-xl border border-white/15 dark:border-white/10 text-foreground/75",
+                        "hover:text-primary hover:border-primary/30 hover:bg-white/[0.1] dark:hover:bg-white/[0.06] transition-all duration-300"
                       )}
                       initial={{ opacity: 0, y: 6 }}
                       whileInView={{ opacity: 1, y: 0 }}
@@ -210,8 +212,9 @@ export const Footer = () => {
                         rel="noopener noreferrer"
                         aria-label={link.label}
                         className={cn(
-                          "inline-flex items-center justify-center w-11 h-11 rounded-xl border border-primary/20",
-                          "bg-background/40 text-foreground/80 transition-colors backdrop-blur-sm",
+                          "inline-flex items-center justify-center w-11 h-11 rounded-xl",
+                          "bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-xl border border-white/20 dark:border-white/10",
+                          "text-foreground/80 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.08)]",
                           link.className
                         )}
                         initial={{ opacity: 0, scale: 0.95 }}
@@ -261,7 +264,7 @@ export const Footer = () => {
                     {techStack.map((tech, index) => (
                       <motion.span
                         key={tech}
-                        className="px-3 py-1.5 rounded-full text-xs bg-primary/5 border border-primary/10 text-muted-foreground"
+                        className="px-3 py-1.5 rounded-full text-xs bg-white/[0.06] dark:bg-white/[0.04] backdrop-blur-xl border border-white/15 dark:border-white/10 text-muted-foreground"
                         initial={{ opacity: 0, scale: 0.95 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
@@ -306,7 +309,7 @@ export const Footer = () => {
 
                 <motion.button
                   onClick={() => scrollToTop()}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 hover:bg-primary/15 text-foreground/90 hover:text-primary transition-colors"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.08] dark:bg-white/[0.05] backdrop-blur-xl border border-white/20 dark:border-white/10 hover:bg-white/[0.12] dark:hover:bg-white/[0.08] text-foreground/90 hover:text-primary transition-all duration-300"
                   whileHover={{ y: -2 }}
                   whileTap={{ scale: 0.95 }}
                 >
