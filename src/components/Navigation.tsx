@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { scrollToSection as smoothScrollToSection, scrollToTop } from '@/components/SmoothScroll';
 import { useAudioContext } from '@/hooks/useAudioFeedback';
 import { getDeviceFlags } from '@/lib/device';
+import { MagneticButton } from '@/components/MagneticButton';
 
 const navLinks = [
   { name: 'About', href: '#about' },
@@ -320,17 +321,18 @@ export const Navigation = () => {
             {navLinks.map((link) => {
               const isActive = activeSection === link.href.substring(1);
               return (
-                <button
+                <MagneticButton
                   key={link.name}
                   onClick={() => { playClickSound(); scrollToSection(link.href); }}
                   onMouseEnter={playHoverSound}
                   className={cn(
-                    'relative px-2.5 lg:px-4 py-1.5 lg:py-2 text-xs lg:text-sm font-medium transition-all duration-300 rounded-full whitespace-nowrap hover:scale-105 active:scale-95',
+                    'relative px-2.5 lg:px-4 py-1.5 lg:py-2 text-xs lg:text-sm font-medium transition-colors duration-300 rounded-full whitespace-nowrap',
                     isActive 
                       ? 'text-primary-foreground' 
                       : 'text-muted-foreground hover:text-foreground hover:bg-white/[0.08] hover:shadow-[0_0_12px_rgba(45,212,191,0.15)]'
                   )}
                   aria-current={isActive ? 'page' : undefined}
+                  strength={0.25}
                 >
                   {isActive && (
                     <motion.div
@@ -340,7 +342,7 @@ export const Navigation = () => {
                     />
                   )}
                   <span className="relative z-10">{link.name}</span>
-                </button>
+                </MagneticButton>
               );
             })}
           </div>
