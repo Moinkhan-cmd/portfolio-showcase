@@ -16,7 +16,7 @@ interface LazyImageProps {
 
 // Generate a simple SVG placeholder with gradient
 const generatePlaceholder = (color?: string): string => {
-  const baseColor = color || "hsl(175 80% 50%)";
+  const baseColor = color || "hsl(258 90% 66%)";
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
     <defs>
       <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -108,7 +108,7 @@ export const LazyImage = memo(({
           placeholderClassName
         )}
         style={{
-          background: `linear-gradient(135deg, hsl(175 80% 50% / 0.2) 0%, hsl(175 80% 50% / 0.1) 50%, hsl(175 80% 50% / 0.2) 100%)`
+          background: `linear-gradient(135deg, hsl(258 90% 66% / 0.2) 0%, hsl(258 90% 66% / 0.1) 50%, hsl(258 90% 66% / 0.2) 100%)`
         }}
       >
         {/* Shimmer effect overlay */}

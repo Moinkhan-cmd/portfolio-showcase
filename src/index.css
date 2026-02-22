@@ -15,17 +15,17 @@ a, button, [role="button"], input[type="submit"], input[type="button"], .cursor-
 
 @layer base {
   :root {
-    --background: 222 47% 6%;
+    --background: 222 47% 11%;
     --foreground: 210 40% 98%;
 
-    --card: 222 47% 8%;
+    --card: 220 39% 12%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 222 47% 8%;
+    --popover: 220 39% 12%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 175 80% 50%;
-    --primary-foreground: 222 47% 6%;
+    --primary: 258 90% 66%;
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 222 30% 14%;
     --secondary-foreground: 210 40% 98%;
@@ -33,23 +33,23 @@ a, button, [role="button"], input[type="submit"], input[type="button"], .cursor-
     --muted: 222 30% 18%;
     --muted-foreground: 215 20% 65%;
 
-    --accent: 175 80% 50%;
-    --accent-foreground: 222 47% 6%;
+    --accent: 188 91% 43%;
+    --accent-foreground: 220 39% 12%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 222 30% 18%;
     --input: 222 30% 18%;
-    --ring: 175 80% 50%;
+    --ring: 258 90% 66%;
 
     --radius: 0.75rem;
 
     /* Custom design tokens */
-    --gradient-primary: linear-gradient(135deg, hsl(175 80% 50%) 0%, hsl(200 90% 60%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(222 47% 10%) 0%, hsl(222 47% 6%) 100%);
-    --gradient-glow: linear-gradient(135deg, hsl(175 80% 50% / 0.2) 0%, hsl(200 90% 60% / 0.1) 100%);
-    --gradient-text: linear-gradient(135deg, hsl(175 80% 60%) 0%, hsl(200 90% 70%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(258 90% 66%) 0%, hsl(188 91% 43%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(222 47% 14%) 0%, hsl(222 47% 11%) 100%);
+    --gradient-glow: linear-gradient(135deg, hsl(258 90% 66% / 0.2) 0%, hsl(188 91% 43% / 0.1) 100%);
+    --gradient-text: linear-gradient(135deg, hsl(258 90% 72%) 0%, hsl(188 91% 55%) 100%);
     
     /* Frosted glass tokens */
     --glass-bg: hsl(0 0% 100% / 0.05);
@@ -60,24 +60,24 @@ a, button, [role="button"], input[type="submit"], input[type="button"], .cursor-
     --glass-shadow: 0 8px 32px hsl(0 0% 0% / 0.4);
     --glass-inner-glow: linear-gradient(135deg, hsl(0 0% 100% / 0.1) 0%, transparent 50%, transparent 100%);
     
-    --shadow-glow: 0 0 30px hsl(175 80% 50% / 0.2);
+    --shadow-glow: 0 0 30px hsl(258 90% 66% / 0.25);
     --shadow-card: 0 4px 20px hsl(0 0% 0% / 0.2);
-    --shadow-hover: 0 8px 30px hsl(175 80% 50% / 0.1);
+    --shadow-hover: 0 8px 30px hsl(258 90% 66% / 0.15);
 
-    --font-display: 'Outfit', sans-serif;
+    --font-display: 'Inter', sans-serif;
     --font-body: 'Inter', sans-serif;
-    --font-hero: 'Space Grotesk', 'Poppins', sans-serif;
+    --font-hero: 'Inter', 'Space Grotesk', sans-serif;
     --font-signature: 'Dancing Script', cursive;
 
     /* Sidebar tokens */
-    --sidebar-background: 222 47% 8%;
+    --sidebar-background: 220 39% 12%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 175 80% 50%;
-    --sidebar-primary-foreground: 222 47% 6%;
+    --sidebar-primary: 258 90% 66%;
+    --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 222 30% 14%;
     --sidebar-accent-foreground: 210 40% 98%;
     --sidebar-border: 222 30% 18%;
-    --sidebar-ring: 175 80% 50%;
+    --sidebar-ring: 258 90% 66%;
   }
 
   .light {
@@ -90,7 +90,7 @@ a, button, [role="button"], input[type="submit"], input[type="button"], .cursor-
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 8%;
 
-    --primary: 175 80% 35%;
+    --primary: 258 90% 55%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 210 40% 94%;
@@ -99,7 +99,7 @@ a, button, [role="button"], input[type="submit"], input[type="button"], .cursor-
     --muted: 210 40% 96%;
     --muted-foreground: 222 20% 35%;
 
-    --accent: 175 80% 35%;
+    --accent: 188 91% 35%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 50%;
@@ -107,10 +107,10 @@ a, button, [role="button"], input[type="submit"], input[type="button"], .cursor-
 
     --border: 214 32% 85%;
     --input: 214 32% 85%;
-    --ring: 175 80% 35%;
+    --ring: 258 90% 55%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(175 80% 35%) 0%, hsl(200 90% 45%) 100%);
-    --gradient-glow: linear-gradient(135deg, hsl(175 80% 35% / 0.15) 0%, hsl(200 90% 45% / 0.1) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(258 90% 55%) 0%, hsl(188 91% 35%) 100%);
+    --gradient-glow: linear-gradient(135deg, hsl(258 90% 55% / 0.15) 0%, hsl(188 91% 35% / 0.1) 100%);
     
     /* Frosted glass tokens - light theme */
     --glass-bg: hsl(0 0% 0% / 0.03);
@@ -121,9 +121,9 @@ a, button, [role="button"], input[type="submit"], input[type="button"], .cursor-
     --glass-shadow: 0 8px 32px hsl(0 0% 0% / 0.08);
     --glass-inner-glow: linear-gradient(135deg, hsl(0 0% 100% / 0.6) 0%, transparent 50%, transparent 100%);
     
-    --shadow-glow: 0 0 30px hsl(175 80% 35% / 0.2);
+    --shadow-glow: 0 0 30px hsl(258 90% 55% / 0.2);
     --shadow-card: 0 4px 20px hsl(0 0% 0% / 0.08);
-    --shadow-hover: 0 8px 30px hsl(175 80% 35% / 0.15);
+    --shadow-hover: 0 8px 30px hsl(258 90% 55% / 0.15);
   }
 }
 
@@ -285,7 +285,7 @@ a, button, [role="button"], input[type="submit"], input[type="button"], .cursor-
   }
 
   .text-glow {
-    text-shadow: 0 0 20px hsla(175, 80%, 50%, 0.5);
+    text-shadow: 0 0 20px hsla(258, 90%, 66%, 0.5);
   }
 
   .gradient-border {
@@ -511,15 +511,15 @@ html {
 @keyframes pulse-glow-enhanced {
   0%, 100% {
     box-shadow: 
-      0 0 20px hsl(175 80% 50% / 0.3),
-      0 0 40px hsl(175 80% 50% / 0.1),
-      inset 0 0 20px hsl(175 80% 50% / 0.05);
+      0 0 20px hsl(258 90% 66% / 0.3),
+      0 0 40px hsl(258 90% 66% / 0.1),
+      inset 0 0 20px hsl(258 90% 66% / 0.05);
   }
   50% {
     box-shadow: 
-      0 0 40px hsl(175 80% 50% / 0.5),
-      0 0 80px hsl(175 80% 50% / 0.2),
-      inset 0 0 40px hsl(175 80% 50% / 0.1);
+      0 0 40px hsl(258 90% 66% / 0.5),
+      0 0 80px hsl(258 90% 66% / 0.2),
+      inset 0 0 40px hsl(258 90% 66% / 0.1);
   }
 }
 
@@ -592,7 +592,7 @@ html {
 }
 
 .border-glow:hover {
-  box-shadow: 0 0 30px hsl(175 80% 50% / 0.4);
+  box-shadow: 0 0 30px hsl(258 90% 66% / 0.4);
 }
 
 /* Ripple effect */
@@ -714,24 +714,24 @@ html {
 .glass-enhanced {
   background: linear-gradient(
     135deg,
-    hsl(222 47% 10% / 0.8) 0%,
-    hsl(222 47% 8% / 0.6) 100%
+    hsl(222 47% 14% / 0.8) 0%,
+    hsl(220 39% 12% / 0.6) 100%
   );
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid hsl(175 80% 50% / 0.2);
+  border: 1px solid hsl(258 90% 66% / 0.2);
   box-shadow: 
     0 8px 32px hsl(0 0% 0% / 0.3),
-    inset 0 1px 0 hsl(255 255% 255% / 0.1);
+    inset 0 1px 0 hsl(0 0% 100% / 0.1);
   transition: all 0.3s ease;
 }
 
 .glass-enhanced:hover {
-  border-color: hsl(175 80% 50% / 0.4);
+  border-color: hsl(258 90% 66% / 0.4);
   box-shadow: 
     0 12px 48px hsl(0 0% 0% / 0.4),
-    0 0 40px hsl(175 80% 50% / 0.15),
-    inset 0 1px 0 hsl(255 255% 255% / 0.15);
+    0 0 40px hsl(258 90% 66% / 0.15),
+    inset 0 1px 0 hsl(0 0% 100% / 0.15);
 }
 
 /* Enhanced glass for light theme */

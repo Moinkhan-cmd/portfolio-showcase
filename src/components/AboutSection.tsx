@@ -81,7 +81,7 @@ export const AboutSection = () => {
       {/* Additional radial gradient overlay for center focus - lighter */}
       <div className="absolute inset-0 pointer-events-none z-10" 
            style={{
-             background: 'radial-gradient(ellipse at center, transparent 0%, hsl(222 47% 6% / 0.2) 50%, hsl(222 47% 6% / 0.5) 100%)'
+             background: 'radial-gradient(ellipse at center, transparent 0%, hsl(222 47% 11% / 0.2) 50%, hsl(222 47% 11% / 0.5) 100%)'
            }} 
       />
       
@@ -138,9 +138,9 @@ export const AboutSection = () => {
                         style={{ transformStyle: "preserve-3d" }}
                         animate={{
                           background: [
-                            "linear-gradient(135deg, hsl(175 80% 50% / 0.2) 0%, hsl(175 80% 50% / 0.05) 100%)",
-                            "linear-gradient(135deg, hsl(200 90% 60% / 0.2) 0%, hsl(175 80% 50% / 0.05) 100%)",
-                            "linear-gradient(135deg, hsl(175 80% 50% / 0.2) 0%, hsl(175 80% 50% / 0.05) 100%)",
+                            "linear-gradient(135deg, hsl(258 90% 66% / 0.2) 0%, hsl(188 91% 43% / 0.05) 100%)",
+                            "linear-gradient(135deg, hsl(188 91% 43% / 0.2) 0%, hsl(258 90% 66% / 0.05) 100%)",
+                            "linear-gradient(135deg, hsl(258 90% 66% / 0.2) 0%, hsl(188 91% 43% / 0.05) 100%)",
                           ],
                         }}
                         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}

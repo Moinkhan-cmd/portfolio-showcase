@@ -329,7 +329,7 @@ export const Navigation = () => {
                     'relative px-2.5 lg:px-4 py-1.5 lg:py-2 text-xs lg:text-sm font-medium transition-colors duration-300 rounded-full whitespace-nowrap',
                     isActive 
                       ? 'text-primary-foreground' 
-                      : 'text-muted-foreground hover:text-foreground hover:bg-white/[0.08] hover:shadow-[0_0_12px_rgba(45,212,191,0.15)]'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-white/[0.08] hover:shadow-[0_0_12px_rgba(139,92,246,0.15)]'
                   )}
                   aria-current={isActive ? 'page' : undefined}
                   strength={0.25}
@@ -362,7 +362,7 @@ export const Navigation = () => {
               size={isScrolled ? 'sm' : 'default'}
               className={cn(
                 'hidden sm:flex rounded-full font-semibold gap-1.5 lg:gap-2 transition-all duration-300 text-xs lg:text-sm',
-                'shadow-[0_0_20px_rgba(45,212,191,0.2)] hover:shadow-[0_0_30px_rgba(45,212,191,0.4)]',
+                'shadow-[0_0_20px_rgba(139,92,246,0.2)] hover:shadow-[0_0_30px_rgba(139,92,246,0.4)]',
                 isScrolled ? 'px-3 lg:px-4' : 'px-4 lg:px-5'
               )}
             >

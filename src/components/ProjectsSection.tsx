@@ -197,11 +197,11 @@ const ProjectCard = ({ project, index, isFeatured = false }: ProjectCardProps) =
         className="relative h-full rounded-2xl overflow-hidden border border-primary/10 bg-gradient-to-br from-card/90 via-card/80 to-card/90 backdrop-blur-sm transition-all duration-300 flex flex-col"
         animate={{
           y: isHovered ? -8 : 0,
-          borderColor: isHovered ? "hsl(175 80% 50% / 0.25)" : "hsl(175 80% 50% / 0.1)",
+          borderColor: isHovered ? "hsl(258 90% 66% / 0.25)" : "hsl(258 90% 66% / 0.1)",
         }}
         style={{
           boxShadow: isHovered
-            ? "0 20px 60px -12px hsl(175 80% 50% / 0.25), 0 8px 25px -8px hsl(0 0% 0% / 0.2)"
+            ? "0 20px 60px -12px hsl(258 90% 66% / 0.25), 0 8px 25px -8px hsl(0 0% 0% / 0.2)"
             : "0 4px 20px -5px hsl(0 0% 0% / 0.15)",
         }}
       >

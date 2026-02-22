@@ -260,7 +260,7 @@ export const ExperienceSection = () => {
                         }`}
                         animate={{
                           boxShadow: isHovered
-                            ? "0 25px 80px -12px hsl(175 80% 50% / 0.25), 0 10px 30px -10px hsl(0 0% 0% / 0.3)"
+                            ? "0 25px 80px -12px hsl(258 90% 66% / 0.25), 0 10px 30px -10px hsl(0 0% 0% / 0.3)"
                             : "0 8px 30px -5px hsl(0 0% 0% / 0.2)",
                         }}
                       >

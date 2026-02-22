@@ -427,7 +427,7 @@ export const AdminProjects = () => {
           <div
             ref={scrollableRef}
             className="flex-1 min-h-0 overflow-y-auto px-6 py-6 focus:outline-none"
-            style={{ scrollbarWidth: 'thin', scrollbarColor: 'hsl(175 80% 50% / 0.3) transparent' }}
+            style={{ scrollbarWidth: 'thin', scrollbarColor: 'hsl(258 90% 66% / 0.3) transparent' }}
             data-lenis-prevent="true"
             tabIndex={-1}
             onMouseEnter={(e) => e.currentTarget.focus()}
