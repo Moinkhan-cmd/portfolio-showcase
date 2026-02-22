@@ -14,9 +14,9 @@ export const ScrollToTop = () => {
       whileTap={{ scale: 0.9 }}
       animate={{ 
         boxShadow: [
-          "0 0 0px hsl(175 80% 50% / 0)",
-          "0 0 20px hsl(175 80% 50% / 0.3)",
-          "0 0 0px hsl(175 80% 50% / 0)"
+          "0 0 0px hsl(258 90% 66% / 0)",
+          "0 0 20px hsl(258 90% 66% / 0.3)",
+          "0 0 0px hsl(258 90% 66% / 0)"
         ]
       }}
       transition={{ 

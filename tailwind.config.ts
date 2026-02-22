@@ -22,13 +22,13 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['Outfit', 'sans-serif'],
+        display: ['Inter', 'sans-serif'],
         body: ['Inter', 'sans-serif'],
         signature: ['Dancing Script', 'cursive'],
-        hero: ['Raleway', 'Montserrat', 'Space Grotesk', 'sans-serif'],
+        hero: ['Inter', 'Space Grotesk', 'sans-serif'],
         elegant: ['Playfair Display', 'serif'],
-        bold: ['Oswald', 'Bebas Neue', 'sans-serif'],
-        stylish: ['Righteous', 'Bebas Neue', 'sans-serif'],
+        bold: ['Inter', 'sans-serif'],
+        stylish: ['Inter', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -94,8 +94,8 @@ export default {
           "50%": { opacity: "0.8" },
         },
         "glow-pulse": {
-          "0%, 100%": { boxShadow: "0 0 20px hsl(175 80% 50% / 0.3)" },
-          "50%": { boxShadow: "0 0 40px hsl(175 80% 50% / 0.5)" },
+          "0%, 100%": { boxShadow: "0 0 20px hsl(258 90% 66% / 0.3)" },
+          "50%": { boxShadow: "0 0 40px hsl(258 90% 66% / 0.5)" },
         },
         "slide-up": {
           from: { opacity: "0" },
